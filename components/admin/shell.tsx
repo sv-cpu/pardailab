@@ -1,34 +1,40 @@
+"use client";
+
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 import { logout } from "@/app/admin/actions";
-import { Mark } from "@/components/site-header";
+import { Mark } from "@/components/mark";
 
-const links = [
-  { href: "/admin", label: "Обзор" },
-  { href: "/admin/articles", label: "Статьи" },
-  { href: "/admin/rubrics", label: "Рубрики" },
-  { href: "/admin/services", label: "Сервисы" },
-  { href: "/admin/models", label: "Модели" },
-];
+import { AdminNav } from "./nav";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-border">
+    <div className="min-h-screen lg:pl-60">
+      <aside className="border-b border-border bg-card lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-60 lg:flex-col lg:border-r lg:border-b-0">
         <div className="h-1 bg-olive" />
-        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-6 gap-y-3 px-5 py-4 sm:px-8">
+        <div className="flex items-center gap-3 px-5 py-4">
           <Link href="/admin" className="flex items-center gap-2 text-olive">
             <Mark className="size-7" />
             <span className="font-heading text-lg text-foreground">Редакция</span>
           </Link>
-          <nav className="flex flex-wrap gap-4 text-sm">
-            {links.map((link) => (
-              <Link key={link.href} href={link.href} className="hover:text-olive">
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="ml-auto flex items-center gap-4 text-sm">
+          <button
+            type="button"
+            className="ml-auto flex size-10 items-center justify-center border border-border lg:hidden"
+            aria-expanded={open}
+            aria-label={open ? "Закрыть меню" : "Открыть меню"}
+            onClick={() => setOpen((value) => !value)}
+          >
+            {open ? <X className="size-4" /> : <Menu className="size-4" />}
+          </button>
+        </div>
+        <div className={open ? "block" : "hidden lg:flex lg:flex-1 lg:flex-col"}>
+          <div className="px-3 pb-4 lg:flex-1">
+            <AdminNav onNavigate={() => setOpen(false)} />
+          </div>
+          <div className="flex items-center gap-4 border-t border-border px-5 py-4 text-sm">
             <Link href="/" className="hover:text-olive">
               На сайт
             </Link>
@@ -39,8 +45,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </form>
           </div>
         </div>
-      </header>
-      <main className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-8">{children}</main>
+      </aside>
+      <main className="mx-auto w-full max-w-6xl px-5 py-8 sm:px-8">{children}</main>
     </div>
   );
 }
