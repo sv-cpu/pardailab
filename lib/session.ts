@@ -1,6 +1,11 @@
 export const sessionCookie = "pardai_session";
 export const sessionMaxAge = 60 * 60 * 24 * 7;
 
+/** Secure only when the client connection is HTTPS, including via a reverse proxy. */
+export function sessionCookieSecure(forwardedProto: string | null) {
+  return forwardedProto?.split(",")[0]?.trim() === "https";
+}
+
 type SessionPayload = { user: string; exp: number };
 
 function bytesToBase64Url(bytes: Uint8Array) {

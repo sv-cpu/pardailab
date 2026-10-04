@@ -1,8 +1,8 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
-import { createSessionToken, readSessionToken, sessionCookie, sessionMaxAge } from "@/lib/session";
+import { createSessionToken, readSessionToken, sessionCookie, sessionCookieSecure, sessionMaxAge } from "@/lib/session";
 
 export function adminCredentials() {
   const user = process.env.ADMIN_USER;
@@ -29,10 +29,11 @@ export async function startSession(user: string) {
   const creds = adminCredentials();
   if (!creds) throw new Error("Редакция не настроена.");
   const token = await createSessionToken(user, creds.secret);
+  const forwardedProto = (await headers()).get("x-forwarded-proto");
   (await cookies()).set(sessionCookie, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: sessionCookieSecure(forwardedProto),
     path: "/",
     maxAge: sessionMaxAge,
   });
