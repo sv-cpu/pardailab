@@ -5,7 +5,8 @@ export type Block =
   | { type: "h2"; text: string }
   | { type: "ul"; items: string[] }
   | { type: "ol"; items: string[] }
-  | { type: "note"; title: string; text: string };
+  | { type: "note"; title: string; text: string }
+  | { type: "html"; html: string };
 
 export interface ResearchMeta {
   number: number;

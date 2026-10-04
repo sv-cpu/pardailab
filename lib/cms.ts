@@ -48,6 +48,7 @@ function isBlock(value: unknown): value is Block {
   if (block.type === "ul" || block.type === "ol") {
     return Array.isArray(block.items) && block.items.every((item) => typeof item === "string");
   }
+  if (block.type === "html") return typeof block.html === "string";
   return false;
 }
 

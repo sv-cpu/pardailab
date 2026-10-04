@@ -1,5 +1,6 @@
 import { aiCategories } from "@/lib/categories";
 import { scoreFields } from "@/lib/scores";
+import { sanitizeArticleHtml } from "@/lib/html";
 import type { AiCategory, Article, ArticleKind, Block, ModelProfile, ModelScores, Service } from "@/lib/types";
 
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -80,6 +81,7 @@ export function blocksToText(blocks: Block[]) {
       if (block.type === "ul") return block.items.map((item) => `- ${item}`).join("\n");
       if (block.type === "ol") return block.items.map((item, index) => `${index + 1}. ${item}`).join("\n");
       if (block.type === "note") return `> ${block.title}\n${block.text}`;
+      if (block.type === "html") return block.html;
       return block.text;
     })
     .join("\n\n");
@@ -112,10 +114,17 @@ export function parseArticle(form: FormData): ParseResult<Article> {
   const tags = lines(text(form, "tags"));
   if (!tags.length) return { ok: false, error: "Добавьте хотя бы одну метку." };
   let body: Block[];
-  try {
-    body = textToBlocks(text(form, "body"));
-  } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "Не удалось прочитать текст." };
+  const html = sanitizeArticleHtml(text(form, "bodyHtml"));
+  if (html) {
+    body = [{ type: "html", html }];
+  } else if (text(form, "body")) {
+    try {
+      body = textToBlocks(text(form, "body"));
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : "Не удалось прочитать текст." };
+    }
+  } else {
+    return { ok: false, error: "Добавьте текст материала." };
   }
   const why = text(form, "whyItMatters");
   const article: Article = {

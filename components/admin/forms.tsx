@@ -1,10 +1,11 @@
 import { aiCategories } from "@/lib/categories";
-import { blocksToText } from "@/lib/admin-parse";
+import { blocksToHtml } from "@/lib/html";
 import { kindLabel } from "@/lib/paths";
 import { scoreFields } from "@/lib/scores";
 import { site } from "@/lib/site";
 import type { Article, ArticleKind, ModelProfile, Service } from "@/lib/types";
 
+import { ArticleEditor } from "./article-editor";
 import { CoverField } from "./cover-field";
 import { RubricFields } from "./rubric-fields";
 import type { RubricRecord } from "@/lib/rubric-seed";
@@ -29,9 +30,18 @@ export function ArticleForm({
   publicHref?: string;
 }) {
   return (
-    <form action={action} className="grid max-w-3xl gap-5">
+    <form action={action} className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_19rem]">
       <input type="hidden" name="originalSlug" defaultValue={article?.slug ?? ""} />
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-5">
+        <Field label="Название">
+          <input name="title" defaultValue={article?.title ?? ""} required className={`${fieldClass} font-heading text-2xl`} />
+        </Field>
+        <Field label="Описание">
+          <textarea name="description" defaultValue={article?.description ?? ""} required rows={3} className={fieldClass} />
+        </Field>
+        <ArticleEditor initialHtml={article ? blocksToHtml(article.body) : "<p></p>"} />
+      </div>
+      <div className="grid gap-5 lg:sticky lg:top-6">
         <Field label="Раздел">
           <select name="kind" defaultValue={article?.kind ?? "news"} className={fieldClass}>
             {kinds.map(([value, label]) => (
@@ -44,14 +54,6 @@ export function ArticleForm({
         <Field label="Адрес">
           <input name="slug" defaultValue={article?.slug ?? ""} required className={fieldClass} />
         </Field>
-      </div>
-      <Field label="Название">
-        <input name="title" defaultValue={article?.title ?? ""} required className={fieldClass} />
-      </Field>
-      <Field label="Описание">
-        <textarea name="description" defaultValue={article?.description ?? ""} required rows={3} className={fieldClass} />
-      </Field>
-      <div className="grid gap-5 sm:grid-cols-2">
         <RubricFields rubrics={rubrics} rubric={article?.rubric} subrubric={article?.subrubric} />
         <Field label="Дата">
           <input name="date" type="date" defaultValue={article?.date ?? new Date().toISOString().slice(0, 10)} required className={fieldClass} />
@@ -71,40 +73,34 @@ export function ArticleForm({
             ))}
           </select>
         </Field>
+        <CoverField
+          preview={article?.coverImage || `/covers/cover-${article?.cover ?? 0}.svg`}
+          uploaded={Boolean(article?.coverImage)}
+        />
+        <input type="hidden" name="existingCover" value={article?.coverImage ?? ""} />
         <Field label="Номер исследования">
           <input name="researchNumber" type="number" min={1} defaultValue={article?.research?.number ?? ""} className={fieldClass} />
         </Field>
-      </div>
-      <CoverField
-        preview={article?.coverImage || `/covers/cover-${article?.cover ?? 0}.svg`}
-        uploaded={Boolean(article?.coverImage)}
-      />
-      <input type="hidden" name="existingCover" value={article?.coverImage ?? ""} />
-      <Field label="Тема исследования">
-        <input name="researchTopic" defaultValue={article?.research?.topic ?? ""} className={fieldClass} />
-      </Field>
-      <Field label="Почему это важно">
-        <textarea name="whyItMatters" defaultValue={article?.whyItMatters ?? ""} rows={3} className={fieldClass} />
-      </Field>
-      <Field label="Метки, по одной на строку">
-        <Lines name="tags" value={article?.tags ?? []} />
-      </Field>
-      <Field label="Текст">
-        <textarea name="body" defaultValue={article ? blocksToText(article.body) : ""} required rows={16} className={`${fieldClass} font-mono`} />
-      </Field>
-      <p className="text-sm text-muted-foreground">
-        Абзацы разделяйте пустой строкой. «## » — заголовок, «- » — список, «1. » — нумерованный список, «&gt; заголовок» и текст ниже — заметка. Номер и тема нужны только для раздела «Исследования».
-      </p>
-      <div className="flex flex-wrap items-center gap-3">
-        <button type="submit" name="intent" value="save" className="rounded-full bg-olive px-5 py-2.5 text-sm text-accent-foreground hover:bg-olive-deep">
-          Сохранить
-        </button>
-        {publicHref ? (
-          <a href={publicHref} className="rounded-full border border-border px-5 py-2.5 text-sm hover:border-olive">
-            Открыть на сайте
-          </a>
-        ) : null}
-        {article ? <ConfirmDelete /> : null}
+        <Field label="Тема исследования">
+          <input name="researchTopic" defaultValue={article?.research?.topic ?? ""} className={fieldClass} />
+        </Field>
+        <Field label="Почему это важно">
+          <textarea name="whyItMatters" defaultValue={article?.whyItMatters ?? ""} rows={3} className={fieldClass} />
+        </Field>
+        <Field label="Метки, по одной на строку">
+          <Lines name="tags" value={article?.tags ?? []} />
+        </Field>
+        <div className="flex flex-wrap items-center gap-3">
+          <button type="submit" name="intent" value="save" className="rounded-full bg-olive px-5 py-2.5 text-sm text-accent-foreground hover:bg-olive-deep">
+            Сохранить
+          </button>
+          {publicHref ? (
+            <a href={publicHref} className="rounded-full border border-border px-5 py-2.5 text-sm hover:border-olive">
+              Открыть на сайте
+            </a>
+          ) : null}
+          {article ? <ConfirmDelete /> : null}
+        </div>
       </div>
     </form>
   );
