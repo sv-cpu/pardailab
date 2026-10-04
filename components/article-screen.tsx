@@ -28,7 +28,7 @@ function Blocks({ blocks }: { blocks: Block[] }) {
       {blocks.map((block, index) => {
         if (block.type === "h2") {
           return (
-            <h2 key={index} className="mt-12 font-serif text-3xl tracking-tight">
+            <h2 key={index} className="mt-12 font-heading text-3xl tracking-tight">
               {block.text}
             </h2>
           );
@@ -91,7 +91,7 @@ export async function ArticleScreen({ kind, slug }: { kind: ArticleKind; slug: s
           <p className="font-mono text-xs tracking-[0.16em] text-olive uppercase">
             Исследование №{article.research.number}
           </p>
-          <h2 className="mt-5 font-serif text-2xl">Тема</h2>
+          <h2 className="mt-5 font-heading text-2xl">Тема</h2>
           <p className="mt-2 text-lg leading-relaxed">{article.research.topic}</p>
           <dl className="mt-6 grid gap-5 sm:grid-cols-2">
             <div>
@@ -112,7 +112,7 @@ export async function ArticleScreen({ kind, slug }: { kind: ArticleKind; slug: s
       ) : null}
       <div className="mt-8 max-w-3xl">
         <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">{article.category}</p>
-        <h1 className="mt-4 font-serif text-4xl leading-[1.12] tracking-tight text-balance sm:text-5xl">
+        <h1 className="mt-4 font-heading text-4xl leading-[1.12] tracking-tight text-balance sm:text-5xl">
           {article.title}
         </h1>
         <p className="mt-5 text-lg leading-relaxed text-pretty text-muted-foreground">{article.description}</p>
@@ -145,7 +145,7 @@ export async function ArticleScreen({ kind, slug }: { kind: ArticleKind; slug: s
       </div>
       {related.length ? (
         <section className="mt-20">
-          <h2 className="font-serif text-3xl tracking-tight">Похожие материалы</h2>
+          <h2 className="font-heading text-3xl tracking-tight">Похожие материалы</h2>
           <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {related.map((item) => (
               <ArticleCard key={`${item.kind}-${item.slug}`} article={item} />

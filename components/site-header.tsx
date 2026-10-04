@@ -26,7 +26,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-[4.25rem] w-full max-w-6xl items-center gap-4 px-5 sm:px-8">
         <Link href="/" className="flex shrink-0 items-center gap-2.5 text-olive">
           <Mark className="size-8" />
-          <span className="font-serif text-xl tracking-tight text-foreground">
+          <span className="font-heading text-xl tracking-tight text-foreground">
             PardAi<span className="text-olive">Labs</span>
           </span>
         </Link>

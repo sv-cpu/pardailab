@@ -16,7 +16,7 @@ export function ServiceCard({ service, similar }: { service: Service; similar: S
             {service.mark}
           </span>
           <div>
-            <h2 className="font-serif text-3xl tracking-tight">
+            <h2 className="font-heading text-3xl tracking-tight">
               <Link href={`/resheniya/${service.slug}`} className="hover:text-olive">
                 {service.name}
               </Link>

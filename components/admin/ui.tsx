@@ -30,7 +30,7 @@ export function RecordList({
   return (
     <div>
       <div className="flex items-end justify-between gap-4">
-        <h1 className="font-serif text-4xl tracking-tight">{title}</h1>
+        <h1 className="font-heading text-4xl tracking-tight">{title}</h1>
         <Link href={href} className="rounded-full bg-olive px-4 py-2 text-sm text-accent-foreground hover:bg-olive-deep">
           Новая запись
         </Link>
@@ -39,7 +39,7 @@ export function RecordList({
         {rows.map((row) => (
           <li key={row.slug}>
             <Link href={`${href.replace(/\/new$/, "")}/${row.slug}`} className="flex items-baseline justify-between gap-4 py-4 hover:text-olive">
-              <span className="font-serif text-2xl">{row.title}</span>
+              <span className="font-heading text-2xl">{row.title}</span>
               <span className="shrink-0 font-mono text-xs text-muted-foreground">{row.meta}</span>
             </Link>
           </li>

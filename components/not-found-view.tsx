@@ -7,7 +7,7 @@ export function NotFoundView() {
   return (
     <Container className="py-24">
       <p className="font-mono text-[11px] tracking-[0.18em] text-olive uppercase">404</p>
-      <h1 className="mt-4 font-serif text-5xl tracking-tight">Такой страницы в лаборатории нет</h1>
+      <h1 className="mt-4 font-heading text-5xl tracking-tight">Такой страницы в лаборатории нет</h1>
       <p className="mt-5 max-w-xl text-lg text-muted-foreground">
         Проверьте адрес или вернитесь к материалам, рейтингу и каталогу.
       </p>

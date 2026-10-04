@@ -50,7 +50,7 @@ export default async function Page() {
           <tbody>
             {models.map((model) => (
               <tr key={model.slug} className="border-b border-border">
-                <th className="py-4 pr-4 font-serif text-xl font-normal">
+                <th className="py-4 pr-4 font-heading text-xl font-normal">
                   <Link href={`/modeli/${model.slug}`} className="hover:text-olive">
                     {model.name}
                   </Link>
@@ -69,7 +69,7 @@ export default async function Page() {
       <div className="mt-12 grid gap-5 lg:grid-cols-2">
         {models.map((model) => (
           <article key={model.slug} className="rounded-2xl border border-border p-6">
-            <h2 className="font-serif text-3xl">
+            <h2 className="font-heading text-3xl">
               <Link href={`/modeli/${model.slug}`} className="hover:text-olive">
                 {model.name}
               </Link>

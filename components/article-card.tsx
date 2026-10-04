@@ -19,7 +19,7 @@ export function ArticleCard({ article }: { article: Article }) {
             Исследование №{article.research.number}
           </p>
         ) : null}
-        <h2 className="mt-3 font-serif text-2xl leading-snug tracking-tight">
+        <h2 className="mt-3 font-heading text-2xl leading-snug tracking-tight">
           <Link href={href} className="after:absolute after:inset-0 group-hover:text-olive">
             {article.title}
           </Link>

@@ -31,7 +31,7 @@ export default async function Page() {
           if (!group.length) return null;
           return (
             <section key={kind}>
-              <h2 className="font-serif text-3xl tracking-tight">{kindLabel[kind]}</h2>
+              <h2 className="font-heading text-3xl tracking-tight">{kindLabel[kind]}</h2>
               <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {group.map((article) => (
                   <ArticleCard key={article.slug} article={article} />

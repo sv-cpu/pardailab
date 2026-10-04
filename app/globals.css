@@ -34,6 +34,7 @@
 
 @theme inline {
   --font-sans: var(--font-plex-sans), "IBM Plex Sans", sans-serif;
+  --font-heading: var(--font-manrope), Manrope, sans-serif;
   --font-serif: var(--font-source-serif), "Source Serif 4", Georgia, serif;
   --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, monospace;
   --color-background: var(--background);

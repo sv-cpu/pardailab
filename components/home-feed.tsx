@@ -17,7 +17,7 @@ export function LeadStory({ article }: { article: Article }) {
         <Cover id={article.cover} alt="" priority />
       </Link>
       <p className="mt-5 font-mono text-[11px] tracking-[0.16em] text-olive uppercase">{article.category}</p>
-      <h1 className="mt-3 font-serif text-4xl leading-tight tracking-tight sm:text-5xl">
+      <h1 className="mt-3 font-heading text-4xl leading-tight tracking-tight sm:text-5xl">
         <Link href={href} className="hover:text-olive">
           {article.title}
         </Link>
@@ -41,7 +41,7 @@ export function HeadlineList({ articles }: { articles: Article[] }) {
               </Link>
               <div>
                 <p className="font-mono text-[11px] tracking-[0.14em] text-olive uppercase">{kindLabel[article.kind]}</p>
-                <h2 className="mt-1 font-serif text-lg leading-snug tracking-tight">
+                <h2 className="mt-1 font-heading text-lg leading-snug tracking-tight">
                   <Link href={href} className="hover:text-olive">
                     {article.title}
                   </Link>
@@ -77,7 +77,7 @@ export function SectionBand({
     <section className="border-t border-border py-12">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="font-serif text-3xl tracking-tight sm:text-4xl">{kindLabel[kind]}</h2>
+          <h2 className="font-heading text-3xl tracking-tight sm:text-4xl">{kindLabel[kind]}</h2>
           <p className="mt-2 text-sm text-muted-foreground">{bandCopy[kind]}</p>
         </div>
         <Link href={href} className="text-sm underline decoration-border underline-offset-4 hover:decoration-olive">
@@ -93,7 +93,7 @@ export function SectionBand({
                 <Cover id={article.cover} alt="" />
               </Link>
               <p className="mt-4 font-mono text-[11px] tracking-[0.14em] text-olive uppercase">{article.category}</p>
-              <h3 className="mt-2 font-serif text-xl leading-snug tracking-tight">
+              <h3 className="mt-2 font-heading text-xl leading-snug tracking-tight">
                 <Link href={itemHref} className="group-hover:text-olive">
                   {article.title}
                 </Link>

@@ -6,7 +6,7 @@ export default async function NewServicePage({ searchParams }: { searchParams: P
   const query = await searchParams;
   return (
     <div>
-      <h1 className="mb-6 font-serif text-4xl tracking-tight">Новый сервис</h1>
+      <h1 className="mb-6 font-heading text-4xl tracking-tight">Новый сервис</h1>
       <div className="mb-5">
         <Notice error={query.error} />
       </div>

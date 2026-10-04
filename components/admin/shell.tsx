@@ -18,7 +18,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-6 gap-y-3 px-5 py-4 sm:px-8">
           <Link href="/admin" className="flex items-center gap-2 text-olive">
             <Mark className="size-7" />
-            <span className="font-serif text-lg text-foreground">Редакция</span>
+            <span className="font-heading text-lg text-foreground">Редакция</span>
           </Link>
           <nav className="flex flex-wrap gap-4 text-sm">
             {links.map((link) => (

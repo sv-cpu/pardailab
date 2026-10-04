@@ -66,7 +66,7 @@ export default async function Page({ params }: Props) {
         items={[{ href: "/", label: "Главная" }, { href: "/modeli", label: "Модели" }, { label: model.name }]}
       />
       <p className="mt-8 font-mono text-[11px] tracking-[0.18em] text-olive uppercase">{model.vendor}</p>
-      <h1 className="mt-4 font-serif text-5xl tracking-tight sm:text-6xl">{model.name}</h1>
+      <h1 className="mt-4 font-heading text-5xl tracking-tight sm:text-6xl">{model.name}</h1>
       <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">{model.summary}</p>
       <p className="mt-6 font-mono text-3xl text-olive">
         {formatScore(model.scores.overall)}
@@ -79,16 +79,16 @@ export default async function Page({ params }: Props) {
       </div>
       <div className="mt-12 grid max-w-3xl gap-6 sm:grid-cols-2">
         <section className="rounded-2xl border border-border bg-card p-6">
-          <h2 className="font-serif text-2xl">Когда выбирать</h2>
+          <h2 className="font-heading text-2xl">Когда выбирать</h2>
           <p className="mt-3 leading-relaxed">{model.bestFor}</p>
         </section>
         <section className="rounded-2xl border border-border p-6">
-          <h2 className="font-serif text-2xl">Когда не выбирать</h2>
+          <h2 className="font-heading text-2xl">Когда не выбирать</h2>
           <p className="mt-3 leading-relaxed text-muted-foreground">{model.avoidWhen}</p>
         </section>
       </div>
       <section className="mt-12">
-        <h2 className="font-serif text-2xl">Рядом в шкале</h2>
+        <h2 className="font-heading text-2xl">Рядом в шкале</h2>
         <ul className="mt-4 space-y-2">
           {others.map((item) => (
             <li key={item.slug}>

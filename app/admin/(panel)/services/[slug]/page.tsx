@@ -18,7 +18,7 @@ export default async function EditServicePage({
   if (!service) notFound();
   return (
     <div>
-      <h1 className="mb-6 font-serif text-4xl tracking-tight">Сервис</h1>
+      <h1 className="mb-6 font-heading text-4xl tracking-tight">Сервис</h1>
       <div className="mb-5">
         <Notice saved={query.saved} error={query.error} />
       </div>

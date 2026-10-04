@@ -50,7 +50,7 @@ export default async function HomePage() {
       <Container className="border-t border-border py-12">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="font-serif text-3xl tracking-tight sm:text-4xl">Модели</h2>
+            <h2 className="font-heading text-3xl tracking-tight sm:text-4xl">Модели</h2>
             <p className="mt-2 text-sm text-muted-foreground">Одна редакционная шкала, разные сильные стороны.</p>
           </div>
           <Link href="/modeli" className="text-sm underline decoration-border underline-offset-4 hover:decoration-olive">
@@ -62,7 +62,7 @@ export default async function HomePage() {
             <li key={model.slug} className="grid gap-2 py-5 sm:grid-cols-[4rem_1fr_auto] sm:items-baseline">
               <span className="font-mono text-sm text-olive">0{index + 1}</span>
               <div>
-                <Link href={`/modeli/${model.slug}`} className="font-serif text-2xl hover:text-olive">
+                <Link href={`/modeli/${model.slug}`} className="font-heading text-2xl hover:text-olive">
                   {model.name}
                 </Link>
                 <p className="mt-1 text-sm text-muted-foreground">{model.bestFor}</p>
@@ -76,7 +76,7 @@ export default async function HomePage() {
       <section className="border-t border-border">
         <Container className="py-12">
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <h2 className="font-serif text-3xl tracking-tight sm:text-4xl">Каталог решений</h2>
+            <h2 className="font-heading text-3xl tracking-tight sm:text-4xl">Каталог решений</h2>
             <Link href="/resheniya" className="text-sm underline decoration-border underline-offset-4 hover:decoration-olive">
               Все сервисы
             </Link>
@@ -85,7 +85,7 @@ export default async function HomePage() {
             {picks.map((service) => (
               <article key={service.slug} className="rounded-2xl border border-border p-6">
                 <div className="flex items-center justify-between gap-3">
-                  <h3 className="font-serif text-2xl">
+                  <h3 className="font-heading text-2xl">
                     <Link href={`/resheniya/${service.slug}`} className="hover:text-olive">
                       {service.name}
                     </Link>
@@ -96,7 +96,7 @@ export default async function HomePage() {
               </article>
             ))}
           </div>
-          <h2 className="mt-16 font-serif text-3xl tracking-tight">Каталог AI по задачам</h2>
+          <h2 className="mt-16 font-heading text-3xl tracking-tight">Каталог AI по задачам</h2>
           <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {aiCategories.map((category) => (
               <li key={category.slug}>

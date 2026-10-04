@@ -64,7 +64,7 @@ function Result({ result }: { result: Recommendation }) {
       <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">{result.intentLabel}</p>
       <div>
         <p className="text-xs text-muted-foreground">Модель</p>
-        <Link href={`/modeli/${result.model.slug}`} className="mt-1 inline-block font-serif text-2xl hover:text-olive">
+        <Link href={`/modeli/${result.model.slug}`} className="mt-1 inline-block font-heading text-2xl hover:text-olive">
           {result.model.name}
         </Link>
         <p className="text-sm text-muted-foreground">Итог {formatScore(result.model.scores.overall)}</p>
@@ -128,7 +128,7 @@ export function Consultant({ catalog }: { catalog: CatalogSnapshot }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.18 }}
         >
-          <DialogTitle className="pr-10 font-serif text-3xl tracking-tight">Подобрать ИИ</DialogTitle>
+          <DialogTitle className="pr-10 font-heading text-3xl tracking-tight">Подобрать ИИ</DialogTitle>
           <DialogDescription className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Опишите задачу. Мы сопоставим её с рейтингом моделей и каталогом сервисов. Это не свободный чат и не
             рекламная витрина.

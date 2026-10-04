@@ -33,7 +33,7 @@ export default async function Page() {
               className="rounded-2xl border border-border bg-card p-6 hover:border-olive"
             >
               <div className="flex items-baseline justify-between gap-4">
-                <h2 className="font-serif text-3xl tracking-tight">{category.label}</h2>
+                <h2 className="font-heading text-3xl tracking-tight">{category.label}</h2>
                 <span className="font-mono text-sm text-olive">{count}</span>
               </div>
               <p className="mt-3 leading-relaxed text-muted-foreground">{category.description}</p>

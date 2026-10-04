@@ -25,7 +25,7 @@ function Group({ title, items }: { title: string; items: SearchHit[] }) {
   if (!items.length) return null;
   return (
     <section>
-      <h2 className="font-serif text-3xl tracking-tight">
+      <h2 className="font-heading text-3xl tracking-tight">
         {title}
         <span className="ml-3 font-mono text-base text-olive">{items.length}</span>
       </h2>
@@ -33,7 +33,7 @@ function Group({ title, items }: { title: string; items: SearchHit[] }) {
         {items.map((item) => (
           <li key={item.href} className="py-5">
             <p className="font-mono text-[11px] tracking-[0.14em] text-olive uppercase">{item.kind}</p>
-            <h3 className="mt-2 font-serif text-2xl">
+            <h3 className="mt-2 font-heading text-2xl">
               <Link href={item.href} className="hover:text-olive">
                 {item.title}
               </Link>
