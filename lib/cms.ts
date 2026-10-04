@@ -1,11 +1,25 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
 import { cache } from "react";
 
 import { articles as localArticles } from "@/lib/content/articles";
 import { rateModels, models as localModels } from "@/lib/content/models";
 import { services as localServices } from "@/lib/content/services";
+import { listArticles, listModels, listServices } from "@/lib/db";
 import type { Article, ArticleIndex, Block, ModelProfile, Service } from "@/lib/types";
+
+const storedArticles = unstable_cache(async () => listArticles(), ["pardai-articles"], { tags: ["content"] });
+const storedServices = unstable_cache(async () => listServices(), ["pardai-services"], { tags: ["content"] });
+const storedModels = unstable_cache(async () => listModels(), ["pardai-models"], { tags: ["content"] });
+
+async function fromStore<T>(read: () => Promise<T[]>): Promise<T[] | null> {
+  try {
+    return await read();
+  } catch {
+    return null;
+  }
+}
 
 const base = process.env.PARDAILABS_API_URL?.replace(/\/$/, "");
 
@@ -70,17 +84,20 @@ function mergeBySlug<T extends { slug: string }>(local: T[], remote: T[] | null)
 
 export const getArticles = cache(async () => {
   const remote = await readCollection("/articles", isArticle);
-  return mergeBySlug(localArticles, remote).sort((a, b) => b.date.localeCompare(a.date));
+  const stored = await fromStore(storedArticles);
+  return mergeBySlug(stored ?? localArticles, remote).sort((a, b) => b.date.localeCompare(a.date));
 });
 
 export const getServices = cache(async () => {
   const remote = await readCollection("/services", isService);
-  return mergeBySlug(localServices, remote);
+  const stored = await fromStore(storedServices);
+  return mergeBySlug(stored ?? localServices, remote);
 });
 
 export const getModels = cache(async () => {
   const remote = await readCollection("/models", isModel);
-  return rateModels(mergeBySlug(localModels, remote));
+  const stored = await fromStore(storedModels);
+  return rateModels(mergeBySlug(stored ?? localModels, remote));
 });
 
 export function toIndex(items: Article[]): ArticleIndex[] {
