@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #1a1c19;
+  --card: #f6f5f2;
+  --muted: #f3f1ec;
+  --muted-foreground: #5c6158;
+  --border: #e4e1d8;
+  --accent-foreground: #f7f6f1;
+  --graphite: #2c2e2a;
+  --olive: #3f4f28;
+  --olive-soft: #e7ecdf;
+  --olive-deep: #2f3b1e;
+  color-scheme: light;
+}
+
+.dark {
+  --background: #121411;
+  --foreground: #f3f1ea;
+  --card: #1c1e19;
+  --muted: #23251f;
+  --muted-foreground: #a8ada3;
+  --border: #31342d;
+  --accent-foreground: #161810;
+  --graphite: #e4e7df;
+  --olive: #c5d4a4;
+  --olive-soft: #24291c;
+  --olive-deep: #d7e4bc;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: var(--font-plex-sans), "IBM Plex Sans", sans-serif;
+  --font-serif: var(--font-source-serif), "Source Serif 4", Georgia, serif;
+  --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-graphite: var(--graphite);
+  --color-olive: var(--olive);
+  --color-olive-soft: var(--olive-soft);
+  --color-olive-deep: var(--olive-deep);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), "IBM Plex Sans", sans-serif;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: #dfe6d2;
+    color: #1a1c19;
+  }
+
+  .dark ::selection {
+    background: #31401f;
+    color: #f3f1ea;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--olive);
+    outline-offset: 3px;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
