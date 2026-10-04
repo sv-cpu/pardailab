@@ -25,10 +25,6 @@ export default async function HomePage() {
 
   return (
     <>
-      <Container className="border-b border-border py-3">
-        <p className="text-sm text-muted-foreground">Практический искусственный интеллект для людей и бизнеса</p>
-      </Container>
-
       {lead ? (
         <Container className="grid gap-10 py-10 lg:grid-cols-[minmax(0,1.45fr)_minmax(18rem,0.7fr)] lg:py-12">
           <LeadStory article={lead} />
