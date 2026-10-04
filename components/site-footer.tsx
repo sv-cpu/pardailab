@@ -2,9 +2,11 @@ import Link from "next/link";
 
 import { OpenConsultantButton } from "@/components/consultant";
 import { Container } from "@/components/container";
-import { library, sections } from "@/lib/site";
+import { menuRubrics } from "@/lib/rubrics";
+import { library } from "@/lib/site";
 
 export function SiteFooter() {
+  const sections = menuRubrics();
   return (
     <footer className="mt-8 border-t border-border pb-28">
       <Container className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
@@ -19,9 +21,9 @@ export function SiteFooter() {
           <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">Разделы</p>
           <ul className="mt-4 space-y-2 text-sm">
             {sections.map((item) => (
-              <li key={item.href}>
+              <li key={item.slug}>
                 <Link href={item.href} className="underline decoration-border underline-offset-4 hover:decoration-olive">
-                  {item.label}
+                  {item.name}
                 </Link>
               </li>
             ))}

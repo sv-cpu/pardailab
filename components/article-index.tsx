@@ -9,13 +9,15 @@ export async function ArticleIndex({
   eyebrow,
   title,
   lede,
+  subrubric,
 }: {
   kind: ArticleKind;
   eyebrow: string;
   title: string;
   lede: string;
+  subrubric?: string;
 }) {
-  const articles = (await getArticles()).filter((item) => item.kind === kind);
+  const articles = (await getArticles()).filter((item) => item.kind === kind && (!subrubric || item.subrubric === subrubric));
   return (
     <Container className="py-16 sm:py-20">
       <PageIntro eyebrow={eyebrow} title={title} lede={lede} />

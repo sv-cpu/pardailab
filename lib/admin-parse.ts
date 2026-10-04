@@ -94,8 +94,11 @@ export function parseArticle(form: FormData): ParseResult<Article> {
   if (!title.ok) return title;
   const description = required(text(form, "description"), "Описание");
   if (!description.ok) return description;
-  const category = required(text(form, "category"), "Рубрика");
-  if (!category.ok) return category;
+  const rubric = text(form, "rubric");
+  const subrubric = text(form, "subrubric");
+  const categoryText = text(form, "category");
+  const category = categoryText || subrubric || rubric;
+  if (!category) return { ok: false, error: "Выберите рубрику." };
   const date = text(form, "date");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return { ok: false, error: "Дата в формате ГГГГ-ММ-ДД." };
   const author = required(text(form, "author"), "Автор");
@@ -120,7 +123,9 @@ export function parseArticle(form: FormData): ParseResult<Article> {
     kind,
     title: title.value,
     description: description.value,
-    category: category.value,
+    category,
+    ...(rubric ? { rubric } : {}),
+    ...(subrubric ? { subrubric } : {}),
     date,
     author: author.value,
     readingMinutes: reading,

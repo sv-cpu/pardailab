@@ -5,6 +5,7 @@ import path from "node:path";
 import { articles as localArticles } from "@/lib/content/articles";
 import { models as localModels } from "@/lib/content/models";
 import { services as localServices } from "@/lib/content/services";
+import { ensureRubrics } from "@/lib/rubrics";
 import type { Article, ModelProfile, Service } from "@/lib/types";
 
 type Table = "articles" | "services" | "models";
@@ -61,6 +62,7 @@ export function openDatabase(filename = databasePath()) {
   db.exec("PRAGMA journal_mode = WAL");
   migrate(db);
   seed(db);
+  ensureRubrics(db);
   return db;
 }
 

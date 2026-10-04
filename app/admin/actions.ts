@@ -7,6 +7,7 @@ import { adminCredentials, clearSession, currentSession, secretsMatch, startSess
 import { parseArticle, parseModel, parseService } from "@/lib/admin-parse";
 import { isStoredCover, removeCover, storeCover } from "@/lib/covers";
 import { deleteRecord, listArticles, saveArticle, saveModel, saveService } from "@/lib/db";
+import { createRubric, deleteRubric, listRubrics, renameRubric } from "@/lib/rubrics";
 
 export type LoginState = { error?: string };
 
@@ -69,7 +70,23 @@ export async function saveArticleAction(formData: FormData) {
     } else if (!coverImage && previous) {
       await removeCover(previous);
     }
-    saveArticle({ ...parsed.value, ...(coverImage ? { coverImage } : {}) }, original);
+    const rubrics = listRubrics();
+    const rubric = rubrics.find((item) => item.slug === parsed.value.rubric && !item.parent);
+    if (!rubric) fail(back, "Выберите рубрику.");
+    const subSlug = parsed.value.subrubric;
+    const subrubric = subSlug ? rubrics.find((item) => item.slug === subSlug && item.parent === rubric.slug) : undefined;
+    if (subSlug && !subrubric) fail(back, "Подрубрика не из этой рубрики.");
+    saveArticle(
+      {
+        ...parsed.value,
+        rubric: rubric.slug,
+        subrubric: subrubric?.slug,
+        category: subrubric?.name ?? rubric.name,
+        kind: rubric.kind ?? parsed.value.kind,
+        ...(coverImage ? { coverImage } : {}),
+      },
+      original,
+    );
   } catch (error) {
     fail(back, error instanceof Error ? error.message : "Не удалось сохранить.");
   }
@@ -115,4 +132,25 @@ export async function saveModelAction(formData: FormData) {
   }
   publish();
   redirect(`/admin/models/${parsed.value.slug}?saved=1`);
+}
+
+export async function saveRubricAction(formData: FormData) {
+  await guard();
+  const intent = String(formData.get("intent") ?? "");
+  try {
+    if (intent === "delete") {
+      deleteRubric(String(formData.get("slug") ?? ""));
+    } else if (intent === "rename") {
+      renameRubric(String(formData.get("slug") ?? ""), String(formData.get("name") ?? ""));
+    } else if (intent === "child") {
+      createRubric(String(formData.get("name") ?? ""), String(formData.get("parent") ?? ""));
+    } else {
+      createRubric(String(formData.get("name") ?? ""), null);
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Не удалось сохранить рубрику.";
+    redirect(`/admin/rubrics?error=${encodeURIComponent(message)}`);
+  }
+  publish();
+  redirect("/admin/rubrics?saved=1");
 }

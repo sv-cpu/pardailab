@@ -6,6 +6,7 @@ import { Mark } from "@/components/site-header";
 const links = [
   { href: "/admin", label: "Обзор" },
   { href: "/admin/articles", label: "Статьи" },
+  { href: "/admin/rubrics", label: "Рубрики" },
   { href: "/admin/services", label: "Сервисы" },
   { href: "/admin/models", label: "Модели" },
 ];

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { ArticleIndex } from "@/components/article-index";
+import { SectionIndex } from "@/components/section-index";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
@@ -9,9 +9,11 @@ export const metadata: Metadata = pageMeta({
   path: "/issledovaniya",
 });
 
-export default function Page() {
+export default async function Page({ searchParams }: { searchParams: Promise<{ rubrika?: string }> }) {
+  const { rubrika } = await searchParams;
   return (
-    <ArticleIndex
+    <SectionIndex
+      rubrika={rubrika}
       kind="research"
       eyebrow="Исследования PardAiLabs"
       title="Собственные проверки, а не пересказ чужих"

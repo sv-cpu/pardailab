@@ -19,6 +19,8 @@ export interface Article {
   title: string;
   description: string;
   category: string;
+  rubric?: string;
+  subrubric?: string;
   date: string;
   author: string;
   readingMinutes: number;

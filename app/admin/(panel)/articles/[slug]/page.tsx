@@ -4,6 +4,7 @@ import { saveArticleAction } from "@/app/admin/actions";
 import { ArticleForm } from "@/components/admin/forms";
 import { Notice } from "@/components/admin/ui";
 import { listArticles } from "@/lib/db";
+import { listRubrics } from "@/lib/rubrics";
 import { articleHref } from "@/lib/paths";
 
 export default async function EditArticlePage({
@@ -23,7 +24,7 @@ export default async function EditArticlePage({
       <div className="mb-5">
         <Notice saved={query.saved} error={query.error} />
       </div>
-      <ArticleForm article={article} action={saveArticleAction} publicHref={articleHref(article.kind, article.slug)} />
+      <ArticleForm article={article} rubrics={listRubrics()} action={saveArticleAction} publicHref={articleHref(article.kind, article.slug)} />
     </div>
   );
 }
