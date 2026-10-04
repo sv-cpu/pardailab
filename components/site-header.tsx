@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { SiteMenu, SiteNav } from "@/components/site-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { menuRubrics } from "@/lib/rubrics";
 
 export function Mark({ className }: { className?: string }) {
   return (
@@ -20,6 +21,7 @@ export function Mark({ className }: { className?: string }) {
 }
 
 export function SiteHeader() {
+  const rubrics = menuRubrics();
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background">
       <div className="h-1 bg-olive" />
@@ -30,9 +32,9 @@ export function SiteHeader() {
             PardAi<span className="text-olive">Labs</span>
           </span>
         </Link>
-        <SiteNav />
+        <SiteNav rubrics={rubrics} />
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
-          <SiteMenu />
+          <SiteMenu rubrics={rubrics} />
           <Link
             href="/poisk"
             className="flex size-11 items-center justify-center rounded-full border border-border hover:border-olive"

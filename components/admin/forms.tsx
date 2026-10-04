@@ -6,6 +6,8 @@ import { site } from "@/lib/site";
 import type { Article, ArticleKind, ModelProfile, Service } from "@/lib/types";
 
 import { CoverField } from "./cover-field";
+import { RubricFields } from "./rubric-fields";
+import type { RubricRecord } from "@/lib/rubric-seed";
 import { ConfirmDelete } from "./delete-button";
 import { Field, fieldClass } from "./ui";
 
@@ -17,10 +19,12 @@ function Lines({ name, value }: { name: string; value: string[] }) {
 
 export function ArticleForm({
   article,
+  rubrics,
   action,
   publicHref,
 }: {
   article?: Article;
+  rubrics: RubricRecord[];
   action: (formData: FormData) => void | Promise<void>;
   publicHref?: string;
 }) {
@@ -48,9 +52,7 @@ export function ArticleForm({
         <textarea name="description" defaultValue={article?.description ?? ""} required rows={3} className={fieldClass} />
       </Field>
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field label="Рубрика">
-          <input name="category" defaultValue={article?.category ?? ""} required className={fieldClass} />
-        </Field>
+        <RubricFields rubrics={rubrics} rubric={article?.rubric} subrubric={article?.subrubric} />
         <Field label="Дата">
           <input name="date" type="date" defaultValue={article?.date ?? new Date().toISOString().slice(0, 10)} required className={fieldClass} />
         </Field>
