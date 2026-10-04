@@ -14,7 +14,7 @@ export function LeadStory({ article }: { article: Article }) {
   return (
     <article>
       <Link href={href} className="block overflow-hidden">
-        <Cover id={article.cover} alt="" priority />
+        <Cover id={article.cover} src={article.coverImage} alt="" priority />
       </Link>
       <p className="mt-5 font-mono text-[11px] tracking-[0.16em] text-olive uppercase">{article.category}</p>
       <h1 className="mt-3 font-heading text-4xl leading-tight tracking-tight sm:text-5xl">
@@ -37,7 +37,7 @@ export function HeadlineList({ articles }: { articles: Article[] }) {
           <li key={`${article.kind}-${article.slug}`}>
             <article className="grid grid-cols-[5.5rem_1fr] gap-4 py-4">
               <Link href={href} className="overflow-hidden" tabIndex={-1} aria-hidden>
-                <Cover id={article.cover} alt="" className="aspect-[4/3]" />
+                <Cover id={article.cover} src={article.coverImage} alt="" className="aspect-[4/3]" />
               </Link>
               <div>
                 <p className="font-mono text-[11px] tracking-[0.14em] text-olive uppercase">{kindLabel[article.kind]}</p>
@@ -90,7 +90,7 @@ export function SectionBand({
           return (
             <article key={article.slug} className="group">
               <Link href={itemHref} className="block overflow-hidden" tabIndex={-1} aria-hidden>
-                <Cover id={article.cover} alt="" />
+                <Cover id={article.cover} src={article.coverImage} alt="" />
               </Link>
               <p className="mt-4 font-mono text-[11px] tracking-[0.14em] text-olive uppercase">{article.category}</p>
               <h3 className="mt-2 font-heading text-xl leading-snug tracking-tight">

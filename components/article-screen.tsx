@@ -133,7 +133,7 @@ export async function ArticleScreen({ kind, slug }: { kind: ArticleKind; slug: s
           </div>
         </dl>
       </div>
-      <Cover id={article.cover} alt={`Обложка: ${article.title}`} priority className="mt-10 max-w-5xl rounded-2xl" />
+      <Cover id={article.cover} src={article.coverImage} alt={`Обложка: ${article.title}`} priority className="mt-10 max-w-5xl rounded-2xl" />
       {article.whyItMatters ? (
         <aside className="mt-10 max-w-3xl border-l-2 border-olive pl-5">
           <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">Почему это важно именно вам</p>

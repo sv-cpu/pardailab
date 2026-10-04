@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 
 import { adminCredentials, clearSession, currentSession, secretsMatch, startSession } from "@/lib/auth";
 import { parseArticle, parseModel, parseService } from "@/lib/admin-parse";
-import { deleteRecord, saveArticle, saveModel, saveService } from "@/lib/db";
+import { isStoredCover, removeCover, storeCover } from "@/lib/covers";
+import { deleteRecord, listArticles, saveArticle, saveModel, saveService } from "@/lib/db";
 
 export type LoginState = { error?: string };
 
@@ -46,14 +47,29 @@ export async function saveArticleAction(formData: FormData) {
   const original = String(formData.get("originalSlug") ?? "");
   const back = original ? `/admin/articles/${original}` : "/admin/articles/new";
   if (formData.get("intent") === "delete") {
-    if (original) deleteRecord("articles", original);
+    if (original) {
+      const existing = listArticles().find((item) => item.slug === original);
+      await removeCover(existing?.coverImage);
+      deleteRecord("articles", original);
+    }
     publish();
     redirect("/admin/articles");
   }
   const parsed = parseArticle(formData);
   if (!parsed.ok) fail(back, parsed.error);
+  const previous = isStoredCover(String(formData.get("existingCover") ?? ""))
+    ? String(formData.get("existingCover"))
+    : undefined;
+  let coverImage = formData.get("clearCover") ? undefined : previous;
+  const upload = formData.get("coverFile");
   try {
-    saveArticle(parsed.value, original);
+    if (upload instanceof File && upload.size > 0) {
+      coverImage = await storeCover(upload);
+      if (previous && previous !== coverImage) await removeCover(previous);
+    } else if (!coverImage && previous) {
+      await removeCover(previous);
+    }
+    saveArticle({ ...parsed.value, ...(coverImage ? { coverImage } : {}) }, original);
   } catch (error) {
     fail(back, error instanceof Error ? error.message : "Не удалось сохранить.");
   }

@@ -5,6 +5,7 @@ import { scoreFields } from "@/lib/scores";
 import { site } from "@/lib/site";
 import type { Article, ArticleKind, ModelProfile, Service } from "@/lib/types";
 
+import { CoverField } from "./cover-field";
 import { ConfirmDelete } from "./delete-button";
 import { Field, fieldClass } from "./ui";
 
@@ -59,7 +60,7 @@ export function ArticleForm({
         <Field label="Минуты чтения">
           <input name="readingMinutes" type="number" min={1} max={180} defaultValue={article?.readingMinutes ?? 6} required className={fieldClass} />
         </Field>
-        <Field label="Обложка">
+        <Field label="Готовая обложка">
           <select name="cover" defaultValue={String(article?.cover ?? 0)} className={fieldClass}>
             {[0, 1, 2, 3, 4, 5].map((cover) => (
               <option key={cover} value={cover}>
@@ -72,6 +73,11 @@ export function ArticleForm({
           <input name="researchNumber" type="number" min={1} defaultValue={article?.research?.number ?? ""} className={fieldClass} />
         </Field>
       </div>
+      <CoverField
+        preview={article?.coverImage || `/covers/cover-${article?.cover ?? 0}.svg`}
+        uploaded={Boolean(article?.coverImage)}
+      />
+      <input type="hidden" name="existingCover" value={article?.coverImage ?? ""} />
       <Field label="Тема исследования">
         <input name="researchTopic" defaultValue={article?.research?.topic ?? ""} className={fieldClass} />
       </Field>

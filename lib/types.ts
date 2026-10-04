@@ -23,6 +23,8 @@ export interface Article {
   author: string;
   readingMinutes: number;
   cover: number;
+  /** Загруженный кадр 16:9. Если нет, на сайте остаётся готовая обложка `cover`. */
+  coverImage?: string;
   tags: string[];
   whyItMatters?: string;
   research?: ResearchMeta;
