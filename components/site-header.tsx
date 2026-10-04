@@ -1,7 +1,7 @@
 import { Search } from "lucide-react";
 import Link from "next/link";
 
-import { SiteNav } from "@/components/site-nav";
+import { SiteMenu, SiteNav } from "@/components/site-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Mark({ className }: { className?: string }) {
@@ -24,14 +24,15 @@ export function SiteHeader() {
     <header className="sticky top-0 z-30 border-b border-border bg-background">
       <div className="h-1 bg-olive" />
       <div className="mx-auto flex h-[4.25rem] w-full max-w-6xl items-center gap-4 px-5 sm:px-8">
-        <Link href="/" className="flex items-center gap-2.5 text-olive">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5 text-olive">
           <Mark className="size-8" />
           <span className="font-serif text-xl tracking-tight text-foreground">
             PardAi<span className="text-olive">Labs</span>
           </span>
         </Link>
+        <SiteNav />
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
-          <SiteNav />
+          <SiteMenu />
           <Link
             href="/poisk"
             className="flex size-11 items-center justify-center rounded-full border border-border hover:border-olive"

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { OpenConsultantButton } from "@/components/consultant";
 import { Container } from "@/components/container";
-import { nav } from "@/lib/site";
+import { library, sections } from "@/lib/site";
 
 export function SiteFooter() {
   return (
@@ -18,7 +18,7 @@ export function SiteFooter() {
         <div>
           <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">Разделы</p>
           <ul className="mt-4 space-y-2 text-sm">
-            {nav.map((item) => (
+            {sections.map((item) => (
               <li key={item.href}>
                 <Link href={item.href} className="underline decoration-border underline-offset-4 hover:decoration-olive">
                   {item.label}
@@ -35,11 +35,13 @@ export function SiteFooter() {
                 Все материалы
               </Link>
             </li>
-            <li>
-              <Link href="/modeli" className="underline decoration-border underline-offset-4 hover:decoration-olive">
-                Рейтинг моделей
-              </Link>
-            </li>
+            {library.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="underline decoration-border underline-offset-4 hover:decoration-olive">
+                  {item.label}
+                </Link>
+              </li>
+            ))}
             <li>
               <Link href="/poisk" className="underline decoration-border underline-offset-4 hover:decoration-olive">
                 Поиск

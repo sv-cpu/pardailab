@@ -6,12 +6,17 @@ export const site = {
   author: "Лаборатория PardAiLabs",
 };
 
-export const nav = [
+export const sections = [
   { href: "/novosti", label: "Новости" },
   { href: "/praktika", label: "Практика" },
-  { href: "/resheniya", label: "Каталог решений" },
   { href: "/razrabotka", label: "Разработка" },
   { href: "/issledovaniya", label: "Исследования" },
+] as const;
+
+export const library = [
   { href: "/modeli", label: "Модели" },
+  { href: "/resheniya", label: "Каталог решений" },
   { href: "/katalog", label: "Каталог AI" },
 ] as const;
+
+export const nav = [...sections, ...library] as const;
