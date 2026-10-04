@@ -1,6 +1,5 @@
 import "server-only";
 
-import { unstable_cache } from "next/cache";
 import { cache } from "react";
 
 import { articles as localArticles } from "@/lib/content/articles";
@@ -8,10 +7,6 @@ import { rateModels, models as localModels } from "@/lib/content/models";
 import { services as localServices } from "@/lib/content/services";
 import { listArticles, listModels, listServices } from "@/lib/db";
 import type { Article, ArticleIndex, Block, ModelProfile, Service } from "@/lib/types";
-
-const storedArticles = unstable_cache(async () => listArticles(), ["pardai-articles"], { tags: ["content"] });
-const storedServices = unstable_cache(async () => listServices(), ["pardai-services"], { tags: ["content"] });
-const storedModels = unstable_cache(async () => listModels(), ["pardai-models"], { tags: ["content"] });
 
 async function fromStore<T>(read: () => Promise<T[]>): Promise<T[] | null> {
   try {
@@ -27,7 +22,7 @@ async function readCollection<T>(path: string, accept: (value: unknown) => value
   if (!base) return null;
   try {
     const response = await fetch(`${base}${path}`, {
-      next: { revalidate: 3600 },
+      cache: "no-store",
       signal: AbortSignal.timeout(2500),
     });
     if (!response.ok) return null;
@@ -84,19 +79,19 @@ function mergeBySlug<T extends { slug: string }>(local: T[], remote: T[] | null)
 
 export const getArticles = cache(async () => {
   const remote = await readCollection("/articles", isArticle);
-  const stored = await fromStore(storedArticles);
+  const stored = await fromStore(async () => listArticles());
   return mergeBySlug(stored ?? localArticles, remote).sort((a, b) => b.date.localeCompare(a.date));
 });
 
 export const getServices = cache(async () => {
   const remote = await readCollection("/services", isService);
-  const stored = await fromStore(storedServices);
+  const stored = await fromStore(async () => listServices());
   return mergeBySlug(stored ?? localServices, remote);
 });
 
 export const getModels = cache(async () => {
   const remote = await readCollection("/models", isModel);
-  const stored = await fromStore(storedModels);
+  const stored = await fromStore(async () => listModels());
   return rateModels(mergeBySlug(stored ?? localModels, remote));
 });
 
