@@ -53,6 +53,9 @@ function Blocks({ blocks }: { blocks: Block[] }) {
             </Tag>
           );
         }
+        if (block.type === "html") {
+          return <div key={index} className="article-html" dangerouslySetInnerHTML={{ __html: block.html }} />;
+        }
         return (
           <aside key={index} className="mt-8 rounded-2xl border border-border bg-card px-5 py-4">
             <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">{block.title}</p>
