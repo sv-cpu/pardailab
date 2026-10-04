@@ -81,9 +81,9 @@ export default async function HomePage() {
               Все сервисы
             </Link>
           </div>
-          <div className="mt-8 grid gap-5 lg:grid-cols-3">
+          <div className="mt-8 grid gap-8 border-t border-border lg:grid-cols-3">
             {picks.map((service) => (
-              <article key={service.slug} className="rounded-2xl border border-border p-6">
+              <article key={service.slug} className="border-b border-border py-6 lg:border-b-0 lg:border-r lg:pr-8 lg:last:border-r-0">
                 <div className="flex items-center justify-between gap-3">
                   <h3 className="font-heading text-2xl">
                     <Link href={`/resheniya/${service.slug}`} className="hover:text-olive">
@@ -97,13 +97,10 @@ export default async function HomePage() {
             ))}
           </div>
           <h2 className="mt-16 font-heading text-3xl tracking-tight">Каталог AI по задачам</h2>
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <ul className="mt-6 grid border-t border-border sm:grid-cols-2 lg:grid-cols-5">
             {aiCategories.map((category) => (
-              <li key={category.slug}>
-                <Link
-                  href={`/katalog/${category.slug}`}
-                  className="block rounded-2xl border border-border px-4 py-4 text-sm hover:border-olive"
-                >
+              <li key={category.slug} className="border-b border-border">
+                <Link href={`/katalog/${category.slug}`} className="block py-4 pr-4 text-sm hover:text-olive">
                   {category.label}
                 </Link>
               </li>

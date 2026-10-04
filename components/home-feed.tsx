@@ -13,7 +13,7 @@ export function LeadStory({ article }: { article: Article }) {
   const href = articleHref(article.kind, article.slug);
   return (
     <article>
-      <Link href={href} className="block overflow-hidden rounded-2xl border border-border">
+      <Link href={href} className="block overflow-hidden">
         <Cover id={article.cover} alt="" priority />
       </Link>
       <p className="mt-5 font-mono text-[11px] tracking-[0.16em] text-olive uppercase">{article.category}</p>
@@ -36,7 +36,7 @@ export function HeadlineList({ articles }: { articles: Article[] }) {
         return (
           <li key={`${article.kind}-${article.slug}`}>
             <article className="grid grid-cols-[5.5rem_1fr] gap-4 py-4">
-              <Link href={href} className="overflow-hidden rounded-lg" tabIndex={-1} aria-hidden>
+              <Link href={href} className="overflow-hidden" tabIndex={-1} aria-hidden>
                 <Cover id={article.cover} alt="" className="aspect-[4/3]" />
               </Link>
               <div>
@@ -89,7 +89,7 @@ export function SectionBand({
           const itemHref = articleHref(article.kind, article.slug);
           return (
             <article key={article.slug} className="group">
-              <Link href={itemHref} className="block overflow-hidden rounded-xl border border-border" tabIndex={-1} aria-hidden>
+              <Link href={itemHref} className="block overflow-hidden" tabIndex={-1} aria-hidden>
                 <Cover id={article.cover} alt="" />
               </Link>
               <p className="mt-4 font-mono text-[11px] tracking-[0.14em] text-olive uppercase">{article.category}</p>
