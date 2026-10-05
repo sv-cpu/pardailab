@@ -11,7 +11,7 @@ import type { Service } from "@/lib/types";
 export const metadata: Metadata = pageMeta({
   title: "Каталог решений",
   description:
-    "Каталог AI-сервисов PardAiLabs: описание, ориентир цены, рейтинг, плюсы, минусы, область применения и похожие инструменты.",
+    "Каталог AI-сервисов PardAiLab: описание, ориентир цены, рейтинг, плюсы, минусы, область применения и похожие инструменты.",
   path: "/resheniya",
 });
 

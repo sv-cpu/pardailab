@@ -37,8 +37,8 @@ const mono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: "PardAiLabs — практический искусственный интеллект",
-    template: "%s — PardAiLabs",
+    default: "PardAiLab — практический искусственный интеллект",
+    template: "%s — PardAiLab",
   },
   description: site.description,
   applicationName: site.name,
@@ -49,13 +49,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ru_RU",
     siteName: site.name,
-    title: "PardAiLabs — практический искусственный интеллект",
+    title: "PardAiLab — практический искусственный интеллект",
     description: site.description,
     url: site.url,
   },
   twitter: {
     card: "summary_large_image",
-    title: "PardAiLabs — практический искусственный интеллект",
+    title: "PardAiLab — практический искусственный интеллект",
     description: site.description,
   },
   robots: { index: true, follow: true },

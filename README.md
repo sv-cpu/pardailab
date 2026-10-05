@@ -1,4 +1,4 @@
-# PardAiLabs
+# PardAiLab
 
 Информационно-аналитический портал лаборатории практического искусственного интеллекта. Next.js (App Router), React, TypeScript, Tailwind CSS и компоненты в духе shadcn/ui.
 

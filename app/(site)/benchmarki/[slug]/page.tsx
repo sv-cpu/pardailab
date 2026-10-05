@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!issue) return {};
   return pageMeta({
     title: `${issue.title}, ${ratingPeriod(issue.tested)}`,
-    description: `Выпуск рейтинга AI-моделей PardAiLabs за ${ratingPeriod(issue.tested)}.`,
+    description: `Выпуск рейтинга AI-моделей PardAiLab за ${ratingPeriod(issue.tested)}.`,
     path: `/benchmarki/${slug}`,
   });
 }

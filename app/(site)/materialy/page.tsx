@@ -10,7 +10,7 @@ import type { ArticleKind } from "@/lib/types";
 
 export const metadata: Metadata = pageMeta({
   title: "Статьи",
-  description: "Новости, практика, разработка и исследования PardAiLabs в одном указателе.",
+  description: "Новости, практика, разработка и исследования PardAiLab в одном указателе.",
   path: "/materialy",
 });
 

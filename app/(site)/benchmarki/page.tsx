@@ -12,7 +12,7 @@ const pageSize = 8;
 
 export const metadata: Metadata = pageMeta({
   title: "Бенчмарки",
-  description: "Выпуски рейтинга AI-моделей PardAiLabs: от нового к старым.",
+  description: "Выпуски рейтинга AI-моделей PardAiLab: от нового к старым.",
   path: "/benchmarki",
 });
 

@@ -15,7 +15,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const { q = "" } = await searchParams;
   return pageMeta({
     title: q ? `Поиск: ${q}` : "Поиск",
-    description: "Поиск по статьям, сервисам, моделям и исследованиям PardAiLabs.",
+    description: "Поиск по статьям, сервисам, моделям и исследованиям PardAiLab.",
     path: q ? `/poisk?q=${encodeURIComponent(q)}` : "/poisk",
     noIndex: Boolean(q),
   });

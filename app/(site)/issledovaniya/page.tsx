@@ -5,7 +5,7 @@ import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "Исследования",
-  description: "Исследования PardAiLabs: узкие проверки моделей и сервисов со статусом «Проверено PardAiLabs».",
+  description: "Исследования PardAiLab: узкие проверки моделей и сервисов со статусом «Проверено PardAiLab».",
   path: "/issledovaniya",
 });
 
@@ -15,7 +15,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ r
     <SectionIndex
       rubrika={rubrika}
       kind="research"
-      eyebrow="Исследования PardAiLabs"
+      eyebrow="Исследования PardAiLab"
       title="Собственные проверки, а не пересказ чужих"
       lede="У каждого материала есть номер, тема, дата и граница выборки. Статус «проверено» означает, что редакция прошла сценарий сама."
     />

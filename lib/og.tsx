@@ -44,7 +44,7 @@ export async function renderOg(kicker: string, title: string) {
           <div style={{ display: "flex", width: 28, height: 28, background: "#3f4f28" }} />
         </div>
         <div style={{ display: "flex", fontSize: 64, lineHeight: 1.15, letterSpacing: -1 }}>{shorten(title, 110)}</div>
-        <div style={{ display: "flex", fontSize: 28, color: "#5c6158" }}>PardAiLabs</div>
+        <div style={{ display: "flex", fontSize: 28, color: "#5c6158" }}>PardAiLab</div>
       </div>
     ),
     {
@@ -57,7 +57,7 @@ export async function renderOg(kicker: string, title: string) {
 export async function articleOg(kind: ArticleKind, slug: string) {
   const articles = await getArticles();
   const article = articles.find((item) => item.kind === kind && item.slug === slug);
-  if (!article) return renderOg("PARDAILABS", "Практический искусственный интеллект");
+  if (!article) return renderOg("PARDAILAB", "Практический искусственный интеллект");
   const kicker = article.research ? `ИССЛЕДОВАНИЕ №${article.research.number}` : kindLabel[kind].toUpperCase();
   return renderOg(kicker, article.title);
 }
