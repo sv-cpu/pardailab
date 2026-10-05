@@ -5,7 +5,8 @@ import { Container } from "@/components/container";
 import { PageIntro } from "@/components/page-intro";
 import { getModels } from "@/lib/cms";
 import { sortModels } from "@/lib/content/models";
-import { formatScore } from "@/lib/format";
+import { formatDate, formatScore } from "@/lib/format";
+import { ratingStamp } from "@/lib/rating";
 import { costHint, scoreFields } from "@/lib/scores";
 import { pageMeta } from "@/lib/seo";
 
@@ -18,6 +19,7 @@ export const metadata: Metadata = pageMeta({
 
 export default async function Page() {
   const models = sortModels(await getModels());
+  const stamp = ratingStamp();
   return (
     <Container className="py-16 sm:py-20">
       <PageIntro
@@ -29,8 +31,9 @@ export default async function Page() {
         <summary className="cursor-pointer text-foreground">Как считается итог</summary>
         <p className="mt-3">
           Качество 22%, документы 14%, русский язык 14%, код 12%, агенты 12%, длинный контекст 12%, скорость 7%,
-          стоимость 7%. {costHint}. Шкала описывает профиль линейки на октябрь 2026 и обновляется, когда лаборатория
-          проходит сценарии заново.
+          стоимость 7%. {costHint}. Шкала описывает профиль линейки на {formatDate(stamp.updated)} и обновляется, когда
+          лаборатория проходит сценарии заново.
+          {stamp.note ? ` ${stamp.note}` : ""}
         </p>
       </details>
       <div className="mt-10 overflow-x-auto">

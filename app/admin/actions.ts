@@ -6,7 +6,10 @@ import { redirect } from "next/navigation";
 import { clearSession, startSession } from "@/lib/auth";
 import { parseArticle, parseModel, parseService } from "@/lib/admin-parse";
 import { isStoredCover, removeCover, storeCover } from "@/lib/covers";
-import { deleteRecord, listArticles, saveArticle, saveModel, saveService } from "@/lib/db";
+import { deleteRecord, listArticles, listModels, saveArticle, saveModel, saveService } from "@/lib/db";
+import { saveRatingStamp } from "@/lib/rating";
+import { scoreFields } from "@/lib/scores";
+import type { ModelScores } from "@/lib/types";
 import { createRubric, deleteRubric, listRubrics, renameRubric } from "@/lib/rubrics";
 import { authenticate, createUser, currentUser, deleteUser, findUserBySlug, ownsArticle, updateUser, type StaffRole } from "@/lib/users";
 import { removeAvatar, storeAvatar } from "@/lib/avatars";
@@ -227,6 +230,34 @@ export async function saveProfileAction(formData: FormData) {
   }
   publish();
   redirect("/admin/profile?saved=1");
+}
+
+export async function saveRatingAction(formData: FormData) {
+  await editorOnly();
+  const updated = String(formData.get("updated") ?? "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(updated)) {
+    redirect("/admin/models/rating?error=" + encodeURIComponent("Укажите дату шкалы."));
+  }
+  const note = String(formData.get("note") ?? "").trim();
+  try {
+    for (const model of listModels()) {
+      const scores = {} as ModelScores;
+      for (const [key, label] of scoreFields) {
+        const value = Number(String(formData.get(`${model.slug}:${key}`) ?? "").replace(",", "."));
+        if (!Number.isFinite(value) || value < 0 || value > 10) {
+          throw new Error(`«${model.name}», ${label}: число от 0 до 10.`);
+        }
+        scores[key] = Math.round(value * 10) / 10;
+      }
+      saveModel({ ...model, scores }, model.slug);
+    }
+    saveRatingStamp(updated, note);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Не удалось сохранить шкалу.";
+    redirect(`/admin/models/rating?error=${encodeURIComponent(message)}`);
+  }
+  publish();
+  redirect("/admin/models/rating?saved=1");
 }
 
 async function readAvatar(formData: FormData) {

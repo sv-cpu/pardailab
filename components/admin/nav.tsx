@@ -13,6 +13,7 @@ const links = [
   { href: "/admin/rubrics", label: "Рубрики", editor: true },
   { href: "/admin/services", label: "Сервисы", editor: true },
   { href: "/admin/models", label: "Модели", editor: true },
+  { href: "/admin/models/rating", label: "Рейтинг", editor: true },
   { href: "/admin/users", label: "Пользователи", editor: true },
 ];
 
@@ -21,7 +22,12 @@ export function AdminNav({ role, onNavigate }: { role: StaffRole; onNavigate?: (
   return (
     <nav className="flex flex-col gap-1" aria-label="Редакция">
       {links.filter((link) => role === "editor" || !link.editor).map((link) => {
-        const active = link.href === "/admin" ? pathname === "/admin" : pathname === link.href || pathname.startsWith(`${link.href}/`);
+        const active =
+          link.href === "/admin"
+            ? pathname === "/admin"
+            : link.href === "/admin/models"
+              ? pathname === "/admin/models" || /^\/admin\/models\/(?!rating(?:\/|$))/.test(pathname)
+              : pathname === link.href || pathname.startsWith(`${link.href}/`);
         return (
           <Link
             key={link.href}
