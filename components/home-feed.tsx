@@ -43,23 +43,23 @@ export function LeadStory({ article }: { article: Article }) {
 
 export function HeadlineList({ articles }: { articles: Article[] }) {
   return (
-    <ol className="divide-y divide-border border-y border-border lg:border-t-0">
+    <ol className="divide-y divide-border">
       {articles.map((article) => {
         const href = articleHref(article.kind, article.slug);
         return (
           <li key={`${article.kind}-${article.slug}`}>
-            <article className="grid grid-cols-[5.5rem_1fr] gap-4 py-4">
-              <Link href={href} className="overflow-hidden" tabIndex={-1} aria-hidden>
-                <Cover id={article.cover} src={article.coverImage} alt="" className="aspect-[4/3]" />
+            <article className="grid grid-cols-[7.25rem_minmax(0,1fr)] items-center gap-3 py-3.5 first:pt-0 last:pb-0 sm:grid-cols-[9.5rem_minmax(0,1fr)] sm:gap-4">
+              <Link href={href} className="block overflow-hidden" tabIndex={-1} aria-hidden>
+                <Cover id={article.cover} src={article.coverImage} alt="" />
               </Link>
-              <div>
-                <p className="font-mono text-[11px] tracking-[0.14em] text-olive uppercase">{kindLabel[article.kind]}</p>
-                <h2 className="mt-1 font-heading text-lg leading-snug tracking-tight">
+              <div className="min-w-0">
+                <p className="font-mono text-[11px] tracking-[0.14em] text-olive uppercase">{article.category}</p>
+                <h2 className="mt-1 font-heading text-base leading-snug tracking-tight">
                   <Link href={href} className="hover:text-olive">
                     {article.title}
                   </Link>
                 </h2>
-                <p className="mt-2 text-xs text-muted-foreground">{formatDate(article.date)}</p>
+                <p className="mt-1.5 text-xs text-muted-foreground">{meta(article)}</p>
               </div>
             </article>
           </li>

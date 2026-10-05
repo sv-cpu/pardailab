@@ -26,7 +26,7 @@ export default async function HomePage() {
   return (
     <>
       {lead ? (
-        <Container className="grid gap-10 py-10 lg:grid-cols-[minmax(0,1.45fr)_minmax(18rem,0.7fr)] lg:py-12">
+        <Container className="grid items-start gap-8 py-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(20rem,0.8fr)] lg:gap-12 lg:py-10">
           <LeadStory article={lead} />
           <HeadlineList articles={rail} />
         </Container>
