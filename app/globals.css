@@ -195,6 +195,21 @@
   text-align: left;
 }
 
+.article-ready {
+  border-color: var(--olive);
+  background: var(--olive-soft);
+  animation: article-ready 0.7s ease;
+}
+
+@keyframes article-ready {
+  from {
+    box-shadow: 0 0 0 3px var(--olive);
+  }
+  to {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

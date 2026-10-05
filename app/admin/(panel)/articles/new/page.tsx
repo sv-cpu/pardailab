@@ -11,7 +11,12 @@ export default async function NewArticlePage({ searchParams }: { searchParams: P
       <div className="mb-5">
         <Notice error={query.error} />
       </div>
-      <ArticleForm rubrics={listRubrics()} action={saveArticleAction} />
+      <ArticleForm
+        rubrics={listRubrics()}
+        action={saveArticleAction}
+        initialDate={new Date().toISOString().slice(0, 10)}
+        initialHtml="<p></p>"
+      />
     </div>
   );
 }

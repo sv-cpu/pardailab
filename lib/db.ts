@@ -101,6 +101,10 @@ function save(db: DatabaseSync, table: Table, originalSlug: string, slug: string
   const encoded = JSON.stringify(payload);
   db.exec("BEGIN");
   try {
+    if (!originalSlug) {
+      const taken = db.prepare(`SELECT slug FROM ${table} WHERE slug = ?`).get(slug);
+      if (taken) throw new Error("Такой адрес уже есть.");
+    }
     if (originalSlug && originalSlug !== slug) {
       const taken = db.prepare(`SELECT slug FROM ${table} WHERE slug = ?`).get(slug);
       if (taken) throw new Error("Такой адрес уже есть.");

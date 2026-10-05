@@ -23,10 +23,6 @@ function publish() {
   revalidatePath("/", "layout");
 }
 
-async function guard() {
-  if (!(await currentUser())) redirect("/admin/login");
-}
-
 export async function login(_state: LoginState, formData: FormData): Promise<LoginState> {
   const user = authenticate(String(formData.get("user") ?? ""), String(formData.get("password") ?? ""));
   if (!user) return { error: "Неверный логин или пароль." };
@@ -43,44 +39,48 @@ function fail(base: string, error: string): never {
   redirect(`${base}?error=${encodeURIComponent(error)}`);
 }
 
-export async function saveArticleAction(formData: FormData) {
-  await guard();
+export type SaveArticleResult = { ok: true; href: string } | { ok: false; error: string };
+
+export async function saveArticleAction(formData: FormData): Promise<SaveArticleResult> {
+  const actor = await currentUser();
+  if (!actor) redirect("/admin/login");
   const original = String(formData.get("originalSlug") ?? "");
-  const back = original ? `/admin/articles/${original}` : "/admin/articles/new";
   if (formData.get("intent") === "delete") {
-    const actor = await currentUser();
-    if (!actor) redirect("/admin/login");
     if (original) {
       const existing = listArticles().find((item) => item.slug === original);
-      if (existing && actor.role !== "editor" && !ownsArticle(existing, actor)) fail(back, "Это не ваша статья.");
+      if (existing && actor.role !== "editor" && !ownsArticle(existing, actor)) {
+        return { ok: false, error: "Это не ваша статья." };
+      }
       await removeCover(existing?.coverImage);
       deleteRecord("articles", original);
     }
     publish();
-    redirect("/admin/articles");
+    return { ok: true, href: "/admin/articles" };
   }
-  const actor = await currentUser();
-  if (!actor) redirect("/admin/login");
   const parsed = parseArticle(formData);
-  if (!parsed.ok) fail(back, parsed.error);
-  const existing = original ? listArticles().find((item) => item.slug === original) : undefined;
+  if (!parsed.ok) return { ok: false, error: parsed.error };
+  const articles = listArticles();
+  const existing = original ? articles.find((item) => item.slug === original) : undefined;
+  if (original && !existing) return { ok: false, error: "Статья не найдена. Текст остался в форме." };
+  if (existing && actor.role !== "editor" && !ownsArticle(existing, actor)) {
+    return { ok: false, error: "Это не ваша статья." };
+  }
+  const rubrics = listRubrics();
+  const rubric = rubrics.find((item) => item.slug === parsed.value.rubric && !item.parent);
+  if (!rubric) return { ok: false, error: "Выберите рубрику." };
+  const subSlug = parsed.value.subrubric;
+  const subrubric = subSlug ? rubrics.find((item) => item.slug === subSlug && item.parent === rubric.slug) : undefined;
+  if (subSlug && !subrubric) return { ok: false, error: "Подрубрика не из этой рубрики." };
+  if (articles.some((item) => item.slug === parsed.value.slug && item.slug !== original)) {
+    return { ok: false, error: "Такой адрес уже есть. Измените название или поправьте адрес — текст на месте." };
+  }
   const previous = isStoredCover(String(formData.get("existingCover") ?? ""))
     ? String(formData.get("existingCover"))
     : undefined;
-  let coverImage = previous;
   const upload = formData.get("coverFile");
+  let uploaded: string | undefined;
   try {
-    if (upload instanceof File && upload.size > 0) {
-      coverImage = await storeCover(upload);
-      if (previous && previous !== coverImage) await removeCover(previous);
-    }
-    if (existing && actor.role !== "editor" && !ownsArticle(existing, actor)) fail(back, "Это не ваша статья.");
-    const rubrics = listRubrics();
-    const rubric = rubrics.find((item) => item.slug === parsed.value.rubric && !item.parent);
-    if (!rubric) fail(back, "Выберите рубрику.");
-    const subSlug = parsed.value.subrubric;
-    const subrubric = subSlug ? rubrics.find((item) => item.slug === subSlug && item.parent === rubric.slug) : undefined;
-    if (subSlug && !subrubric) fail(back, "Подрубрика не из этой рубрики.");
+    if (upload instanceof File && upload.size > 0) uploaded = await storeCover(upload);
     saveArticle(
       {
         ...parsed.value,
@@ -95,15 +95,17 @@ export async function saveArticleAction(formData: FormData) {
         cover: existing?.cover ?? parsed.value.cover,
         ...(existing?.whyItMatters ? { whyItMatters: existing.whyItMatters } : {}),
         ...(existing?.research ? { research: existing.research } : {}),
-        ...(coverImage ? { coverImage } : {}),
+        ...((uploaded ?? previous) ? { coverImage: uploaded ?? previous } : {}),
       },
       original,
     );
   } catch (error) {
-    fail(back, error instanceof Error ? error.message : "Не удалось сохранить.");
+    if (uploaded) await removeCover(uploaded);
+    return { ok: false, error: error instanceof Error ? error.message : "Не удалось сохранить." };
   }
+  if (uploaded && previous && previous !== uploaded) await removeCover(previous);
   publish();
-  redirect(`/admin/articles/${parsed.value.slug}?saved=1`);
+  return { ok: true, href: `/admin/articles/${parsed.value.slug}?saved=1` };
 }
 
 export async function saveServiceAction(formData: FormData) {

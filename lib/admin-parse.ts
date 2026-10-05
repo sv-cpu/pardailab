@@ -1,6 +1,7 @@
 import { aiCategories } from "@/lib/categories";
 import { scoreFields } from "@/lib/scores";
 import { sanitizeArticleHtml } from "@/lib/html";
+import { transliterate } from "@/lib/rubric-seed";
 import type { AiCategory, Article, ArticleKind, Block, ModelProfile, ModelScores, Service } from "@/lib/types";
 
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -31,6 +32,18 @@ function parseSlug(value: string): ParseResult<string> {
     return { ok: false, error: "Адрес — латиница в нижнем регистре, цифры и дефисы." };
   }
   return { ok: true, value };
+}
+
+export function articleSlug(title: string, rawSlug: string): ParseResult<string> {
+  const typed = rawSlug.trim();
+  const source = typed ? transliterate(typed) : transliterate(title);
+  if (!source) return { ok: false, error: "Не удалось собрать адрес. Напишите название или адрес латиницей." };
+  return parseSlug(source);
+}
+
+function htmlHasContent(html: string) {
+  if (/<(img|iframe|video|audio|table|hr)\b/i.test(html)) return true;
+  return html.replace(/<[^>]+>/g, " ").replace(/&nbsp;/gi, " ").trim().length > 0;
 }
 
 function parseScore(value: string, label: string): ParseResult<number> {
@@ -88,12 +101,12 @@ export function blocksToText(blocks: Block[]) {
 }
 
 export function parseArticle(form: FormData): ParseResult<Article> {
-  const slug = parseSlug(text(form, "slug"));
+  const title = required(text(form, "title"), "Название");
+  if (!title.ok) return title;
+  const slug = articleSlug(title.value, text(form, "slug"));
   if (!slug.ok) return slug;
   const kindValue = text(form, "kind") as ArticleKind;
   const kind = kinds.has(kindValue) ? kindValue : "news";
-  const title = required(text(form, "title"), "Название");
-  if (!title.ok) return title;
   const description = required(text(form, "description"), "Описание");
   if (!description.ok) return description;
   const rubric = text(form, "rubric");
@@ -107,11 +120,14 @@ export function parseArticle(form: FormData): ParseResult<Article> {
   const coverValue = Number(text(form, "cover"));
   const cover = Number.isInteger(coverValue) && coverValue >= 0 && coverValue <= 5 ? coverValue : 0;
   const tags = lines(text(form, "tags"));
-  if (!tags.length) return { ok: false, error: "Добавьте хотя бы одну метку." };
   let body: Block[];
-  const html = sanitizeArticleHtml(text(form, "bodyHtml"));
-  if (html) {
+  const rawHtml = text(form, "bodyHtml");
+  const html = sanitizeArticleHtml(rawHtml);
+  const rawVisible = rawHtml.replace(/<[^>]+>/g, " ").replace(/&nbsp;/gi, " ").trim();
+  if (html && htmlHasContent(html)) {
     body = [{ type: "html", html }];
+  } else if (rawVisible || /<(img|iframe|video|audio|table)\b/i.test(rawHtml)) {
+    return { ok: false, error: "Текст не сохранился: после очистки HTML в статье ничего не осталось." };
   } else if (text(form, "body")) {
     try {
       body = textToBlocks(text(form, "body"));
