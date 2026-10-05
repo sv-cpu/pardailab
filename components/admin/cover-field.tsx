@@ -49,9 +49,9 @@ export function CoverField({ preview }: { preview: string }) {
   const [error, setError] = useState("");
 
   return (
-    <div className="grid gap-3 sm:col-span-2">
+    <div className="grid min-w-0 gap-3">
       <span className="text-sm text-muted-foreground">Обложка, 16:9</span>
-      <div className="relative aspect-video overflow-hidden border border-border bg-card">
+      <div className="relative aspect-video w-40 overflow-hidden border border-border bg-card sm:w-52">
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={image} alt="" className="size-full object-cover" />
@@ -63,7 +63,7 @@ export function CoverField({ preview }: { preview: string }) {
         name="coverFile"
         type="file"
         accept="image/jpeg,image/png,image/webp"
-        className="text-sm"
+        className="max-w-full text-sm"
         onChange={async (event) => {
           const file = event.target.files?.[0];
           if (!file) return;

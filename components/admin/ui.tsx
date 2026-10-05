@@ -1,11 +1,11 @@
 import Link from "next/link";
 
 export const fieldClass =
-  "w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-olive";
+  "box-border w-full min-w-0 max-w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-olive";
 
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label className="grid gap-2 text-sm">
+    <label className="grid min-w-0 gap-2 text-sm">
       <span className="text-muted-foreground">{label}</span>
       {children}
     </label>

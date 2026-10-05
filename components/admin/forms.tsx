@@ -26,7 +26,7 @@ export function ArticleForm({
   publicHref?: string;
 }) {
   return (
-    <form action={action} className="mx-auto grid w-full max-w-3xl gap-5">
+    <form action={action} className="mx-auto grid w-full min-w-0 max-w-3xl gap-5">
       <input type="hidden" name="originalSlug" defaultValue={article?.slug ?? ""} />
       <Field label="Название">
         <input name="title" defaultValue={article?.title ?? ""} required className={`${fieldClass} font-heading text-2xl`} />
