@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { RecordList } from "@/components/admin/ui";
 import { listModels } from "@/lib/db";
 import { overallScore } from "@/lib/scores";
@@ -8,5 +10,14 @@ export default async function ModelsPage() {
   const rows = listModels()
     .sort((a, b) => overallScore(b.scores) - overallScore(a.scores) || a.name.localeCompare(b.name, "ru"))
     .map((model) => ({ slug: model.slug, title: model.name, meta: model.vendor }));
-  return <RecordList title="Модели" href="/admin/models/new" rows={rows} />;
+  return (
+    <div className="grid gap-6">
+      <p className="text-sm">
+        <Link href="/admin/models/rating" className="text-olive">
+          Обновить рейтинг
+        </Link>
+      </p>
+      <RecordList title="Модели" href="/admin/models/new" rows={rows} />
+    </div>
+  );
 }

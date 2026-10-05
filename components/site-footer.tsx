@@ -2,11 +2,14 @@ import Link from "next/link";
 
 import { OpenConsultantButton } from "@/components/consultant";
 import { Container } from "@/components/container";
+import { ratingStamp } from "@/lib/rating";
+import { ratingPeriod } from "@/lib/rating-view";
 import { menuRubrics } from "@/lib/rubrics";
 import { library } from "@/lib/site";
 
 export function SiteFooter() {
   const sections = menuRubrics();
+  const rating = ratingStamp();
   return (
     <footer className="mt-8 border-t border-border pb-28">
       <Container className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
@@ -63,7 +66,7 @@ export function SiteFooter() {
       </Container>
       <Container className="border-t border-border py-6 text-sm text-muted-foreground">
         <p>
-          Оценки — редакционная шкала лаборатории на октябрь 2026. Это не реклама вендоров и не академическая
+          Оценки — редакционная шкала лаборатории, {ratingPeriod(rating.updated).toLowerCase()}. Это не реклама вендоров и не академическая
           сертификация.
         </p>
         <p className="mt-2">© {new Date().getFullYear()} PardAiLabs</p>

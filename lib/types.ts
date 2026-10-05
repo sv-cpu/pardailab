@@ -77,6 +77,10 @@ export interface ModelScores {
 export interface ModelProfile {
   slug: string;
   name: string;
+  /** Полное название с версией. В таблице рейтинга показывается оно. */
+  versionName?: string;
+  /** Участие в десятке рейтинга. Пустое значение значит «участвует». */
+  inRating?: boolean;
   vendor: string;
   summary: string;
   bestFor: string;
