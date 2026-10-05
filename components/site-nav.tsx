@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 import type { MenuRubric } from "@/lib/rubrics";
-import { library } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 function Item({
@@ -66,12 +65,6 @@ function RubricItem({ item, pathname }: { item: MenuRubric; pathname: string }) 
 
 export function SiteNav({ rubrics }: { rubrics: MenuRubric[] }) {
   const pathname = usePathname();
-  const moreRef = useRef<HTMLDetailsElement>(null);
-  const libraryActive = library.some((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
-
-  useEffect(() => {
-    if (moreRef.current) moreRef.current.open = false;
-  }, [pathname]);
 
   return (
     <nav className="hidden min-w-0 flex-1 items-center gap-5 lg:flex" aria-label="Разделы">
@@ -79,22 +72,6 @@ export function SiteNav({ rubrics }: { rubrics: MenuRubric[] }) {
         <RubricItem key={item.slug} item={item} pathname={pathname} />
       ))}
       <Item href="/benchmarki" label="Бенчмарки" pathname={pathname} />
-      <details ref={moreRef} className="relative">
-        <summary
-          className={cn(
-            "flex cursor-pointer list-none items-center gap-1 border-b border-transparent py-1 text-sm hover:text-foreground",
-            libraryActive ? "border-olive text-foreground" : "text-muted-foreground",
-          )}
-        >
-          Ещё
-          <ChevronDown className="size-3.5" aria-hidden />
-        </summary>
-        <div className="absolute left-0 z-40 mt-3 flex w-56 flex-col gap-2 rounded-2xl border border-border bg-background p-3">
-          {library.map((item) => (
-            <Item key={item.href} {...item} pathname={pathname} className="border-b-0 py-1" />
-          ))}
-        </div>
-      </details>
     </nav>
   );
 }
@@ -129,11 +106,6 @@ export function SiteMenu({ rubrics }: { rubrics: MenuRubric[] }) {
                 </div>
               ) : null}
             </div>
-          ))}
-        </nav>
-        <nav className="flex flex-col gap-1 border-t border-border pt-3" aria-label="Каталоги">
-          {library.map((item) => (
-            <Item key={item.href} {...item} pathname={pathname} />
           ))}
         </nav>
       </div>
