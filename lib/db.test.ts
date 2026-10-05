@@ -26,5 +26,10 @@ describe("sqlite store", () => {
     assert.equal(listArticles(again).find((item) => item.slug === "kontekst-i-dokumenty")?.title, "Проверка редакции");
     deleteRecord("articles", "kontekst-i-dokumenty", again);
     assert.equal(listArticles(again).some((item) => item.slug === "kontekst-i-dokumenty"), false);
+
+    const fresh = listArticles(again)[0];
+    assert.ok(fresh);
+    assert.throws(() => saveArticle({ ...fresh, title: "Чужая запись" }, "", again), /Такой адрес уже есть/);
+    assert.equal(listArticles(again).find((item) => item.slug === fresh.slug)?.title, fresh.title);
   });
 });

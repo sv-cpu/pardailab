@@ -1,67 +1,14 @@
 import { aiCategories } from "@/lib/categories";
-import { blocksToHtml } from "@/lib/html";
 import { scoreFields } from "@/lib/scores";
-import type { Article, ModelProfile, Service } from "@/lib/types";
+import type { ModelProfile, Service } from "@/lib/types";
 
-import { ArticleEditor } from "./article-editor";
-import { CoverField } from "./cover-field";
-import { RubricFields } from "./rubric-fields";
-import type { RubricRecord } from "@/lib/rubric-seed";
 import { ConfirmDelete } from "./delete-button";
 import { Field, fieldClass } from "./ui";
 
+export { ArticleForm } from "./article-form";
+
 function Lines({ name, value }: { name: string; value: string[] }) {
   return <textarea name={name} defaultValue={value.join("\n")} rows={4} className={fieldClass} />;
-}
-
-export function ArticleForm({
-  article,
-  rubrics,
-  action,
-  publicHref,
-}: {
-  article?: Article;
-  rubrics: RubricRecord[];
-  action: (formData: FormData) => void | Promise<void>;
-  publicHref?: string;
-}) {
-  return (
-    <form action={action} className="mx-auto grid w-full min-w-0 max-w-3xl gap-5">
-      <input type="hidden" name="originalSlug" defaultValue={article?.slug ?? ""} />
-      <Field label="Название">
-        <input name="title" defaultValue={article?.title ?? ""} required className={`${fieldClass} font-heading text-2xl`} />
-      </Field>
-      <Field label="Адрес">
-        <input name="slug" defaultValue={article?.slug ?? ""} required className={fieldClass} />
-      </Field>
-      <Field label="Описание">
-        <textarea name="description" defaultValue={article?.description ?? ""} required rows={3} className={fieldClass} />
-      </Field>
-      <div className="grid gap-5">
-        <RubricFields rubrics={rubrics} rubric={article?.rubric} subrubric={article?.subrubric} />
-      </div>
-      <Field label="Дата">
-        <input name="date" type="date" defaultValue={article?.date ?? new Date().toISOString().slice(0, 10)} required className={fieldClass} />
-      </Field>
-      <CoverField preview={article?.coverImage ?? ""} />
-      <input type="hidden" name="existingCover" value={article?.coverImage ?? ""} />
-      <Field label="Метки, по одной на строку">
-        <Lines name="tags" value={article?.tags ?? []} />
-      </Field>
-      <ArticleEditor initialHtml={article ? blocksToHtml(article.body) : "<p></p>"} />
-      <div className="flex flex-wrap items-center gap-3">
-        <button type="submit" name="intent" value="save" className="rounded-full bg-olive px-5 py-2.5 text-sm text-accent-foreground hover:bg-olive-deep">
-          Сохранить
-        </button>
-        {publicHref ? (
-          <a href={publicHref} className="rounded-full border border-border px-5 py-2.5 text-sm hover:border-olive">
-            Открыть на сайте
-          </a>
-        ) : null}
-        {article ? <ConfirmDelete /> : null}
-      </div>
-    </form>
-  );
 }
 
 export function ServiceForm({

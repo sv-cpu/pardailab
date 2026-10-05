@@ -2,48 +2,61 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export function ArticleEditor({ initialHtml }: { initialHtml: string }) {
+export function ArticleEditor({ initialHtml, onChange }: { initialHtml: string; onChange: (html: string) => void }) {
   const editorRef = useRef<HTMLDivElement>(null);
   const htmlRef = useRef<HTMLTextAreaElement>(null);
-  const storedRef = useRef<HTMLInputElement>(null);
+  const snippetRef = useRef<HTMLTextAreaElement>(null);
+  const rangeRef = useRef<Range | null>(null);
   const modeRef = useRef<"visual" | "html">("visual");
   const draftRef = useRef(initialHtml);
+  const onChangeRef = useRef(onChange);
   const [mode, setMode] = useState<"visual" | "html">("visual");
   const [html, setHtml] = useState(initialHtml);
   const [insertOpen, setInsertOpen] = useState(false);
   const [snippet, setSnippet] = useState("");
+  const [insertNote, setInsertNote] = useState("");
+  const [insertReady, setInsertReady] = useState(false);
+  const [sourceReady, setSourceReady] = useState(false);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  function remember(next: string) {
+    draftRef.current = next;
+    setHtml(next);
+    onChangeRef.current(next);
+  }
+
+  useEffect(() => {
+    if (mode === "visual" && editorRef.current) editorRef.current.innerHTML = draftRef.current;
+  }, [mode]);
+
+  useEffect(() => {
+    if (!insertOpen) return;
+    const field = snippetRef.current;
+    if (!field) return;
+    field.focus();
+    field.scrollIntoView({ block: "nearest" });
+  }, [insertOpen, insertReady]);
 
   function read() {
     if (modeRef.current === "visual") return editorRef.current?.innerHTML ?? html;
     return htmlRef.current?.value ?? html;
   }
 
-  function remember(next: string) {
-    draftRef.current = next;
-    setHtml(next);
-    if (storedRef.current) storedRef.current.value = next;
-  }
-
-  useEffect(() => {
-    const form = storedRef.current?.form;
-    if (!form) return;
-    const sync = () => {
-      const value = modeRef.current === "visual" ? (editorRef.current?.innerHTML ?? "") : (htmlRef.current?.value ?? "");
-      if (storedRef.current) storedRef.current.value = value;
-    };
-    form.addEventListener("submit", sync);
-    return () => form.removeEventListener("submit", sync);
-  }, []);
-
-  useEffect(() => {
-    if (mode === "visual" && editorRef.current) editorRef.current.innerHTML = draftRef.current;
-  }, [mode]);
-
   function show(next: "visual" | "html") {
+    if (next === "html" && modeRef.current === "html") {
+      setSourceReady(true);
+      htmlRef.current?.focus();
+      htmlRef.current?.scrollIntoView({ block: "center" });
+      return;
+    }
     const value = read();
     modeRef.current = next;
     remember(value);
     setMode(next);
+    setSourceReady(next === "html");
   }
 
   function run(command: string, value?: string) {
@@ -58,19 +71,62 @@ export function ArticleEditor({ initialHtml }: { initialHtml: string }) {
     run("createLink", href);
   }
 
+  function openInsert() {
+    const selection = window.getSelection();
+    const editor = editorRef.current;
+    if (selection && selection.rangeCount > 0 && editor?.contains(selection.anchorNode)) {
+      rangeRef.current = selection.getRangeAt(0).cloneRange();
+    }
+    setInsertOpen(true);
+    setInsertNote("Поле готово принять HTML.");
+    setInsertReady(false);
+    requestAnimationFrame(() => setInsertReady(true));
+  }
+
+  function placeCaret() {
+    const editor = editorRef.current;
+    const selection = window.getSelection();
+    if (!editor || !selection) return;
+    editor.focus();
+    if (rangeRef.current) {
+      selection.removeAllRanges();
+      selection.addRange(rangeRef.current);
+      return;
+    }
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+
   function insertSnippet() {
     const piece = snippet.trim();
-    if (!piece) return;
+    if (!piece) {
+      setInsertNote("Поле готово. Сначала вставьте сюда HTML.");
+      setInsertReady(false);
+      requestAnimationFrame(() => setInsertReady(true));
+      return;
+    }
     if (modeRef.current === "visual" && editorRef.current) {
-      editorRef.current.focus();
-      document.execCommand("insertHTML", false, piece);
+      const before = editorRef.current.innerHTML;
+      placeCaret();
+      const inserted = document.execCommand("insertHTML", false, piece);
+      if (!inserted && editorRef.current.innerHTML === before) editorRef.current.insertAdjacentHTML("beforeend", piece);
       remember(editorRef.current.innerHTML);
-    } else {
-      const next = `${read()}\n${piece}`;
+      rangeRef.current = null;
+    } else if (htmlRef.current) {
+      const area = htmlRef.current;
+      const start = area.selectionStart ?? area.value.length;
+      const end = area.selectionEnd ?? start;
+      const atStart = start === 0 && end === 0 && area.value.length > 0;
+      const next = atStart ? `${area.value}\n${piece}` : `${area.value.slice(0, start)}${piece}${area.value.slice(end)}`;
       remember(next);
     }
     setSnippet("");
-    setInsertOpen(false);
+    setInsertNote("Фрагмент вставлен. Поле снова готово принять HTML.");
+    setInsertReady(false);
+    requestAnimationFrame(() => setInsertReady(true));
   }
 
   return (
@@ -84,7 +140,7 @@ export function ArticleEditor({ initialHtml }: { initialHtml: string }) {
         <Tool label="1." onClick={() => run("insertOrderedList")} />
         <Tool label="Цитата" onClick={() => run("formatBlock", "<blockquote>")} />
         <Tool label="Ссылка" onClick={addLink} />
-        <Tool label="Вставить HTML" onClick={() => setInsertOpen((open) => !open)} />
+        <Tool label="Вставить HTML" onClick={openInsert} />
         <span className="flex gap-3 border-l border-border px-2 text-sm">
           <button type="button" className={mode === "visual" ? "text-olive" : "text-muted-foreground"} onClick={() => show("visual")}>
             Текст
@@ -95,17 +151,27 @@ export function ArticleEditor({ initialHtml }: { initialHtml: string }) {
         </span>
       </div>
       {insertOpen ? (
-        <div className="grid gap-2 border border-border p-3">
+        <div className={`grid gap-2 border p-3 ${insertReady ? "article-ready border-olive bg-olive-soft" : "border-border"}`}>
+          <p className="text-sm text-foreground" aria-live="polite">
+            {insertNote || "Поле готово принять HTML."}
+          </p>
           <textarea
+            ref={snippetRef}
             value={snippet}
             onChange={(event) => setSnippet(event.target.value)}
             rows={5}
             placeholder="<p>Фрагмент HTML</p>"
-            className="box-border w-full max-w-full border border-border bg-background px-3 py-2 font-mono text-sm"
+            aria-label="Фрагмент HTML"
+            className="box-border w-full max-w-full border border-olive bg-background px-3 py-2 font-mono text-sm"
           />
-          <button type="button" className="justify-self-start text-sm text-olive" onClick={insertSnippet}>
-            Вставить в статью
-          </button>
+          <div className="flex flex-wrap gap-4">
+            <button type="button" className="text-sm text-olive" onClick={insertSnippet}>
+              Вставить в статью
+            </button>
+            <button type="button" className="text-sm text-muted-foreground" onClick={() => setInsertOpen(false)}>
+              Закрыть
+            </button>
+          </div>
         </div>
       ) : null}
       {mode === "visual" ? (
@@ -120,16 +186,18 @@ export function ArticleEditor({ initialHtml }: { initialHtml: string }) {
           onInput={() => remember(editorRef.current?.innerHTML ?? "")}
         />
       ) : (
-        <textarea
-          ref={htmlRef}
-          value={html}
-          onChange={(event) => remember(event.target.value)}
-          rows={22}
-          aria-label="HTML статьи"
-          className="box-border min-h-64 w-full max-w-full border border-border bg-background px-4 py-3 font-mono text-sm sm:min-h-80"
-        />
+        <div className="grid gap-2">
+          {sourceReady ? <p className="text-sm text-foreground">Окно готово: можно вставлять HTML.</p> : null}
+          <textarea
+            ref={htmlRef}
+            value={html}
+            onChange={(event) => remember(event.target.value)}
+            rows={22}
+            aria-label="HTML статьи"
+            className={`box-border min-h-64 w-full max-w-full border bg-background px-4 py-3 font-mono text-sm sm:min-h-80 ${sourceReady ? "article-ready border-olive" : "border-border"}`}
+          />
+        </div>
       )}
-      <input ref={storedRef} type="hidden" name="bodyHtml" defaultValue={initialHtml} />
     </div>
   );
 }
