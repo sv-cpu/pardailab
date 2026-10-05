@@ -5,6 +5,8 @@ import { getArticles, getModels, getServices } from "@/lib/cms";
 import { articleHref } from "@/lib/paths";
 import { site } from "@/lib/site";
 
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [articles, models, services] = await Promise.all([getArticles(), getModels(), getServices()]);
   const staticPaths = [
