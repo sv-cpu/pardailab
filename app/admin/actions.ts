@@ -7,6 +7,7 @@ import { clearSession, startSession } from "@/lib/auth";
 import { parseArticle, parseModel, parseService } from "@/lib/admin-parse";
 import { isStoredCover, removeCover, storeCover } from "@/lib/covers";
 import { deleteRecord, listArticles, listModels, saveArticle, saveModel, saveService } from "@/lib/db";
+import { saveBenchmark, deleteBenchmark, type BenchmarkRow } from "@/lib/benchmarks";
 import { saveRatingStamp } from "@/lib/rating";
 import { transliterate } from "@/lib/rubric-seed";
 import { scoreFields } from "@/lib/scores";
@@ -313,6 +314,58 @@ export async function dropRatingModelAction(formData: FormData) {
   saveModel({ ...model, inRating: false }, model.slug);
   publish();
   redirect("/admin/models/rating?saved=1");
+}
+
+export async function saveBenchmarkAction(formData: FormData) {
+  await editorOnly();
+  const original = String(formData.get("originalSlug") ?? "");
+  const slug = String(formData.get("slug") ?? "").trim();
+  const tested = String(formData.get("tested") ?? "");
+  const nextUpdate = String(formData.get("nextUpdate") ?? "");
+  const back = original ? `/admin/benchmarks/${original}` : "/admin/benchmarks/new";
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+    redirect(`${back}?error=` + encodeURIComponent("Адрес — латиница, цифры и дефисы."));
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(tested) || !/^\d{4}-\d{2}-\d{2}$/.test(nextUpdate)) {
+    redirect(`${back}?error=` + encodeURIComponent("Укажите обе даты."));
+  }
+  try {
+    const rows: BenchmarkRow[] = [];
+    for (let index = 0; index < 10; index += 1) {
+      const versionName = String(formData.get(`row-${index}-version`) ?? "").trim();
+      if (!versionName) throw new Error(`Строка ${index + 1}: укажите полное название с версией.`);
+      const scores = {} as ModelScores;
+      for (const [key, label] of scoreFields) {
+        const value = Number(String(formData.get(`row-${index}-${key}`) ?? "").replace(",", "."));
+        if (!Number.isFinite(value) || value < 0 || value > 10) {
+          throw new Error(`«${versionName}», ${label}: число от 0 до 10.`);
+        }
+        scores[key] = Math.round(value * 10) / 10;
+      }
+      rows.push({
+        modelSlug: String(formData.get(`row-${index}-model`) ?? ""),
+        versionName,
+        vendor: String(formData.get(`row-${index}-vendor`) ?? "").trim(),
+        scores,
+      });
+    }
+    saveBenchmark(
+      { slug, title: "Рейтинг AI-моделей", tested, nextUpdate, rows },
+      original,
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Не удалось сохранить выпуск.";
+    redirect(`${back}?error=${encodeURIComponent(message)}`);
+  }
+  publish();
+  redirect(`/admin/benchmarks/${slug}?saved=1`);
+}
+
+export async function deleteBenchmarkAction(formData: FormData) {
+  await editorOnly();
+  deleteBenchmark(String(formData.get("slug") ?? ""));
+  publish();
+  redirect("/admin/benchmarks?saved=1");
 }
 
 async function readAvatar(formData: FormData) {

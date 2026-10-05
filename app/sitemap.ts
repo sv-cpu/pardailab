@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { listBenchmarks } from "@/lib/benchmarks";
 import { aiCategories } from "@/lib/categories";
 import { getArticles, getModels, getServices } from "@/lib/cms";
 import { articleHref } from "@/lib/paths";
@@ -17,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/razrabotka",
     "/issledovaniya",
     "/modeli",
+    "/benchmarki",
     "/katalog",
     "/materialy",
     "/poisk",
@@ -33,6 +35,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: article.date,
       changeFrequency: "monthly" as const,
       priority: article.kind === "research" ? 0.9 : 0.6,
+    })),
+    ...listBenchmarks().map((issue) => ({
+      url: new URL(`/benchmarki/${issue.slug}`, site.url).toString(),
+      lastModified: issue.tested,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
     })),
     ...models.map((model) => ({
       url: new URL(`/modeli/${model.slug}`, site.url).toString(),

@@ -78,6 +78,7 @@ export function SiteNav({ rubrics }: { rubrics: MenuRubric[] }) {
       {rubrics.map((item) => (
         <RubricItem key={item.slug} item={item} pathname={pathname} />
       ))}
+      <Item href="/benchmarki" label="Бенчмарки" pathname={pathname} />
       <details ref={moreRef} className="relative">
         <summary
           className={cn(
@@ -114,6 +115,7 @@ export function SiteMenu({ rubrics }: { rubrics: MenuRubric[] }) {
       </summary>
       <div className="absolute right-0 z-40 mt-2 flex w-64 flex-col gap-3 rounded-2xl border border-border bg-background p-3">
         <nav className="flex flex-col gap-2" aria-label="Разделы">
+          <Item href="/benchmarki" label="Бенчмарки" pathname={pathname} />
           {rubrics.map((item) => (
             <div key={item.slug}>
               <Item href={item.href} label={item.name} pathname={pathname} />

@@ -13,7 +13,7 @@ const links = [
   { href: "/admin/rubrics", label: "Рубрики", editor: true },
   { href: "/admin/services", label: "Сервисы", editor: true },
   { href: "/admin/models", label: "Модели", editor: true },
-  { href: "/admin/models/rating", label: "Рейтинг", editor: true },
+  { href: "/admin/benchmarks", label: "Бенчмарки", editor: true },
   { href: "/admin/users", label: "Пользователи", editor: true },
 ];
 

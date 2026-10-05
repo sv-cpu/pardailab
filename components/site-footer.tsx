@@ -36,6 +36,11 @@ export function SiteFooter() {
           <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">Справочник</p>
           <ul className="mt-4 space-y-2 text-sm">
             <li>
+              <Link href="/benchmarki" className="underline decoration-border underline-offset-4 hover:decoration-olive">
+                Бенчмарки
+              </Link>
+            </li>
+            <li>
               <Link href="/materialy" className="underline decoration-border underline-offset-4 hover:decoration-olive">
                 Все материалы
               </Link>
