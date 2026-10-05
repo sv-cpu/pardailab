@@ -59,6 +59,7 @@ export async function saveArticleAction(formData: FormData): Promise<SaveArticle
   }
   const parsed = parseArticle(formData);
   if (!parsed.ok) return { ok: false, error: parsed.error };
+  const draft = parsed.value;
   const articles = listArticles();
   const existing = original ? articles.find((item) => item.slug === original) : undefined;
   if (original && !existing) return { ok: false, error: "Статья не найдена. Текст остался в форме." };
@@ -66,12 +67,26 @@ export async function saveArticleAction(formData: FormData): Promise<SaveArticle
     return { ok: false, error: "Это не ваша статья." };
   }
   const rubrics = listRubrics();
-  const rubric = rubrics.find((item) => item.slug === parsed.value.rubric && !item.parent);
-  if (!rubric) return { ok: false, error: "Выберите рубрику." };
-  const subSlug = parsed.value.subrubric;
-  const subrubric = subSlug ? rubrics.find((item) => item.slug === subSlug && item.parent === rubric.slug) : undefined;
-  if (subSlug && !subrubric) return { ok: false, error: "Подрубрика не из этой рубрики." };
-  if (articles.some((item) => item.slug === parsed.value.slug && item.slug !== original)) {
+  function placed(index: number): { error: string } | { parent: (typeof rubrics)[number]; child?: (typeof rubrics)[number] } | undefined {
+    const placement = draft.placements?.[index];
+    if (!placement) return undefined;
+    const parent = rubrics.find((item) => item.slug === placement.rubric && !item.parent);
+    if (!parent) return { error: index === 0 ? "Выберите рубрику." : "Вторая рубрика не найдена." };
+    const child = placement.subrubric
+      ? rubrics.find((item) => item.slug === placement.subrubric && item.parent === parent.slug)
+      : undefined;
+    if (placement.subrubric && !child) return { error: "Подрубрика не из этой рубрики." };
+    return child ? { parent, child } : { parent };
+  }
+  const primary = placed(0);
+  if (!primary) return { ok: false, error: "Выберите рубрику." };
+  if ("error" in primary) return { ok: false, error: primary.error };
+  const extra = placed(1);
+  if (extra && "error" in extra) return { ok: false, error: extra.error };
+  const rubric = primary.parent;
+  const subrubric = "child" in primary ? primary.child : undefined;
+  const secondary = extra && "parent" in extra ? extra : undefined;
+  if (articles.some((item) => item.slug === draft.slug && item.slug !== original)) {
     return { ok: false, error: "Такой адрес уже есть. Измените название или поправьте адрес — текст на месте." };
   }
   const previous = isStoredCover(String(formData.get("existingCover") ?? ""))
@@ -83,9 +98,15 @@ export async function saveArticleAction(formData: FormData): Promise<SaveArticle
     if (upload instanceof File && upload.size > 0) uploaded = await storeCover(upload);
     saveArticle(
       {
-        ...parsed.value,
+        ...draft,
         rubric: rubric.slug,
         subrubric: subrubric?.slug,
+        placements: [
+          { rubric: rubric.slug, ...(subrubric ? { subrubric: subrubric.slug } : {}) },
+          ...(secondary
+            ? [{ rubric: secondary.parent.slug, ...(secondary.child ? { subrubric: secondary.child.slug } : {}) }]
+            : []),
+        ],
         category: subrubric?.name ?? rubric.name,
         kind: rubric.kind ?? existing?.kind ?? "news",
         author: existing?.author ?? actor.name,

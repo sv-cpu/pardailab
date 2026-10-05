@@ -5,6 +5,8 @@ export type ArticleDraft = {
   description: string;
   rubric: string;
   subrubric: string;
+  rubric2: string;
+  subrubric2: string;
   date: string;
   tags: string;
   bodyHtml: string;
@@ -28,6 +30,8 @@ export function readDraft(slug: string): ArticleDraft | null {
       description: typeof parsed.description === "string" ? parsed.description : "",
       rubric: typeof parsed.rubric === "string" ? parsed.rubric : "",
       subrubric: typeof parsed.subrubric === "string" ? parsed.subrubric : "",
+      rubric2: typeof parsed.rubric2 === "string" ? parsed.rubric2 : "",
+      subrubric2: typeof parsed.subrubric2 === "string" ? parsed.subrubric2 : "",
       date: typeof parsed.date === "string" ? parsed.date : "",
       tags: typeof parsed.tags === "string" ? parsed.tags : "",
       bodyHtml: parsed.bodyHtml,

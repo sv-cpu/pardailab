@@ -111,9 +111,18 @@ export function parseArticle(form: FormData): ParseResult<Article> {
   if (!description.ok) return description;
   const rubric = text(form, "rubric");
   const subrubric = text(form, "subrubric");
+  const rubric2 = text(form, "rubric2");
+  const subrubric2 = text(form, "subrubric2");
+  if (rubric2 && rubric2 === rubric && subrubric2 === subrubric) {
+    return { ok: false, error: "Вторая рубрика совпадает с первой." };
+  }
   const categoryText = text(form, "category");
   const category = categoryText || subrubric || rubric;
   if (!category) return { ok: false, error: "Выберите рубрику." };
+  const placements = [
+    ...(rubric ? [{ rubric, ...(subrubric ? { subrubric } : {}) }] : []),
+    ...(rubric2 ? [{ rubric: rubric2, ...(subrubric2 ? { subrubric: subrubric2 } : {}) }] : []),
+  ];
   const date = text(form, "date");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return { ok: false, error: "Дата в формате ГГГГ-ММ-ДД." };
   const author = text(form, "author") || "Редакция";
@@ -145,6 +154,7 @@ export function parseArticle(form: FormData): ParseResult<Article> {
     category,
     ...(rubric ? { rubric } : {}),
     ...(subrubric ? { subrubric } : {}),
+    ...(placements.length ? { placements } : {}),
     date,
     author,
     readingMinutes: readingMinutes(body),

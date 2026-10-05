@@ -24,6 +24,8 @@ function same(left: Fields, right: Fields) {
     left.description === right.description &&
     left.rubric === right.rubric &&
     left.subrubric === right.subrubric &&
+    left.rubric2 === right.rubric2 &&
+    left.subrubric2 === right.subrubric2 &&
     left.date === right.date &&
     left.tags === right.tags &&
     left.bodyHtml === right.bodyHtml
@@ -56,8 +58,10 @@ export function ArticleForm({
       title: article?.title ?? "",
       slug: article?.slug ?? "",
       description: article?.description ?? "",
-      rubric: article?.rubric ?? "",
-      subrubric: article?.subrubric ?? "",
+      rubric: article?.rubric ?? article?.placements?.[0]?.rubric ?? "",
+      subrubric: article?.subrubric ?? article?.placements?.[0]?.subrubric ?? "",
+      rubric2: article?.placements?.[1]?.rubric ?? "",
+      subrubric2: article?.placements?.[1]?.subrubric ?? "",
       date: article?.date ?? initialDate,
       tags: article?.tags.join("\n") ?? "",
       bodyHtml: initialHtml,
@@ -87,6 +91,8 @@ export function ArticleForm({
       description: stored.description,
       rubric: stored.rubric,
       subrubric: stored.subrubric,
+      rubric2: stored.rubric2,
+      subrubric2: stored.subrubric2,
       date: stored.date || baseline.date,
       tags: stored.tags,
       bodyHtml: stored.bodyHtml,
@@ -246,13 +252,27 @@ export function ArticleForm({
           className={fieldClass}
         />
       </Field>
-      <div className="grid gap-5">
+      <div className="grid gap-8">
         <RubricFields
+          heading="Рубрика"
+          hint="По ней открывается страница статьи."
           rubrics={rubrics}
           rubric={fields.rubric}
           subrubric={fields.subrubric}
           onRubric={(rubric) => patch({ rubric, subrubric: "" })}
           onSubrubric={(subrubric) => patch({ subrubric })}
+        />
+        <RubricFields
+          heading="Вторая рубрика"
+          hint="Необязательно. После публикации статья появится и в этом разделе."
+          rubricName="rubric2"
+          subName="subrubric2"
+          emptyRubric="Не выбрана"
+          rubrics={rubrics}
+          rubric={fields.rubric2}
+          subrubric={fields.subrubric2}
+          onRubric={(rubric2) => patch({ rubric2, subrubric2: "" })}
+          onSubrubric={(subrubric2) => patch({ subrubric2 })}
         />
       </div>
       <Field label="Дата">

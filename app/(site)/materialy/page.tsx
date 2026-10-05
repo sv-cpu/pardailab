@@ -5,6 +5,8 @@ import { Container } from "@/components/container";
 import { PageIntro } from "@/components/page-intro";
 import { getArticles } from "@/lib/cms";
 import { kindLabel } from "@/lib/paths";
+import { matchesKind, placementLabel } from "@/lib/placements";
+import { listRubrics } from "@/lib/rubrics";
 import { pageMeta } from "@/lib/seo";
 import type { ArticleKind } from "@/lib/types";
 
@@ -17,7 +19,7 @@ export const metadata: Metadata = pageMeta({
 const order: ArticleKind[] = ["research", "news", "practice", "development"];
 
 export default async function Page() {
-  const articles = await getArticles();
+  const [articles, rubrics] = await Promise.all([getArticles(), listRubrics()]);
   return (
     <Container className="py-16 sm:py-20">
       <PageIntro
@@ -27,14 +29,15 @@ export default async function Page() {
       />
       <div className="mt-14 space-y-14">
         {order.map((kind) => {
-          const group = articles.filter((item) => item.kind === kind);
+          const parent = rubrics.find((item) => item.kind === kind);
+          const group = articles.filter((item) => matchesKind(item, kind, rubrics));
           if (!group.length) return null;
           return (
             <section key={kind}>
               <h2 className="font-heading text-3xl tracking-tight">{kindLabel[kind]}</h2>
               <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {group.map((article) => (
-                  <ArticleCard key={article.slug} article={article} />
+                  <ArticleCard key={article.slug} article={article} category={placementLabel(article, rubrics, parent?.slug)} />
                 ))}
               </div>
             </section>

@@ -37,6 +37,29 @@ describe("parseArticle", () => {
     assert.equal(parsed.value.rubric, "novosti");
   });
 
+  it("keeps a second rubric and rejects a duplicate pair", () => {
+    const form = new FormData();
+    form.set("title", "Два раздела");
+    form.set("description", "Коротко.");
+    form.set("rubric", "novosti");
+    form.set("subrubric", "dokumenty");
+    form.set("rubric2", "praktika");
+    form.set("subrubric2", "ofis");
+    form.set("date", "2026-10-01");
+    form.set("bodyHtml", "<p>Текст.</p>");
+    const parsed = parseArticle(form);
+    assert.equal(parsed.ok, true);
+    if (!parsed.ok) return;
+    assert.deepEqual(parsed.value.placements, [
+      { rubric: "novosti", subrubric: "dokumenty" },
+      { rubric: "praktika", subrubric: "ofis" },
+    ]);
+
+    form.set("rubric2", "novosti");
+    form.set("subrubric2", "dokumenty");
+    assert.equal(parseArticle(form).ok, false);
+  });
+
   it("builds the address from the title and allows an article without tags", () => {
     const form = new FormData();
     form.set("title", "Новое досье");
