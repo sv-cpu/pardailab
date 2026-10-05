@@ -74,7 +74,7 @@ export function ArticleEditor({ initialHtml }: { initialHtml: string }) {
   }
 
   return (
-    <div className="grid gap-3">
+    <div className="grid min-w-0 gap-3">
       <div className="flex flex-wrap items-center gap-1 border border-border bg-card px-2 py-2">
         <Tool label="Ж" onClick={() => run("bold")} />
         <Tool label="К" onClick={() => run("italic")} />
@@ -85,7 +85,7 @@ export function ArticleEditor({ initialHtml }: { initialHtml: string }) {
         <Tool label="Цитата" onClick={() => run("formatBlock", "<blockquote>")} />
         <Tool label="Ссылка" onClick={addLink} />
         <Tool label="Вставить HTML" onClick={() => setInsertOpen((open) => !open)} />
-        <span className="ml-auto flex gap-3 px-2 text-sm">
+        <span className="flex gap-3 border-l border-border px-2 text-sm">
           <button type="button" className={mode === "visual" ? "text-olive" : "text-muted-foreground"} onClick={() => show("visual")}>
             Текст
           </button>
@@ -101,7 +101,7 @@ export function ArticleEditor({ initialHtml }: { initialHtml: string }) {
             onChange={(event) => setSnippet(event.target.value)}
             rows={5}
             placeholder="<p>Фрагмент HTML</p>"
-            className="w-full border border-border bg-background px-3 py-2 font-mono text-sm"
+            className="box-border w-full max-w-full border border-border bg-background px-3 py-2 font-mono text-sm"
           />
           <button type="button" className="justify-self-start text-sm text-olive" onClick={insertSnippet}>
             Вставить в статью
@@ -111,7 +111,7 @@ export function ArticleEditor({ initialHtml }: { initialHtml: string }) {
       {mode === "visual" ? (
         <div
           ref={editorRef}
-          className="article-editor min-h-[28rem] border border-border bg-background px-5 py-4"
+          className="article-editor min-h-64 w-full max-w-full overflow-x-auto border border-border bg-background px-4 py-4 sm:min-h-80"
           contentEditable
           role="textbox"
           aria-multiline="true"
@@ -126,7 +126,7 @@ export function ArticleEditor({ initialHtml }: { initialHtml: string }) {
           onChange={(event) => remember(event.target.value)}
           rows={22}
           aria-label="HTML статьи"
-          className="min-h-[28rem] w-full border border-border bg-background px-4 py-3 font-mono text-sm"
+          className="box-border min-h-64 w-full max-w-full border border-border bg-background px-4 py-3 font-mono text-sm sm:min-h-80"
         />
       )}
       <input ref={storedRef} type="hidden" name="bodyHtml" defaultValue={initialHtml} />
