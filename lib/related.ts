@@ -1,3 +1,4 @@
+import { comparePublished } from "@/lib/format";
 import type { Article } from "@/lib/types";
 
 export function relatedArticles(all: Article[], current: Article, limit = 3) {
@@ -8,7 +9,7 @@ export function relatedArticles(all: Article[], current: Article, limit = 3) {
       const sameKind = item.kind === current.kind ? 2 : 0;
       return { item, score: shared + sameKind };
     })
-    .sort((a, b) => b.score - a.score || b.item.date.localeCompare(a.item.date))
+    .sort((a, b) => b.score - a.score || comparePublished(a.item.date, b.item.date))
     .slice(0, limit)
     .map((entry) => entry.item);
 }

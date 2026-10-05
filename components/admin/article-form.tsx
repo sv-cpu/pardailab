@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 
 import type { SaveArticleResult } from "@/app/admin/actions";
+import { publishedParts } from "@/lib/format";
 import { articleHref } from "@/lib/paths";
 import { transliterate, type RubricRecord } from "@/lib/rubric-seed";
 import type { Article } from "@/lib/types";
@@ -25,6 +26,7 @@ function same(left: Fields, right: Fields) {
     left.rubric === right.rubric &&
     left.subrubric === right.subrubric &&
     left.date === right.date &&
+    left.time === right.time &&
     left.tags === right.tags &&
     left.bodyHtml === right.bodyHtml
   );
@@ -51,6 +53,7 @@ export function ArticleForm({
 }) {
   const router = useRouter();
   const draftSlug = article?.slug ?? "";
+  const published = publishedParts(article?.date ?? initialDate);
   const baseline = useMemo<Fields>(
     () => ({
       title: article?.title ?? "",
@@ -58,11 +61,12 @@ export function ArticleForm({
       description: article?.description ?? "",
       rubric: article?.rubric ?? "",
       subrubric: article?.subrubric ?? "",
-      date: article?.date ?? initialDate,
+      date: published.date || initialDate,
+      time: published.time,
       tags: article?.tags.join("\n") ?? "",
       bodyHtml: initialHtml,
     }),
-    [article, initialDate, initialHtml],
+    [article, initialDate, initialHtml, published.date, published.time],
   );
   const [fields, setFields] = useState<Fields>(baseline);
   const [slugTouched, setSlugTouched] = useState(Boolean(article?.slug));
@@ -88,6 +92,7 @@ export function ArticleForm({
       rubric: stored.rubric,
       subrubric: stored.subrubric,
       date: stored.date || baseline.date,
+      time: stored.time || baseline.time,
       tags: stored.tags,
       bodyHtml: stored.bodyHtml,
     };
@@ -106,6 +111,14 @@ export function ArticleForm({
   }, [article, baseline, draftSlug]);
 
   const dirty = !same(fields, baseline) || slugTouched !== Boolean(article?.slug);
+
+  useEffect(() => {
+    if (article || fields.time) return;
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    setFields((current) => (current.time ? current : { ...current, time: `${hours}:${minutes}` }));
+  }, [article, fields.time]);
 
   useEffect(() => {
     if (!dirty) return;
@@ -255,9 +268,15 @@ export function ArticleForm({
           onSubrubric={(subrubric) => patch({ subrubric })}
         />
       </div>
-      <Field label="Дата">
-        <input name="date" type="date" value={fields.date} required onChange={(event) => patch({ date: event.target.value })} className={fieldClass} />
-      </Field>
+      <div className="grid gap-5 sm:grid-cols-2">
+        <Field label="Дата">
+          <input name="date" type="date" value={fields.date} required onChange={(event) => patch({ date: event.target.value })} className={fieldClass} />
+        </Field>
+        <Field label="Время">
+          <input name="time" type="time" value={fields.time} onChange={(event) => patch({ time: event.target.value })} className={fieldClass} />
+        </Field>
+      </div>
+      <p className="-mt-3 text-sm text-muted-foreground">На главной сверху статья с самой поздней датой и временем. У материалов одного дня решает время.</p>
       <CoverField preview={article?.coverImage ?? ""} />
       <input type="hidden" name="existingCover" value={article?.coverImage ?? ""} />
       <Field label="Метки">

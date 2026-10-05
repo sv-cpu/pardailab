@@ -9,6 +9,7 @@ import { isStoredCover, removeCover, storeCover } from "@/lib/covers";
 import { deleteRecord, listArticles, listModels, saveArticle, saveModel, saveService } from "@/lib/db";
 import { saveBenchmark, deleteBenchmark, type BenchmarkRow } from "@/lib/benchmarks";
 import { saveRatingStamp } from "@/lib/rating";
+import { stampPublished } from "@/lib/format";
 import { transliterate } from "@/lib/rubric-seed";
 import { scoreFields } from "@/lib/scores";
 import type { ModelScores } from "@/lib/types";
@@ -84,6 +85,7 @@ export async function saveArticleAction(formData: FormData): Promise<SaveArticle
     saveArticle(
       {
         ...parsed.value,
+        date: stampPublished(parsed.value.date.slice(0, 10), parsed.value.date.slice(11, 16), existing?.date),
         rubric: rubric.slug,
         subrubric: subrubric?.slug,
         category: subrubric?.name ?? rubric.name,

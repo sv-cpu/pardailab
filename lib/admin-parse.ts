@@ -114,8 +114,11 @@ export function parseArticle(form: FormData): ParseResult<Article> {
   const categoryText = text(form, "category");
   const category = categoryText || subrubric || rubric;
   if (!category) return { ok: false, error: "Выберите рубрику." };
-  const date = text(form, "date");
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return { ok: false, error: "Дата в формате ГГГГ-ММ-ДД." };
+  const day = text(form, "date");
+  const clock = text(form, "time");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return { ok: false, error: "Дата в формате ГГГГ-ММ-ДД." };
+  if (clock && !/^\d{2}:\d{2}$/.test(clock)) return { ok: false, error: "Время в формате ЧЧ:ММ." };
+  const date = clock ? `${day}T${clock}` : day;
   const author = text(form, "author") || "Редакция";
   const coverValue = Number(text(form, "cover"));
   const cover = Number.isInteger(coverValue) && coverValue >= 0 && coverValue <= 5 ? coverValue : 0;

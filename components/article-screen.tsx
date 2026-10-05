@@ -9,7 +9,7 @@ import { Container } from "@/components/container";
 import { Cover } from "@/components/cover";
 import { JsonLd } from "@/components/json-ld";
 import { getArticles } from "@/lib/cms";
-import { formatDate } from "@/lib/format";
+import { formatPublished } from "@/lib/format";
 import { articleHref, kindLabel } from "@/lib/paths";
 import { relatedArticles } from "@/lib/related";
 import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo";
@@ -103,7 +103,7 @@ export async function ArticleScreen({ kind, slug }: { kind: ArticleKind; slug: s
           <dl className="mt-6 grid gap-5 sm:grid-cols-2">
             <div>
               <dt className="font-mono text-[11px] tracking-[0.16em] text-muted-foreground uppercase">Дата</dt>
-              <dd className="mt-2">{formatDate(article.date)}</dd>
+              <dd className="mt-2">{formatPublished(article.date)}</dd>
             </div>
             <div>
               <dt className="font-mono text-[11px] tracking-[0.16em] text-muted-foreground uppercase">Статус</dt>
@@ -127,7 +127,7 @@ export async function ArticleScreen({ kind, slug }: { kind: ArticleKind; slug: s
           {article.research ? null : (
             <div>
               <dt className="sr-only">Дата</dt>
-              <dd>{formatDate(article.date)}</dd>
+              <dd>{formatPublished(article.date)}</dd>
             </div>
           )}
           <div>
