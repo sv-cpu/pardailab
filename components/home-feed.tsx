@@ -59,7 +59,7 @@ export function HeadlineList({ articles }: { articles: Article[] }) {
                     {article.title}
                   </Link>
                 </h2>
-                <p className="mt-1.5 text-xs text-muted-foreground">{meta(article)}</p>
+                <p className="mt-1.5 text-xs text-muted-foreground"><Byline article={article} /></p>
               </div>
             </article>
           </li>
