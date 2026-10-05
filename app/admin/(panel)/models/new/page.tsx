@@ -1,8 +1,10 @@
 import { saveModelAction } from "@/app/admin/actions";
 import { ModelForm } from "@/components/admin/forms";
 import { Notice } from "@/components/admin/ui";
+import { requireEditor } from "@/lib/users";
 
 export default async function NewModelPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  await requireEditor();
   const query = await searchParams;
   return (
     <div>

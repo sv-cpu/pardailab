@@ -3,11 +3,13 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { adminCredentials, clearSession, currentSession, secretsMatch, startSession } from "@/lib/auth";
+import { clearSession, startSession } from "@/lib/auth";
 import { parseArticle, parseModel, parseService } from "@/lib/admin-parse";
 import { isStoredCover, removeCover, storeCover } from "@/lib/covers";
 import { deleteRecord, listArticles, saveArticle, saveModel, saveService } from "@/lib/db";
 import { createRubric, deleteRubric, listRubrics, renameRubric } from "@/lib/rubrics";
+import { authenticate, createUser, currentUser, deleteUser, findUserBySlug, ownsArticle, updateUser, type StaffRole } from "@/lib/users";
+import { removeAvatar, storeAvatar } from "@/lib/avatars";
 
 export type LoginState = { error?: string };
 
@@ -17,20 +19,13 @@ function publish() {
 }
 
 async function guard() {
-  if (!(await currentSession())) redirect("/admin/login");
+  if (!(await currentUser())) redirect("/admin/login");
 }
 
 export async function login(_state: LoginState, formData: FormData): Promise<LoginState> {
-  const creds = adminCredentials();
-  if (!creds) {
-    return { error: "Редакция не настроена: задайте ADMIN_USER, ADMIN_PASSWORD и ADMIN_SESSION_SECRET." };
-  }
-  const user = String(formData.get("user") ?? "");
-  const password = String(formData.get("password") ?? "");
-  if (!secretsMatch(user, creds.user) || !secretsMatch(password, creds.password)) {
-    return { error: "Неверный логин или пароль." };
-  }
-  await startSession(creds.user);
+  const user = authenticate(String(formData.get("user") ?? ""), String(formData.get("password") ?? ""));
+  if (!user) return { error: "Неверный логин или пароль." };
+  await startSession(user.login);
   redirect("/admin");
 }
 
@@ -48,16 +43,19 @@ export async function saveArticleAction(formData: FormData) {
   const original = String(formData.get("originalSlug") ?? "");
   const back = original ? `/admin/articles/${original}` : "/admin/articles/new";
   if (formData.get("intent") === "delete") {
+    const actor = await currentUser();
+    if (!actor) redirect("/admin/login");
     if (original) {
       const existing = listArticles().find((item) => item.slug === original);
+      if (existing && actor.role !== "editor" && !ownsArticle(existing, actor)) fail(back, "Это не ваша статья.");
       await removeCover(existing?.coverImage);
       deleteRecord("articles", original);
     }
     publish();
     redirect("/admin/articles");
   }
-  const session = await currentSession();
-  if (!session) redirect("/admin/login");
+  const actor = await currentUser();
+  if (!actor) redirect("/admin/login");
   const parsed = parseArticle(formData);
   if (!parsed.ok) fail(back, parsed.error);
   const existing = original ? listArticles().find((item) => item.slug === original) : undefined;
@@ -71,6 +69,7 @@ export async function saveArticleAction(formData: FormData) {
       coverImage = await storeCover(upload);
       if (previous && previous !== coverImage) await removeCover(previous);
     }
+    if (existing && actor.role !== "editor" && !ownsArticle(existing, actor)) fail(back, "Это не ваша статья.");
     const rubrics = listRubrics();
     const rubric = rubrics.find((item) => item.slug === parsed.value.rubric && !item.parent);
     if (!rubric) fail(back, "Выберите рубрику.");
@@ -84,7 +83,10 @@ export async function saveArticleAction(formData: FormData) {
         subrubric: subrubric?.slug,
         category: subrubric?.name ?? rubric.name,
         kind: rubric.kind ?? existing?.kind ?? "news",
-        author: session.user,
+        author: existing?.author ?? actor.name,
+        ...(!existing || existing.authorSlug || ownsArticle(existing, actor)
+          ? { authorSlug: existing?.authorSlug ?? actor.slug }
+          : {}),
         cover: existing?.cover ?? parsed.value.cover,
         ...(existing?.whyItMatters ? { whyItMatters: existing.whyItMatters } : {}),
         ...(existing?.research ? { research: existing.research } : {}),
@@ -100,7 +102,7 @@ export async function saveArticleAction(formData: FormData) {
 }
 
 export async function saveServiceAction(formData: FormData) {
-  await guard();
+  await editorOnly();
   const original = String(formData.get("originalSlug") ?? "");
   const back = original ? `/admin/services/${original}` : "/admin/services/new";
   if (formData.get("intent") === "delete") {
@@ -120,7 +122,7 @@ export async function saveServiceAction(formData: FormData) {
 }
 
 export async function saveModelAction(formData: FormData) {
-  await guard();
+  await editorOnly();
   const original = String(formData.get("originalSlug") ?? "");
   const back = original ? `/admin/models/${original}` : "/admin/models/new";
   if (formData.get("intent") === "delete") {
@@ -140,7 +142,7 @@ export async function saveModelAction(formData: FormData) {
 }
 
 export async function saveRubricAction(formData: FormData) {
-  await guard();
+  await editorOnly();
   const intent = String(formData.get("intent") ?? "");
   try {
     if (intent === "delete") {
@@ -158,4 +160,77 @@ export async function saveRubricAction(formData: FormData) {
   }
   publish();
   redirect("/admin/rubrics?saved=1");
+}
+
+async function editorOnly() {
+  const actor = await currentUser();
+  if (!actor) redirect("/admin/login");
+  if (actor.role !== "editor") redirect("/admin");
+  return actor;
+}
+
+export async function saveUserAction(formData: FormData) {
+  const actor = await editorOnly();
+  const intent = String(formData.get("intent") ?? "");
+  try {
+    if (intent === "delete") {
+      const slug = String(formData.get("slug") ?? "");
+      const existing = findUserBySlug(slug);
+      await removeAvatar(existing?.photo);
+      deleteUser(slug, actor);
+    } else if (intent === "update") {
+      const slug = String(formData.get("slug") ?? "");
+      const password = String(formData.get("password") ?? "");
+      const photo = await readAvatar(formData);
+      updateUser(slug, {
+        name: String(formData.get("name") ?? ""),
+        role: String(formData.get("role") ?? "") as StaffRole,
+        bio: String(formData.get("bio") ?? ""),
+        ...(password ? { password } : {}),
+        ...(photo ? { photo } : {}),
+      });
+    } else {
+      const photo = await readAvatar(formData);
+      createUser({
+        name: String(formData.get("name") ?? ""),
+        login: String(formData.get("login") ?? ""),
+        password: String(formData.get("password") ?? ""),
+        role: String(formData.get("role") ?? "journalist") as StaffRole,
+        bio: String(formData.get("bio") ?? ""),
+        ...(photo ? { photo } : {}),
+      });
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Не удалось сохранить пользователя.";
+    redirect(`/admin/users?error=${encodeURIComponent(message)}`);
+  }
+  publish();
+  redirect("/admin/users?saved=1");
+}
+
+export async function saveProfileAction(formData: FormData) {
+  const actor = await currentUser();
+  if (!actor) redirect("/admin/login");
+  try {
+    const password = String(formData.get("password") ?? "");
+    const photo = await readAvatar(formData);
+    if (photo && actor.photo) await removeAvatar(actor.photo);
+    updateUser(actor.slug, {
+      name: String(formData.get("name") ?? ""),
+      bio: String(formData.get("bio") ?? ""),
+      ...(password ? { password } : {}),
+      ...(photo ? { photo } : {}),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Не удалось сохранить профиль.";
+    redirect(`/admin/profile?error=${encodeURIComponent(message)}`);
+  }
+  publish();
+  redirect("/admin/profile?saved=1");
+}
+
+async function readAvatar(formData: FormData) {
+  const file = formData.get("photo");
+  if (!(file instanceof File) || file.size <= 0) return undefined;
+  return storeAvatar(file);
 }

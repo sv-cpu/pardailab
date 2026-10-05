@@ -1,8 +1,10 @@
 import { saveRubricAction } from "@/app/admin/actions";
 import { Notice, fieldClass } from "@/components/admin/ui";
 import { listRubrics } from "@/lib/rubrics";
+import { requireEditor } from "@/lib/users";
 
 export default async function RubricsPage({ searchParams }: { searchParams: Promise<{ saved?: string; error?: string }> }) {
+  await requireEditor();
   const query = await searchParams;
   const rubrics = listRubrics();
   const parents = rubrics.filter((item) => !item.parent);

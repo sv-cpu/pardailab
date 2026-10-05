@@ -128,7 +128,15 @@ export async function ArticleScreen({ kind, slug }: { kind: ArticleKind; slug: s
           )}
           <div>
             <dt className="sr-only">Автор</dt>
-            <dd>{article.author}</dd>
+            <dd>
+              {article.authorSlug ? (
+                <Link href={`/avtory/${article.authorSlug}`} className="hover:text-olive">
+                  {article.author}
+                </Link>
+              ) : (
+                article.author
+              )}
+            </dd>
           </div>
           <div>
             <dt className="sr-only">Время чтения</dt>

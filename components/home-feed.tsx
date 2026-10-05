@@ -5,8 +5,19 @@ import { formatDate } from "@/lib/format";
 import { articleHref, kindLabel } from "@/lib/paths";
 import type { Article, ArticleKind } from "@/lib/types";
 
-function meta(article: Article) {
-  return `${article.author} · ${formatDate(article.date)}`;
+function Byline({ article }: { article: Article }) {
+  const author = article.authorSlug ? (
+    <Link href={`/avtory/${article.authorSlug}`} className="hover:text-olive">
+      {article.author}
+    </Link>
+  ) : (
+    article.author
+  );
+  return (
+    <>
+      {author} · {formatDate(article.date)}
+    </>
+  );
 }
 
 export function LeadStory({ article }: { article: Article }) {
@@ -23,7 +34,9 @@ export function LeadStory({ article }: { article: Article }) {
         </Link>
       </h1>
       <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{article.description}</p>
-      <p className="mt-4 text-sm text-muted-foreground">{meta(article)}</p>
+      <p className="mt-4 text-sm text-muted-foreground">
+        <Byline article={article} />
+      </p>
     </article>
   );
 }
@@ -98,7 +111,9 @@ export function SectionBand({
                   {article.title}
                 </Link>
               </h3>
-              <p className="mt-3 text-xs text-muted-foreground">{meta(article)}</p>
+              <p className="mt-3 text-xs text-muted-foreground">
+                <Byline article={article} />
+              </p>
             </article>
           );
         })}
