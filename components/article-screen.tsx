@@ -13,7 +13,10 @@ import { formatDate } from "@/lib/format";
 import { articleHref, kindLabel } from "@/lib/paths";
 import { relatedArticles } from "@/lib/related";
 import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo";
+import { site } from "@/lib/site";
 import type { ArticleKind, Block } from "@/lib/types";
+
+import { ShareBar } from "./share-bar";
 
 const roots: Record<ArticleKind, string> = {
   news: "/novosti",
@@ -72,6 +75,7 @@ export async function ArticleScreen({ kind, slug }: { kind: ArticleKind; slug: s
   const article = articles.find((item) => item.kind === kind && item.slug === slug);
   if (!article) notFound();
   const related = relatedArticles(articles, article);
+  const pageUrl = new URL(articleHref(kind, slug), site.url).toString();
   const crumbs = [
     { name: "Главная", path: "/" },
     { name: kindLabel[kind], path: roots[kind] },
@@ -143,6 +147,9 @@ export async function ArticleScreen({ kind, slug }: { kind: ArticleKind; slug: s
             <dd>{article.readingMinutes} мин чтения</dd>
           </div>
         </dl>
+        <div className="mt-6">
+          <ShareBar url={pageUrl} title={article.title} />
+        </div>
       </div>
       <Cover id={article.cover} src={article.coverImage} alt={`Обложка: ${article.title}`} priority className="mt-10 max-w-5xl rounded-2xl" />
       {article.whyItMatters ? (
@@ -153,6 +160,9 @@ export async function ArticleScreen({ kind, slug }: { kind: ArticleKind; slug: s
       ) : null}
       <div className="mt-4">
         <Blocks blocks={article.body} />
+      </div>
+      <div className="mt-10 max-w-3xl border-t border-border pt-6">
+        <ShareBar url={pageUrl} title={article.title} />
       </div>
       {related.length ? (
         <section className="mt-20">
