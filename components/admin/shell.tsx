@@ -7,9 +7,11 @@ import { useState } from "react";
 import { logout } from "@/app/admin/actions";
 import { Mark } from "@/components/mark";
 
+import type { StaffRole } from "@/lib/users";
+
 import { AdminNav } from "./nav";
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export function AdminShell({ role, children }: { role: StaffRole; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="min-h-screen lg:pl-60">
@@ -32,7 +34,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
         <div className={open ? "block" : "hidden lg:flex lg:flex-1 lg:flex-col"}>
           <div className="px-3 pb-4 lg:flex-1">
-            <AdminNav onNavigate={() => setOpen(false)} />
+            <AdminNav role={role} onNavigate={() => setOpen(false)} />
           </div>
           <div className="flex items-center gap-4 border-t border-border px-5 py-4 text-sm">
             <Link href="/" className="hover:text-olive">

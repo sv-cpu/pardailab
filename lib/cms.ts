@@ -6,6 +6,7 @@ import { articles as localArticles } from "@/lib/content/articles";
 import { rateModels, models as localModels } from "@/lib/content/models";
 import { services as localServices } from "@/lib/content/services";
 import { listArticles, listModels, listServices } from "@/lib/db";
+import { attachAuthors } from "@/lib/users";
 import type { Article, ArticleIndex, Block, ModelProfile, Service } from "@/lib/types";
 
 async function fromStore<T>(read: () => Promise<T[]>): Promise<T[] | null> {
@@ -81,7 +82,7 @@ function mergeBySlug<T extends { slug: string }>(local: T[], remote: T[] | null)
 export const getArticles = cache(async () => {
   const remote = await readCollection("/articles", isArticle);
   const stored = await fromStore(async () => listArticles());
-  return mergeBySlug(stored ?? localArticles, remote).sort((a, b) => b.date.localeCompare(a.date));
+  return attachAuthors(mergeBySlug(stored ?? localArticles, remote)).sort((a, b) => b.date.localeCompare(a.date));
 });
 
 export const getServices = cache(async () => {

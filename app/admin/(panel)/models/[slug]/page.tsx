@@ -4,6 +4,7 @@ import { saveModelAction } from "@/app/admin/actions";
 import { ModelForm } from "@/components/admin/forms";
 import { Notice } from "@/components/admin/ui";
 import { listModels } from "@/lib/db";
+import { requireEditor } from "@/lib/users";
 
 export default async function EditModelPage({
   params,
@@ -12,6 +13,7 @@ export default async function EditModelPage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ saved?: string; error?: string }>;
 }) {
+  await requireEditor();
   const { slug } = await params;
   const query = await searchParams;
   const model = listModels().find((item) => item.slug === slug);

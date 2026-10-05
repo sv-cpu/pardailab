@@ -1,8 +1,10 @@
 import { saveServiceAction } from "@/app/admin/actions";
 import { ServiceForm } from "@/components/admin/forms";
 import { Notice } from "@/components/admin/ui";
+import { requireEditor } from "@/lib/users";
 
 export default async function NewServicePage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  await requireEditor();
   const query = await searchParams;
   return (
     <div>

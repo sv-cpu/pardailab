@@ -24,6 +24,7 @@ export interface Article {
   subrubric?: string;
   date: string;
   author: string;
+  authorSlug?: string;
   readingMinutes: number;
   cover: number;
   /** Загруженный кадр 16:9. Если нет, на сайте остаётся готовая обложка `cover`. */

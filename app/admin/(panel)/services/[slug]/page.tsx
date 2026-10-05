@@ -4,6 +4,7 @@ import { saveServiceAction } from "@/app/admin/actions";
 import { ServiceForm } from "@/components/admin/forms";
 import { Notice } from "@/components/admin/ui";
 import { listServices } from "@/lib/db";
+import { requireEditor } from "@/lib/users";
 
 export default async function EditServicePage({
   params,
@@ -12,6 +13,7 @@ export default async function EditServicePage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ saved?: string; error?: string }>;
 }) {
+  await requireEditor();
   const { slug } = await params;
   const query = await searchParams;
   const service = listServices().find((item) => item.slug === slug);
