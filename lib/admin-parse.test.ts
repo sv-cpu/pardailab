@@ -19,21 +19,21 @@ describe("article body", () => {
 });
 
 describe("parseArticle", () => {
-  it("requires a research topic for research pieces", () => {
+  it("counts reading time from the text and skips the removed fields", () => {
     const form = new FormData();
     form.set("slug", "nomer-128");
-    form.set("kind", "research");
     form.set("title", "Новое досье");
     form.set("description", "Коротко.");
-    form.set("category", "Документы");
+    form.set("rubric", "novosti");
     form.set("date", "2026-10-01");
-    form.set("author", "Лаборатория");
-    form.set("readingMinutes", "8");
-    form.set("cover", "1");
     form.set("tags", "досье");
     form.set("body", "Текст исследования.");
-    form.set("researchNumber", "128");
     const parsed = parseArticle(form);
-    assert.equal(parsed.ok, false);
+    assert.equal(parsed.ok, true);
+    if (!parsed.ok) return;
+    assert.equal(parsed.value.readingMinutes, 1);
+    assert.equal(parsed.value.research, undefined);
+    assert.equal(parsed.value.whyItMatters, undefined);
+    assert.equal(parsed.value.rubric, "novosti");
   });
 });

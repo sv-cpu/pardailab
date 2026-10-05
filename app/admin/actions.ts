@@ -56,19 +56,20 @@ export async function saveArticleAction(formData: FormData) {
     publish();
     redirect("/admin/articles");
   }
+  const session = await currentSession();
+  if (!session) redirect("/admin/login");
   const parsed = parseArticle(formData);
   if (!parsed.ok) fail(back, parsed.error);
+  const existing = original ? listArticles().find((item) => item.slug === original) : undefined;
   const previous = isStoredCover(String(formData.get("existingCover") ?? ""))
     ? String(formData.get("existingCover"))
     : undefined;
-  let coverImage = formData.get("clearCover") ? undefined : previous;
+  let coverImage = previous;
   const upload = formData.get("coverFile");
   try {
     if (upload instanceof File && upload.size > 0) {
       coverImage = await storeCover(upload);
       if (previous && previous !== coverImage) await removeCover(previous);
-    } else if (!coverImage && previous) {
-      await removeCover(previous);
     }
     const rubrics = listRubrics();
     const rubric = rubrics.find((item) => item.slug === parsed.value.rubric && !item.parent);
@@ -82,7 +83,11 @@ export async function saveArticleAction(formData: FormData) {
         rubric: rubric.slug,
         subrubric: subrubric?.slug,
         category: subrubric?.name ?? rubric.name,
-        kind: rubric.kind ?? parsed.value.kind,
+        kind: rubric.kind ?? existing?.kind ?? "news",
+        author: session.user,
+        cover: existing?.cover ?? parsed.value.cover,
+        ...(existing?.whyItMatters ? { whyItMatters: existing.whyItMatters } : {}),
+        ...(existing?.research ? { research: existing.research } : {}),
         ...(coverImage ? { coverImage } : {}),
       },
       original,

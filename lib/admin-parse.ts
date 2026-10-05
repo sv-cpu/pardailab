@@ -90,8 +90,8 @@ export function blocksToText(blocks: Block[]) {
 export function parseArticle(form: FormData): ParseResult<Article> {
   const slug = parseSlug(text(form, "slug"));
   if (!slug.ok) return slug;
-  const kind = text(form, "kind") as ArticleKind;
-  if (!kinds.has(kind)) return { ok: false, error: "Выберите раздел." };
+  const kindValue = text(form, "kind") as ArticleKind;
+  const kind = kinds.has(kindValue) ? kindValue : "news";
   const title = required(text(form, "title"), "Название");
   if (!title.ok) return title;
   const description = required(text(form, "description"), "Описание");
@@ -103,14 +103,9 @@ export function parseArticle(form: FormData): ParseResult<Article> {
   if (!category) return { ok: false, error: "Выберите рубрику." };
   const date = text(form, "date");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return { ok: false, error: "Дата в формате ГГГГ-ММ-ДД." };
-  const author = required(text(form, "author"), "Автор");
-  if (!author.ok) return author;
-  const reading = Number(text(form, "readingMinutes"));
-  if (!Number.isInteger(reading) || reading < 1 || reading > 180) {
-    return { ok: false, error: "Время чтения — целое число минут от 1 до 180." };
-  }
-  const cover = Number(text(form, "cover"));
-  if (!Number.isInteger(cover) || cover < 0 || cover > 5) return { ok: false, error: "Выберите обложку." };
+  const author = text(form, "author") || "Редакция";
+  const coverValue = Number(text(form, "cover"));
+  const cover = Number.isInteger(coverValue) && coverValue >= 0 && coverValue <= 5 ? coverValue : 0;
   const tags = lines(text(form, "tags"));
   if (!tags.length) return { ok: false, error: "Добавьте хотя бы одну метку." };
   let body: Block[];
@@ -126,7 +121,6 @@ export function parseArticle(form: FormData): ParseResult<Article> {
   } else {
     return { ok: false, error: "Добавьте текст материала." };
   }
-  const why = text(form, "whyItMatters");
   const article: Article = {
     slug: slug.value,
     kind,
@@ -136,21 +130,27 @@ export function parseArticle(form: FormData): ParseResult<Article> {
     ...(rubric ? { rubric } : {}),
     ...(subrubric ? { subrubric } : {}),
     date,
-    author: author.value,
-    readingMinutes: reading,
+    author,
+    readingMinutes: readingMinutes(body),
     cover,
     tags,
     body,
   };
-  if (why) article.whyItMatters = why;
-  if (kind === "research") {
-    const number = Number(text(form, "researchNumber"));
-    const topic = text(form, "researchTopic");
-    if (!Number.isInteger(number) || number < 1) return { ok: false, error: "Номер исследования — целое число." };
-    if (!topic) return { ok: false, error: "Заполните тему исследования." };
-    article.research = { number, topic, status: "verified" };
-  }
   return { ok: true, value: article };
+}
+
+function readingMinutes(body: Block[]) {
+  const words = body
+    .flatMap((block) => {
+      if (block.type === "ul" || block.type === "ol") return block.items;
+      if (block.type === "html") return [block.html.replace(/<[^>]+>/g, " ")];
+      if (block.type === "note") return [block.title, block.text];
+      return [block.text];
+    })
+    .join(" ")
+    .split(/\s+/)
+    .filter(Boolean).length;
+  return Math.min(180, Math.max(1, Math.round(words / 180)));
 }
 
 export function parseService(form: FormData): ParseResult<Service> {

@@ -44,7 +44,7 @@ function cropToWide(file: File) {
   });
 }
 
-export function CoverField({ preview, uploaded }: { preview: string; uploaded: boolean }) {
+export function CoverField({ preview }: { preview: string }) {
   const [image, setImage] = useState(preview);
   const [error, setError] = useState("");
 
@@ -52,8 +52,12 @@ export function CoverField({ preview, uploaded }: { preview: string; uploaded: b
     <div className="grid gap-3 sm:col-span-2">
       <span className="text-sm text-muted-foreground">Обложка, 16:9</span>
       <div className="relative aspect-video overflow-hidden border border-border bg-card">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={image} alt="" className="size-full object-cover" />
+        {image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={image} alt="" className="size-full object-cover" />
+        ) : (
+          <p className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">Обложка не загружена</p>
+        )}
       </div>
       <input
         name="coverFile"
@@ -77,12 +81,6 @@ export function CoverField({ preview, uploaded }: { preview: string; uploaded: b
         }}
       />
       <p className="text-sm text-muted-foreground">Кадр сохранится как 1600×900. Лишнее по краям обрежется.</p>
-      {uploaded ? (
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" name="clearCover" />
-          Убрать загруженную обложку и вернуть готовую
-        </label>
-      ) : null}
       {error ? <p className="text-sm text-olive-deep">{error}</p> : null}
     </div>
   );
