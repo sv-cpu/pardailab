@@ -13,8 +13,8 @@ export default async function ModelsPage() {
   return (
     <div className="grid gap-6">
       <p className="text-sm">
-        <Link href="/admin/models/rating" className="text-olive">
-          Обновить рейтинг
+        <Link href="/admin/benchmarks" className="text-olive">
+          Бенчмарки
         </Link>
       </p>
       <RecordList title="Модели" href="/admin/models/new" rows={rows} />

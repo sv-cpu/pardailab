@@ -49,9 +49,14 @@ export default async function HomePage() {
             <h2 className="font-heading text-3xl tracking-tight sm:text-4xl">Модели</h2>
             <p className="mt-2 text-sm text-muted-foreground">Одна редакционная шкала, разные сильные стороны.</p>
           </div>
-          <Link href="/modeli" className="text-sm underline decoration-border underline-offset-4 hover:decoration-olive">
-            Вся матрица
-          </Link>
+          <span className="flex gap-4 text-sm">
+            <Link href="/benchmarki" className="underline decoration-border underline-offset-4 hover:decoration-olive">
+              Бенчмарки
+            </Link>
+            <Link href="/modeli" className="underline decoration-border underline-offset-4 hover:decoration-olive">
+              Карточки
+            </Link>
+          </span>
         </div>
         <ol className="mt-8 divide-y divide-border border-y border-border">
           {leaders.map((model, index) => (
