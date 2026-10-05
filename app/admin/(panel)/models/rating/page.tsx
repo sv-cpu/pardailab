@@ -1,7 +1,8 @@
 import Link from "next/link";
 
+import { addRatingModelAction, dropRatingModelAction } from "@/app/admin/actions";
 import { RatingBoard } from "@/components/admin/rating-board";
-import { Notice } from "@/components/admin/ui";
+import { Notice, fieldClass } from "@/components/admin/ui";
 import { rateModels, sortModels } from "@/lib/content/models";
 import { listModels } from "@/lib/db";
 import { ratingStamp } from "@/lib/rating";
@@ -21,19 +22,40 @@ export default async function RatingPage({ searchParams }: { searchParams: Promi
   });
   return (
     <div className="mx-auto grid w-full max-w-3xl gap-6">
-      <div>
-        <h1 className="font-heading text-4xl tracking-tight">Рейтинг моделей</h1>
-        <p className="mt-3 text-muted-foreground">
-          Шкала обновляется целиком, обычно раз в одну-две недели. Итог считается из оценок, порядок на сайте изменится после сохранения.
-        </p>
-        <p className="mt-2 text-sm">
-          <Link href="/modeli" className="text-olive">
-            Открыть на сайте
-          </Link>
-        </p>
-      </div>
+      <p className="text-sm">
+        <Link href="/modeli" className="text-olive">
+          Открыть на сайте
+        </Link>
+      </p>
       <Notice saved={query.saved} error={query.error} />
-      <RatingBoard models={models} updated={stamp.updated} note={stamp.note} />
+      <RatingBoard models={models.filter((model) => model.inRating !== false)} updated={stamp.updated} nextUpdate={stamp.nextUpdate} />
+      <section className="grid gap-4 border border-border p-4">
+        <h2 className="font-heading text-2xl">Список моделей</h2>
+        <p className="text-sm text-muted-foreground">В рейтинге всегда десять моделей. Новая строка получает оценки 5, пока лаборатория не пройдёт испытания.</p>
+        <form action={addRatingModelAction} className="grid gap-3">
+          <input name="versionName" required placeholder="Полное название с версией" className={fieldClass} />
+          <input name="vendor" required placeholder="Вендор" className={fieldClass} />
+          <input name="slug" required placeholder="Адрес латиницей" className={fieldClass} />
+          <button type="submit" className="justify-self-start text-sm text-olive">
+            Добавить в рейтинг
+          </button>
+        </form>
+        <ul className="grid gap-2">
+          {models
+            .filter((model) => model.inRating !== false)
+            .map((model) => (
+              <li key={model.slug}>
+                <form action={dropRatingModelAction} className="flex items-center justify-between gap-3">
+                  <input type="hidden" name="slug" value={model.slug} />
+                  <span className="text-sm">{model.versionName || model.name}</span>
+                  <button type="submit" className="text-sm text-muted-foreground">
+                    Убрать
+                  </button>
+                </form>
+              </li>
+            ))}
+        </ul>
+      </section>
     </div>
   );
 }

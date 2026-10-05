@@ -8,6 +8,7 @@ import { parseArticle, parseModel, parseService } from "@/lib/admin-parse";
 import { isStoredCover, removeCover, storeCover } from "@/lib/covers";
 import { deleteRecord, listArticles, listModels, saveArticle, saveModel, saveService } from "@/lib/db";
 import { saveRatingStamp } from "@/lib/rating";
+import { transliterate } from "@/lib/rubric-seed";
 import { scoreFields } from "@/lib/scores";
 import type { ModelScores } from "@/lib/types";
 import { createRubric, deleteRubric, listRubrics, renameRubric } from "@/lib/rubrics";
@@ -238,24 +239,78 @@ export async function saveRatingAction(formData: FormData) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(updated)) {
     redirect("/admin/models/rating?error=" + encodeURIComponent("Укажите дату шкалы."));
   }
-  const note = String(formData.get("note") ?? "").trim();
+  const nextUpdate = String(formData.get("nextUpdate") ?? "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(nextUpdate)) {
+    redirect("/admin/models/rating?error=" + encodeURIComponent("Укажите дату следующего обновления."));
+  }
+  const slugs = formData.getAll("modelSlug").map(String);
   try {
-    for (const model of listModels()) {
+    const models = listModels();
+    for (const slug of slugs) {
+      const model = models.find((item) => item.slug === slug);
+      if (!model) throw new Error("Модель не найдена.");
+      const versionName = String(formData.get(`${slug}:version`) ?? "").trim();
+      if (!versionName) throw new Error("Укажите полное название с версией.");
       const scores = {} as ModelScores;
       for (const [key, label] of scoreFields) {
-        const value = Number(String(formData.get(`${model.slug}:${key}`) ?? "").replace(",", "."));
+        const value = Number(String(formData.get(`${slug}:${key}`) ?? "").replace(",", "."));
         if (!Number.isFinite(value) || value < 0 || value > 10) {
-          throw new Error(`«${model.name}», ${label}: число от 0 до 10.`);
+          throw new Error(`«${versionName}», ${label}: число от 0 до 10.`);
         }
         scores[key] = Math.round(value * 10) / 10;
       }
-      saveModel({ ...model, scores }, model.slug);
+      saveModel({ ...model, name: versionName, versionName, scores, inRating: true }, model.slug);
     }
-    saveRatingStamp(updated, note);
+    saveRatingStamp(updated, nextUpdate);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Не удалось сохранить шкалу.";
     redirect(`/admin/models/rating?error=${encodeURIComponent(message)}`);
   }
+  publish();
+  redirect("/admin/models/rating?saved=1");
+}
+
+export async function addRatingModelAction(formData: FormData) {
+  await editorOnly();
+  const versionName = String(formData.get("versionName") ?? "").trim();
+  const vendor = String(formData.get("vendor") ?? "").trim();
+  const slug = transliterate(String(formData.get("slug") ?? ""));
+  if (!versionName || !vendor || !slug) {
+    redirect("/admin/models/rating?error=" + encodeURIComponent("Заполните название, вендора и адрес."));
+  }
+  const models = listModels();
+  if (models.filter((model) => model.inRating !== false).length >= 10) {
+    redirect("/admin/models/rating?error=" + encodeURIComponent("В рейтинге уже десять моделей. Сначала уберите одну."));
+  }
+  if (models.some((model) => model.slug === slug)) {
+    redirect("/admin/models/rating?error=" + encodeURIComponent("Такой адрес уже есть."));
+  }
+  const scores = { speed: 5, cost: 5, quality: 5, russian: 5, code: 5, agents: 5, documents: 5, context: 5 };
+  saveModel(
+    {
+      slug,
+      name: versionName,
+      versionName,
+      vendor,
+      summary: "Оценки стоят до завершения цикла испытаний лаборатории.",
+      bestFor: "Уточняется после испытаний.",
+      avoidWhen: "Уточняется после испытаний.",
+      scores,
+      tags: [slug],
+      inRating: true,
+    },
+    "",
+  );
+  publish();
+  redirect("/admin/models/rating?saved=1");
+}
+
+export async function dropRatingModelAction(formData: FormData) {
+  await editorOnly();
+  const slug = String(formData.get("slug") ?? "");
+  const model = listModels().find((item) => item.slug === slug);
+  if (!model) redirect("/admin/models/rating");
+  saveModel({ ...model, inRating: false }, model.slug);
   publish();
   redirect("/admin/models/rating?saved=1");
 }

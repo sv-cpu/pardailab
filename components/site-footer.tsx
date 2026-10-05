@@ -2,8 +2,8 @@ import Link from "next/link";
 
 import { OpenConsultantButton } from "@/components/consultant";
 import { Container } from "@/components/container";
-import { formatDate } from "@/lib/format";
 import { ratingStamp } from "@/lib/rating";
+import { ratingPeriod } from "@/lib/rating-view";
 import { menuRubrics } from "@/lib/rubrics";
 import { library } from "@/lib/site";
 
@@ -66,7 +66,7 @@ export function SiteFooter() {
       </Container>
       <Container className="border-t border-border py-6 text-sm text-muted-foreground">
         <p>
-          Оценки — редакционная шкала лаборатории на {formatDate(rating.updated)}. Это не реклама вендоров и не академическая
+          Оценки — редакционная шкала лаборатории, {ratingPeriod(rating.updated).toLowerCase()}. Это не реклама вендоров и не академическая
           сертификация.
         </p>
         <p className="mt-2">© {new Date().getFullYear()} PardAiLabs</p>
