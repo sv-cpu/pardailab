@@ -69,7 +69,7 @@ export function articleJsonLd(article: Article) {
       "@type": "Organization",
       name: site.name,
       url: site.url,
-      logo: { "@type": "ImageObject", url: new URL("/icon", site.url).toString() },
+      logo: { "@type": "ImageObject", url: new URL("/icon.png", site.url).toString() },
     },
     mainEntityOfPage: url,
     timeRequired: `PT${article.readingMinutes}M`,
@@ -99,7 +99,7 @@ export function websiteJsonLd() {
         name: site.name,
         url: site.url,
         description: site.description,
-        logo: new URL("/icon", site.url).toString(),
+        logo: new URL("/icon.png", site.url).toString(),
       },
       {
         "@type": "WebSite",
