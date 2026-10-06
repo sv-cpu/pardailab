@@ -114,6 +114,7 @@
 .article-html h2 {
   margin-top: 1.75rem;
   font-size: 1.875rem;
+  scroll-margin-top: 6rem;
 }
 
 .article-editor h3,
