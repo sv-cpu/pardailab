@@ -12,7 +12,7 @@ export function SearchForm({
   return (
     <form action="/poisk" method="get" role="search" className="w-full">
       <label htmlFor="q" className="sr-only">
-        Поиск по статьям, сервисам, моделям и исследованиям
+        Поиск по словам, которые помните
       </label>
       <div
         className={cn(
@@ -25,7 +25,7 @@ export function SearchForm({
           id="q"
           name="q"
           defaultValue={defaultValue}
-          placeholder="Статьи, сервисы, модели"
+          placeholder="Слова, которые помните"
           className={cn(
             "h-full min-w-0 flex-1 bg-transparent text-foreground outline-none placeholder:text-muted-foreground",
             large ? "text-lg" : "text-base",
