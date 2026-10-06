@@ -11,6 +11,8 @@ import { JsonLd } from "@/components/json-ld";
 import { getArticles } from "@/lib/cms";
 import { formatPublished } from "@/lib/format";
 import { articleHref, kindLabel } from "@/lib/paths";
+import { placementLabels } from "@/lib/placements";
+import { listRubrics } from "@/lib/rubrics";
 import { relatedArticles } from "@/lib/related";
 import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -118,7 +120,7 @@ export async function ArticleScreen({ kind, slug }: { kind: ArticleKind; slug: s
         </section>
       ) : null}
       <div className="mt-8 max-w-3xl">
-        <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">{article.category}</p>
+        <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">{placementLabels(article, listRubrics())}</p>
         <h1 className="mt-4 font-heading text-4xl leading-[1.12] tracking-tight text-balance sm:text-5xl">
           {article.title}
         </h1>

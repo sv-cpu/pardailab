@@ -2,6 +2,7 @@ import type { DatabaseSync } from "node:sqlite";
 
 import { articles as localArticles } from "@/lib/content/articles";
 import { getDb, listArticles, saveArticle } from "@/lib/db";
+import { articlePlacements, usesRubric } from "@/lib/placements";
 import { buildRubricSeed, sectionRubrics, transliterate, type RubricRecord } from "@/lib/rubric-seed";
 import type { Article, ArticleKind } from "@/lib/types";
 
@@ -113,8 +114,11 @@ export function renameRubric(slug: string, name: string, db = getDb()) {
   if (!next.name) throw new Error("Введите название.");
   writeRubric(next, db);
   for (const article of listArticles(db)) {
-    if (article.subrubric === slug) saveArticle({ ...article, category: next.name }, article.slug, db);
-    else if (article.rubric === slug && !article.subrubric) saveArticle({ ...article, category: next.name }, article.slug, db);
+    const [first] = articlePlacements(article);
+    if (!first) continue;
+    if (first.subrubric === slug || (first.rubric === slug && !first.subrubric)) {
+      saveArticle({ ...article, category: next.name }, article.slug, db);
+    }
   }
 }
 
@@ -125,7 +129,7 @@ export function deleteRubric(slug: string, db = getDb()) {
   if (current.kind) throw new Error("Раздел сайта нельзя удалить, его можно только переименовать.");
   if (all.some((item) => item.parent === slug)) throw new Error("Сначала удалите подрубрики.");
   const articles = listArticles(db);
-  if (articles.some((item) => item.rubric === slug || item.subrubric === slug)) {
+  if (articles.some((item) => usesRubric(item, slug))) {
     throw new Error("Рубрика стоит у статей. Сначала выберите у них другую.");
   }
   db.prepare("DELETE FROM rubrics WHERE slug = ?").run(slug);

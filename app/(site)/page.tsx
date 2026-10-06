@@ -7,6 +7,8 @@ import { getArticles, getModels, getServices } from "@/lib/cms";
 import { sortModels } from "@/lib/content/models";
 import { sortServices } from "@/lib/content/services";
 import { formatScore } from "@/lib/format";
+import { matchesKind, placementLabel } from "@/lib/placements";
+import { listRubrics } from "@/lib/rubrics";
 import type { ArticleKind } from "@/lib/types";
 
 const bands: { kind: ArticleKind; href: string }[] = [
@@ -17,7 +19,7 @@ const bands: { kind: ArticleKind; href: string }[] = [
 ];
 
 export default async function HomePage() {
-  const [articles, models, services] = await Promise.all([getArticles(), getModels(), getServices()]);
+  const [articles, models, services, rubrics] = await Promise.all([getArticles(), getModels(), getServices(), listRubrics()]);
   const lead = articles[0];
   const rail = articles.filter((item) => item.slug !== lead?.slug).slice(0, 4);
   const leaders = sortModels(models).slice(0, 4);
@@ -38,7 +40,13 @@ export default async function HomePage() {
             key={band.kind}
             kind={band.kind}
             href={band.href}
-            articles={articles.filter((item) => item.kind === band.kind && item.slug !== lead?.slug).slice(0, 4)}
+            articles={articles
+              .filter((item) => matchesKind(item, band.kind, rubrics) && item.slug !== lead?.slug)
+              .slice(0, 4)
+              .map((item) => ({
+                ...item,
+                category: placementLabel(item, rubrics, rubrics.find((rubric) => rubric.kind === band.kind)?.slug),
+              }))}
           />
         ))}
       </Container>

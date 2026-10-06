@@ -22,6 +22,8 @@ export interface Article {
   category: string;
   rubric?: string;
   subrubric?: string;
+  /** До двух пар «рубрика + подрубрика». Первая совпадает с `rubric` и задаёт адрес страницы. */
+  placements?: { rubric: string; subrubric?: string }[];
   date: string;
   author: string;
   authorSlug?: string;
