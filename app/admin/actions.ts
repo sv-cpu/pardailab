@@ -14,6 +14,7 @@ import { transliterate } from "@/lib/rubric-seed";
 import { scoreFields } from "@/lib/scores";
 import type { ModelScores } from "@/lib/types";
 import { createRubric, deleteRubric, listRubrics, renameRubric } from "@/lib/rubrics";
+import { verifyPassword } from "@/lib/passwords";
 import { authenticate, createUser, currentUser, deleteUser, findUserBySlug, ownsArticle, updateUser, type StaffRole } from "@/lib/users";
 import { removeAvatar, storeAvatar } from "@/lib/avatars";
 
@@ -211,14 +212,17 @@ export async function saveUserAction(formData: FormData) {
     } else if (intent === "update") {
       const slug = String(formData.get("slug") ?? "");
       const password = String(formData.get("password") ?? "");
+      const existing = findUserBySlug(slug);
       const photo = await readAvatar(formData);
+      const remove = formData.get("removePhoto") === "1";
       updateUser(slug, {
         name: String(formData.get("name") ?? ""),
         role: String(formData.get("role") ?? "") as StaffRole,
         bio: String(formData.get("bio") ?? ""),
         ...(password ? { password } : {}),
-        ...(photo ? { photo } : {}),
+        ...(photo ? { photo } : remove ? { photo: null } : {}),
       });
+      if ((photo || remove) && existing?.photo && existing.photo !== photo) await removeAvatar(existing.photo);
     } else {
       const photo = await readAvatar(formData);
       createUser({
@@ -242,21 +246,41 @@ export async function saveProfileAction(formData: FormData) {
   const actor = await currentUser();
   if (!actor) redirect("/admin/login");
   try {
-    const password = String(formData.get("password") ?? "");
+    const name = String(formData.get("name") ?? "").trim();
+    if (!name) throw new Error("Введите имя.");
     const photo = await readAvatar(formData);
-    if (photo && actor.photo) await removeAvatar(actor.photo);
+    const remove = formData.get("removePhoto") === "1";
     updateUser(actor.slug, {
-      name: String(formData.get("name") ?? ""),
+      name,
       bio: String(formData.get("bio") ?? ""),
-      ...(password ? { password } : {}),
-      ...(photo ? { photo } : {}),
+      ...(photo ? { photo } : remove ? { photo: null } : {}),
     });
+    if ((photo || remove) && actor.photo && actor.photo !== photo) await removeAvatar(actor.photo);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Не удалось сохранить профиль.";
     redirect(`/admin/profile?error=${encodeURIComponent(message)}`);
   }
   publish();
   redirect("/admin/profile?saved=1");
+}
+
+export async function savePasswordAction(formData: FormData) {
+  const actor = await currentUser();
+  if (!actor) redirect("/admin/login");
+  try {
+    const current = String(formData.get("currentPassword") ?? "");
+    const next = String(formData.get("password") ?? "");
+    const again = String(formData.get("passwordAgain") ?? "");
+    if (!verifyPassword(current, actor.passwordHash)) throw new Error("Текущий пароль не подошёл.");
+    if (next.length < 8) throw new Error("Новый пароль — не короче 8 знаков.");
+    if (next !== again) throw new Error("Новый пароль и повтор не совпадают.");
+    updateUser(actor.slug, { name: actor.name, bio: actor.bio, password: next });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Не удалось сменить пароль.";
+    redirect(`/admin/profile?error=${encodeURIComponent(message)}`);
+  }
+  publish();
+  redirect("/admin/profile?saved=password");
 }
 
 export async function saveRatingAction(formData: FormData) {
