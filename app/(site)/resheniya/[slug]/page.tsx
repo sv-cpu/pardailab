@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { InquiryForm } from "@/components/inquiry-form";
 import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
 import { ServiceCard } from "@/components/service-card";
@@ -68,6 +69,15 @@ export default async function Page({ params }: Props) {
           Весь каталог решений
         </Link>
       </p>
+      <div className="mt-16 border-t border-border pt-8">
+        <InquiryForm
+          kind="correction"
+          pageTitle={service.name}
+          pagePath={`/resheniya/${service.slug}`}
+          title="Замечание к карточке"
+          lede="Если описание сервиса не сходится, напишите."
+        />
+      </div>
     </Container>
   );
 }

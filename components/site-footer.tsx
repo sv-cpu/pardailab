@@ -22,6 +22,10 @@ export function SiteFooter() {
             <Link href="/o-proekte" className="underline decoration-border underline-offset-4 hover:decoration-olive">
               О проекте
             </Link>
+            <span className="text-muted-foreground"> · </span>
+            <Link href="/o-proekte#redaktsii" className="underline decoration-border underline-offset-4 hover:decoration-olive">
+              Написать редакции
+            </Link>
           </p>
         </div>
         <div>

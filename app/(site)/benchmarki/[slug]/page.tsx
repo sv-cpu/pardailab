@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { BenchmarkIssue } from "@/components/benchmark-issue";
 import { Container } from "@/components/container";
+import { InquiryForm } from "@/components/inquiry-form";
 import { findBenchmark, ratedRows } from "@/lib/benchmarks";
 import { ratingPeriod } from "@/lib/rating-view";
 import { pageMeta } from "@/lib/seo";
@@ -34,6 +35,15 @@ export default async function Page({ params }: Props) {
       </p>
       <div className="mt-6">
         <BenchmarkIssue tested={issue.tested} nextUpdate={issue.nextUpdate} models={ratedRows(issue)} />
+      </div>
+      <div className="mt-16 border-t border-border pt-8">
+        <InquiryForm
+          kind="correction"
+          pageTitle={issue.title}
+          pagePath={`/benchmarki/${issue.slug}`}
+          title="Замечание к выпуску"
+          lede="Если в этом выпуске шкалы что-то не сходится, напишите."
+        />
       </div>
     </Container>
   );
