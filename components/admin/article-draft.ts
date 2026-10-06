@@ -6,6 +6,7 @@ export type ArticleDraft = {
   rubric: string;
   subrubric: string;
   date: string;
+  time: string;
   tags: string;
   bodyHtml: string;
   savedAt: number;
@@ -29,6 +30,7 @@ export function readDraft(slug: string): ArticleDraft | null {
       rubric: typeof parsed.rubric === "string" ? parsed.rubric : "",
       subrubric: typeof parsed.subrubric === "string" ? parsed.subrubric : "",
       date: typeof parsed.date === "string" ? parsed.date : "",
+      time: typeof parsed.time === "string" ? parsed.time : "",
       tags: typeof parsed.tags === "string" ? parsed.tags : "",
       bodyHtml: parsed.bodyHtml,
       savedAt: typeof parsed.savedAt === "number" ? parsed.savedAt : Date.now(),

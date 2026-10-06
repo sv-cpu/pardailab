@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Cover } from "@/components/cover";
-import { formatDate } from "@/lib/format";
+import { formatPublished } from "@/lib/format";
 import { articleHref, kindLabel } from "@/lib/paths";
 import type { Article, ArticleKind } from "@/lib/types";
 
@@ -15,7 +15,7 @@ function Byline({ article }: { article: Article }) {
   );
   return (
     <>
-      {author} · {formatDate(article.date)}
+      {author} · {formatPublished(article.date)}
     </>
   );
 }

@@ -1,3 +1,4 @@
+import { comparePublished } from "@/lib/format";
 import { site } from "@/lib/site";
 import type { Article, Block } from "@/lib/types";
 
@@ -1014,5 +1015,5 @@ const research = finish([
 ]);
 
 export const articles: Article[] = [...research, ...news, ...practice, ...development].sort((x, y) =>
-  y.date.localeCompare(x.date),
+  comparePublished(x.date, y.date),
 );
