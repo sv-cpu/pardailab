@@ -67,6 +67,18 @@ export default function Page() {
             сдать, а не с пресс-релиза, который нужно разослать.
           </p>
           <p className="mt-5 font-serif text-lg leading-8 text-pretty">
+            Та же команда делает{" "}
+            <a
+              href="https://tech-victory.ru"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline decoration-border underline-offset-4 hover:decoration-olive"
+            >
+              tech-victory.ru
+            </a>{" "}
+            — портал о беспилотниках, робототехнике и смежных технологиях.
+          </p>
+          <p className="mt-5 font-serif text-lg leading-8 text-pretty">
             Мы не выпускаем собственные модели и не продаём позицию в каталоге или в шкале. Сравнение существует, чтобы его
             можно было прочитать и оспорить по делу.
           </p>
