@@ -64,7 +64,7 @@ export default async function Page({ searchParams }: Props) {
       </div>
       {q && total === 0 ? (
         <p className="mt-10 max-w-2xl text-lg text-muted-foreground">
-          По запросу «{q}» ничего не нашлось. Попробуйте «договор», «код» или «голос» — или откройте подбор справа внизу.
+          По запросу «{q}» ничего не нашлось. Попробуйте «договор», «код» или «голос».
         </p>
       ) : null}
       {!q ? (

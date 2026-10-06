@@ -1,4 +1,3 @@
-import { ConsultantSlot } from "@/components/consultant-slot";
 import { JsonLd } from "@/components/json-ld";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -17,7 +16,6 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       <SiteHeader />
       <main id="content">{children}</main>
       <SiteFooter />
-      <ConsultantSlot />
     </>
   );
 }
