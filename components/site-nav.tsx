@@ -148,12 +148,12 @@ export function SiteMenu({ rubrics }: { rubrics: MenuRubric[] }) {
   }, [pathname]);
 
   return (
-    <details ref={menuRef} className="relative lg:hidden">
+    <details ref={menuRef} className="lg:hidden">
       <summary className="flex h-11 cursor-pointer list-none items-center gap-2 rounded-full border border-border px-4 text-sm">
         <Menu className="size-4" aria-hidden />
         Меню
       </summary>
-      <div className="absolute right-0 z-40 mt-2 flex max-h-[70vh] w-72 flex-col gap-4 overflow-y-auto rounded-2xl border border-border bg-background p-3">
+      <div className="fixed top-[4.75rem] right-5 left-5 z-40 flex max-h-[min(70vh,calc(100dvh-6rem))] flex-col gap-4 overflow-y-auto rounded-2xl border border-border bg-background p-4 sm:right-8 sm:left-auto sm:w-80">
         <nav className="flex flex-col gap-2" aria-label="Разделы">
           {rubrics.map((item) => (
             <div key={item.slug}>
