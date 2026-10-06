@@ -1,13 +1,14 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import { HomeScale } from "@/components/home-scale";
 import { HeadlineList, LeadStory, SectionBand } from "@/components/home-feed";
 import { aiCategories } from "@/lib/categories";
 import { getArticles, getModels, getServices } from "@/lib/cms";
-import { sortModels } from "@/lib/content/models";
 import { sortServices } from "@/lib/content/services";
 import { formatScore } from "@/lib/format";
 import { matchesKind, placementLabel } from "@/lib/placements";
+import { ratingStamp } from "@/lib/rating";
 import { listRubrics } from "@/lib/rubrics";
 import type { ArticleKind } from "@/lib/types";
 
@@ -22,8 +23,8 @@ export default async function HomePage() {
   const [articles, models, services, rubrics] = await Promise.all([getArticles(), getModels(), getServices(), listRubrics()]);
   const lead = articles[0];
   const rail = articles.filter((item) => item.slug !== lead?.slug).slice(0, 4);
-  const leaders = sortModels(models).slice(0, 4);
   const picks = sortServices(services).slice(0, 3);
+  const rating = ratingStamp();
 
   return (
     <>
@@ -51,35 +52,8 @@ export default async function HomePage() {
         ))}
       </Container>
 
-      <Container className="border-t border-border py-12">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h2 className="font-heading text-3xl tracking-tight sm:text-4xl">Модели</h2>
-            <p className="mt-2 text-sm text-muted-foreground">Одна редакционная шкала, разные сильные стороны.</p>
-          </div>
-          <span className="flex gap-4 text-sm">
-            <Link href="/benchmarki" className="underline decoration-border underline-offset-4 hover:decoration-olive">
-              Бенчмарки
-            </Link>
-            <Link href="/modeli" className="underline decoration-border underline-offset-4 hover:decoration-olive">
-              Карточки
-            </Link>
-          </span>
-        </div>
-        <ol className="mt-8 divide-y divide-border border-y border-border">
-          {leaders.map((model, index) => (
-            <li key={model.slug} className="grid gap-2 py-5 sm:grid-cols-[4rem_1fr_auto] sm:items-baseline">
-              <span className="font-mono text-sm text-olive">0{index + 1}</span>
-              <div>
-                <Link href={`/modeli/${model.slug}`} className="font-heading text-2xl hover:text-olive">
-                  {model.name}
-                </Link>
-                <p className="mt-1 text-sm text-muted-foreground">{model.bestFor}</p>
-              </div>
-              <span className="font-mono text-lg">{formatScore(model.scores.overall)}</span>
-            </li>
-          ))}
-        </ol>
+      <Container className="py-12">
+        <HomeScale models={models} updated={rating.updated} />
       </Container>
 
       <section className="border-t border-border">
