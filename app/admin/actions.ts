@@ -163,8 +163,9 @@ export async function saveModelAction(formData: FormData) {
   }
   const parsed = parseModel(formData);
   if (!parsed.ok) fail(back, parsed.error);
+  const existing = original ? listModels().find((item) => item.slug === original) : undefined;
   try {
-    saveModel(parsed.value, original);
+    saveModel({ ...parsed.value, inRating: existing?.inRating }, original);
   } catch (error) {
     fail(back, error instanceof Error ? error.message : "Не удалось сохранить.");
   }
@@ -309,7 +310,7 @@ export async function saveRatingAction(formData: FormData) {
         }
         scores[key] = Math.round(value * 10) / 10;
       }
-      saveModel({ ...model, name: versionName, versionName, scores, inRating: true }, model.slug);
+      saveModel({ ...model, versionName, scores, inRating: true }, model.slug);
     }
     saveRatingStamp(updated, nextUpdate);
   } catch (error) {

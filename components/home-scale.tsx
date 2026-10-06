@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { formatScore } from "@/lib/format";
-import { modelTitle, ratingPeriod, topTen } from "@/lib/rating-view";
+import { modelRelease, modelTitle, ratingPeriod, topTen } from "@/lib/rating-view";
 import type { RatedModel } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -94,7 +94,10 @@ export function HomeScale({ models, updated }: { models: RatedModel[]; updated: 
               <tr key={model.slug} className="border-b border-border">
                 <th scope="row" className="py-3 pr-4 text-left font-heading text-lg font-normal">
                   <Link href={`/modeli/${model.slug}`} className="hover:text-olive">
-                    {modelTitle(model)}
+                    <span className="block">{model.name}</span>
+                    {modelRelease(model) ? (
+                      <span className="mt-0.5 block font-sans text-xs font-normal text-muted-foreground">{modelRelease(model)}</span>
+                    ) : null}
                   </Link>
                 </th>
                 {columns.map(([key]) => {

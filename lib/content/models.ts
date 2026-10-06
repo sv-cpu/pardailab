@@ -5,6 +5,7 @@ export const models: ModelProfile[] = [
   {
     slug: "gpt",
     name: "GPT",
+    versionName: "GPT-6 Astra",
     vendor: "OpenAI",
     summary:
       "Универсальная модель для текста, кода и агентных сценариев. Дороже открытых альтернатив, зато реже требует второй инструмент рядом.",
@@ -16,6 +17,7 @@ export const models: ModelProfile[] = [
   {
     slug: "claude",
     name: "Claude",
+    versionName: "Claude Opus 5.5",
     vendor: "Anthropic",
     summary:
       "Самый ровный профиль лаборатории для длинных документов, аккуратного русского и агентов, которые должны держать инструкцию.",
@@ -27,6 +29,7 @@ export const models: ModelProfile[] = [
   {
     slug: "gemini",
     name: "Gemini",
+    versionName: "Gemini 3.8 Flash",
     vendor: "Google",
     summary:
       "Сильный длинный контекст и удобная связка с поиском и документами Google. В русском и коде уступает лидерам шкалы, но не выпадает из рабочей зоны.",
@@ -38,6 +41,7 @@ export const models: ModelProfile[] = [
   {
     slug: "qwen",
     name: "Qwen",
+    versionName: "Qwen3.8-Max",
     vendor: "Alibaba Cloud",
     summary:
       "Сильная открытая линейка с хорошей ценой и уверенным кодом. Русский деловой стиль слабее моделей, которые мы ставим в первую очередь для писем и договоров.",
@@ -49,6 +53,7 @@ export const models: ModelProfile[] = [
   {
     slug: "deepseek",
     name: "DeepSeek",
+    versionName: "DeepSeek V4 Pro",
     vendor: "DeepSeek",
     summary:
       "Один из самых выгодных вариантов для кода. Документы и русский требуют проверки: модель сильная, но тон и полнота проседают чаще, чем у Claude и GPT.",
@@ -60,6 +65,7 @@ export const models: ModelProfile[] = [
   {
     slug: "mistral",
     name: "Mistral",
+    versionName: "Mistral Large 3",
     vendor: "Mistral AI",
     summary:
       "Быстрые прикладные модели и европейский контур поставки. Для сложного агента и длинного русского документа это не первый выбор шкалы.",
@@ -71,6 +77,7 @@ export const models: ModelProfile[] = [
   {
     slug: "llama",
     name: "Llama",
+    versionName: "Llama 4 Scout",
     vendor: "Meta",
     summary:
       "Открытые веса для своего контура. Качество из коробки ниже коммерческих лидеров: модель раскрывается там, где есть инфраструктура и задача на контроль данных.",

@@ -96,8 +96,11 @@ export function ModelForm({
     <form action={action} className="grid max-w-3xl gap-5">
       <input type="hidden" name="originalSlug" defaultValue={model?.slug ?? ""} />
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field label="Название">
+        <Field label="Линейка">
           <input name="name" defaultValue={model?.name ?? ""} required className={fieldClass} />
+        </Field>
+        <Field label="Версия в шкале">
+          <input name="versionName" defaultValue={model?.versionName ?? ""} required className={fieldClass} />
         </Field>
         <Field label="Адрес">
           <input name="slug" defaultValue={model?.slug ?? ""} required className={fieldClass} />

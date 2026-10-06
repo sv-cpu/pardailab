@@ -1,5 +1,5 @@
 import { sortModels } from "@/lib/content/models";
-import { overallScore, ratingLeaders } from "@/lib/scores";
+import { ratingLeaders } from "@/lib/scores";
 import type { RatedModel } from "@/lib/types";
 
 export function ratingPeriod(iso: string) {
@@ -10,7 +10,25 @@ export function ratingPeriod(iso: string) {
 }
 
 export function modelTitle(model: { name: string; versionName?: string }) {
-  return model.versionName?.trim() || model.name;
+  const version = model.versionName?.trim();
+  if (!version) return model.name;
+  return version.toLocaleLowerCase("ru").startsWith(model.name.trim().toLocaleLowerCase("ru"))
+    ? version
+    : `${model.name.trim()} ${version}`;
+}
+
+/** Выпуск внутри линейки. Если имя версии уже содержит семейство, наружу выходит только то, что отличает выпуск. */
+export function modelRelease(model: { name: string; versionName?: string }) {
+  const version = model.versionName?.trim() ?? "";
+  const family = model.name.trim();
+  if (!version || version.toLocaleLowerCase("ru") === family.toLocaleLowerCase("ru")) return "";
+  const lowerFamily = family.toLocaleLowerCase("ru");
+  const lowerVersion = version.toLocaleLowerCase("ru");
+  if (lowerVersion.startsWith(lowerFamily) && /[\s-]/.test(version.charAt(family.length) || "")) {
+    const rest = version.slice(family.length).trim().replace(/^[-–]\s*/, "");
+    if (rest && !/^\d/.test(rest)) return rest;
+  }
+  return version;
 }
 
 export function topTen(models: RatedModel[]) {
