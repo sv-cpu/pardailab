@@ -1,14 +1,15 @@
-import { Search } from "lucide-react";
 import Link from "next/link";
 
 import { Mark } from "@/components/mark";
 import { SiteMenu, SiteNav } from "@/components/site-nav";
+import { SiteSearch } from "@/components/site-search";
 import { ThemeToggle } from "@/components/theme-toggle";
+import type { SearchRecord } from "@/lib/search";
 import { menuRubrics } from "@/lib/rubrics";
 
 export { Mark };
 
-export function SiteHeader() {
+export function SiteHeader({ records }: { records: SearchRecord[] }) {
   const rubrics = menuRubrics();
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background">
@@ -23,13 +24,7 @@ export function SiteHeader() {
         <SiteNav rubrics={rubrics} />
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
           <SiteMenu rubrics={rubrics} />
-          <Link
-            href="/poisk"
-            className="flex size-11 items-center justify-center rounded-full border border-border hover:border-olive"
-            aria-label="Поиск"
-          >
-            <Search className="size-4" aria-hidden />
-          </Link>
+          <SiteSearch records={records} />
           <ThemeToggle />
         </div>
       </div>
