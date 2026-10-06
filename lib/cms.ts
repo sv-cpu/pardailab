@@ -8,7 +8,7 @@ import { services as localServices } from "@/lib/content/services";
 import { listArticles, listModels, listServices } from "@/lib/db";
 import { comparePublished } from "@/lib/format";
 import { attachAuthors } from "@/lib/users";
-import type { Article, ArticleIndex, Block, ModelProfile, Service } from "@/lib/types";
+import type { Article, Block, ModelProfile, Service } from "@/lib/types";
 
 async function fromStore<T>(read: () => Promise<T[]>): Promise<T[] | null> {
   try {
@@ -99,15 +99,3 @@ export const getModels = cache(async () => {
   const stored = await fromStore(async () => listModels());
   return rateModels(mergeBySlug(stored ?? localModels, remote));
 });
-
-export function toIndex(items: Article[]): ArticleIndex[] {
-  return items.map(({ slug, kind, title, description, category, tags, readingMinutes }) => ({
-    slug,
-    kind,
-    title,
-    description,
-    category,
-    tags,
-    readingMinutes,
-  }));
-}
