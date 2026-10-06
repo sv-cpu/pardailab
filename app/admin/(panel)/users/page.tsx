@@ -1,4 +1,5 @@
 import { saveUserAction } from "@/app/admin/actions";
+import { AvatarField } from "@/components/admin/avatar-field";
 import { Notice, fieldClass } from "@/components/admin/ui";
 import { listUsers, requireEditor, roleLabel, type StaffRole } from "@/lib/users";
 
@@ -30,7 +31,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
                 ))}
               </select>
               <input name="password" type="password" placeholder="Новый пароль, если нужно сменить" className={fieldClass} />
-              <input name="photo" type="file" accept="image/jpeg,image/png,image/webp" className="text-sm" />
+              <AvatarField photo={user.photo} fallback={user.name} />
               <button type="submit" className="justify-self-start text-sm text-olive">
                 Сохранить
               </button>
@@ -57,7 +58,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
           <option value="journalist">Журналист</option>
           <option value="editor">Редактор</option>
         </select>
-        <input name="photo" type="file" accept="image/jpeg,image/png,image/webp" className="text-sm" />
+        <AvatarField fallback="Новый" />
         <button type="submit" className="justify-self-start rounded-full bg-olive px-4 py-2 text-sm text-accent-foreground">
           Добавить
         </button>

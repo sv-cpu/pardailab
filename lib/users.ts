@@ -151,7 +151,7 @@ export function createUser(
 
 export function updateUser(
   slug: string,
-  input: { name: string; role?: StaffRole; bio: string; password?: string; photo?: string },
+  input: { name: string; role?: StaffRole; bio: string; password?: string; photo?: string | null },
   db = getDb(),
 ) {
   const current = findUserBySlug(slug, db);
@@ -165,8 +165,9 @@ export function updateUser(
     bio: input.bio.trim(),
     role: input.role ?? current.role,
     passwordHash: input.password ? hashPassword(input.password) : current.passwordHash,
-    ...(input.photo ? { photo: input.photo } : {}),
   };
+  if (input.photo === null) delete next.photo;
+  else if (input.photo) next.photo = input.photo;
   writeUser(next, db);
   return next;
 }

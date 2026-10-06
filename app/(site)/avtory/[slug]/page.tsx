@@ -24,10 +24,14 @@ export default async function Page({ params }: Props) {
   return (
     <Container className="py-16 sm:py-20">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-        {user.photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={user.photo} alt="" className="size-32 object-cover" />
-        ) : null}
+        <div className="grid size-32 shrink-0 place-items-center overflow-hidden rounded-full bg-olive-soft text-olive">
+          {user.photo ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={user.photo} alt="" className="size-full object-cover" />
+          ) : (
+            <span className="font-heading text-4xl">{user.name.trim().slice(0, 1).toLocaleUpperCase("ru-RU")}</span>
+          )}
+        </div>
         <div>
           <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">{roleLabel[user.role]}</p>
           <h1 className="mt-3 font-heading text-4xl tracking-tight sm:text-5xl">{user.name}</h1>
