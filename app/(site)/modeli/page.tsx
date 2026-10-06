@@ -11,7 +11,7 @@ import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "Модели",
-  description: "Карточки моделей лаборатории PardAiLabs: профиль, сильные стороны и когда модель лучше не брать.",
+  description: "Карточки моделей лаборатории PardAiLab: профиль, сильные стороны и когда модель лучше не брать.",
   path: "/modeli",
 });
 

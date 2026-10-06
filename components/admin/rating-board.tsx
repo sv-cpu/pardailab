@@ -170,10 +170,10 @@ export function RatingBoard({
       </section>
 
       <section className="max-w-3xl space-y-3 leading-relaxed text-muted-foreground">
-        <h2 className="font-heading text-3xl tracking-tight text-foreground">Методика PardAiLabs</h2>
+        <h2 className="font-heading text-3xl tracking-tight text-foreground">Методика PardAiLab</h2>
         <p>Каждая модель тестируется по единому набору сценариев.</p>
         <p>Используются одинаковые инструкции, одинаковые условия запуска и единые критерии оценки.</p>
-        <p>Результаты проверяются лабораторией PardAiLabs и публикуются только после завершения полного цикла испытаний.</p>
+        <p>Результаты проверяются лабораторией PardAiLab и публикуются только после завершения полного цикла испытаний.</p>
       </section>
     </div>
   );

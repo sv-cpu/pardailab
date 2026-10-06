@@ -110,7 +110,7 @@ export async function ArticleScreen({ kind, slug }: { kind: ArticleKind; slug: s
               <dd className="mt-2">
                 <Badge>
                   <Check className="size-3.5" aria-hidden />
-                  Проверено PardAiLabs
+                  Проверено PardAiLab
                 </Badge>
               </dd>
             </div>

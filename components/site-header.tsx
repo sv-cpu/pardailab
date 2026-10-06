@@ -17,7 +17,7 @@ export function SiteHeader() {
         <Link href="/" className="flex shrink-0 items-center gap-2.5 text-olive">
           <Mark className="size-8" />
           <span className="font-heading text-xl tracking-tight text-foreground">
-            PardAi<span className="text-olive">Labs</span>
+            PardAi<span className="text-olive">Lab</span>
           </span>
         </Link>
         <SiteNav rubrics={rubrics} />

@@ -1,6 +1,6 @@
 import { articleOg, ogContentType, ogSize } from "@/lib/og";
 
-export const alt = "Разработка PardAiLabs";
+export const alt = "Разработка PardAiLab";
 export const size = ogSize;
 export const contentType = ogContentType;
 export const runtime = "nodejs";

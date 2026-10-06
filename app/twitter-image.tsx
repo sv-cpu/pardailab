@@ -1,6 +1,6 @@
 import { ogContentType, ogSize, renderOg } from "@/lib/og";
 
-export const alt = "PardAiLabs — практический искусственный интеллект";
+export const alt = "PardAiLab — практический искусственный интеллект";
 export const size = ogSize;
 export const contentType = ogContentType;
 export const runtime = "nodejs";

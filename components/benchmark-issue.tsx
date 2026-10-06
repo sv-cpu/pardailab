@@ -42,7 +42,7 @@ export function BenchmarkIssue({
       <h2 className="mt-12 font-heading text-3xl tracking-tight">Топ-10 моделей</h2>
       <div className="mt-6 overflow-x-auto">
         <table className="w-full min-w-[64rem] border-collapse text-left text-sm">
-          <caption className="sr-only">Топ-10 моделей по шкале PardAiLabs</caption>
+          <caption className="sr-only">Топ-10 моделей по шкале PardAiLab</caption>
           <thead>
             <tr className="border-b border-border text-muted-foreground">
               <th className="py-3 pr-3 font-medium">Место</th>
@@ -113,11 +113,11 @@ export function BenchmarkIssue({
         </tbody>
       </table>
 
-      <h2 className="mt-14 font-heading text-3xl tracking-tight">Методика PardAiLabs</h2>
+      <h2 className="mt-14 font-heading text-3xl tracking-tight">Методика PardAiLab</h2>
       <div className="mt-4 max-w-3xl space-y-3 leading-relaxed text-muted-foreground">
         <p>Каждая модель тестируется по единому набору сценариев.</p>
         <p>Используются одинаковые инструкции, одинаковые условия запуска и единые критерии оценки.</p>
-        <p>Результаты проверяются лабораторией PardAiLabs и публикуются только после завершения полного цикла испытаний.</p>
+        <p>Результаты проверяются лабораторией PardAiLab и публикуются только после завершения полного цикла испытаний.</p>
       </div>
     </>
   );

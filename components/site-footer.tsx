@@ -14,7 +14,7 @@ export function SiteFooter() {
     <footer className="mt-8 border-t border-border pb-28">
       <Container className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="font-heading text-2xl tracking-tight">PardAiLabs</p>
+          <p className="font-heading text-2xl tracking-tight">PardAiLab</p>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
             Независимая лаборатория практического искусственного интеллекта. Мы объясняем инструменты и публикуем
             собственные проверки, а не пересказываем ленту.
@@ -74,7 +74,7 @@ export function SiteFooter() {
           Оценки — редакционная шкала лаборатории, {ratingPeriod(rating.updated).toLowerCase()}. Это не реклама вендоров и не академическая
           сертификация.
         </p>
-        <p className="mt-2">© {new Date().getFullYear()} PardAiLabs</p>
+        <p className="mt-2">© {new Date().getFullYear()} PardAiLab</p>
       </Container>
     </footer>
   );

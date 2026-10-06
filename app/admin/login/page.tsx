@@ -7,7 +7,7 @@ export default function LoginPage() {
       <div className="mb-8 flex items-center gap-2 text-olive">
         <Mark className="size-8" />
         <span className="font-heading text-xl text-foreground">
-          PardAi<span className="text-olive">Labs</span>
+          PardAi<span className="text-olive">Lab</span>
         </span>
       </div>
       <h1 className="font-heading text-4xl tracking-tight">Вход в редакцию</h1>
