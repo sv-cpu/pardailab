@@ -18,6 +18,11 @@ export function SiteFooter() {
             Независимая лаборатория практического искусственного интеллекта. Мы объясняем инструменты и публикуем
             собственные проверки, а не пересказываем ленту.
           </p>
+          <p className="mt-4 text-sm">
+            <Link href="/o-proekte" className="underline decoration-border underline-offset-4 hover:decoration-olive">
+              О проекте
+            </Link>
+          </p>
         </div>
         <div>
           <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">Разделы</p>

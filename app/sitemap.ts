@@ -22,6 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/katalog",
     "/materialy",
     "/poisk",
+    "/o-proekte",
   ];
 
   return [
