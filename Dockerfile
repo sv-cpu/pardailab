@@ -5,6 +5,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+ENV NEXT_PUBLIC_SITE_URL=https://pardailab.ru
 RUN npm run build && rm -rf .next/cache
 
 ENV NODE_ENV=production

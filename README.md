@@ -45,6 +45,6 @@ npm run build
 
 Ответ — JSON-массив объектов той же формы, что в `lib/types.ts`. Записи с совпадающим `slug` заменяют локальный архив, остальные материалы архива остаются. Если API недоступен, сайт тихо остаётся на локальных данных. Жёсткой привязки к CMS нет.
 
-Адрес сайта для canonical, Open Graph и sitemap: `NEXT_PUBLIC_SITE_URL` (по умолчанию `https://pardailabs.ru`).
+Адрес сайта для canonical, Open Graph и sitemap: `NEXT_PUBLIC_SITE_URL` (по умолчанию `https://pardailab.ru`).
 
 Шрифт IBM Plex в `assets/fonts` используется только для картинок Open Graph и распространяется по лицензии OFL (`assets/fonts/OFL.txt`).

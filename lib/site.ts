@@ -1,6 +1,6 @@
 export const site = {
   name: "PardAiLabs",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://pardailabs.ru",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://pardailab.ru",
   description:
     "Практический искусственный интеллект для людей и бизнеса. Независимая лаборатория: исследования, обзоры моделей и понятные сценарии без рекламной подачи.",
   author: "Лаборатория PardAiLabs",
