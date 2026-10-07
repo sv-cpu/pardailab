@@ -173,6 +173,31 @@
   height: auto;
 }
 
+.article-editor figure img,
+.article-html figure img,
+.article-editor video,
+.article-html video {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.article-editor video,
+.article-html video {
+  max-height: 28rem;
+  background: #141414;
+}
+
+.article-editor figcaption,
+.article-html figcaption {
+  margin-top: 0.35rem;
+  font-family: var(--font-heading), Manrope, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--muted-foreground);
+}
+
 .article-editor iframe,
 .article-html iframe {
   width: 100%;

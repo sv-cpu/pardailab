@@ -1,5 +1,6 @@
 import sanitizeHtml from "sanitize-html";
 
+import { isStoredMedia } from "@/lib/media-path";
 import type { Block } from "@/lib/types";
 
 const allowedTags = [
@@ -11,6 +12,7 @@ const allowedTags = [
   "figure",
   "figcaption",
   "iframe",
+  "video",
   "aside",
   "hr",
   "sup",
@@ -29,12 +31,31 @@ function safeUrl(value: string) {
   return "";
 }
 
+function safeImageSrc(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed || /[\s\\]/.test(trimmed) || trimmed.includes("..")) return "";
+  if (trimmed.startsWith("/") && !trimmed.startsWith("//")) return trimmed;
+  try {
+    const url = new URL(trimmed);
+    if (url.protocol === "http:" || url.protocol === "https:") return trimmed;
+  } catch {
+    return "";
+  }
+  return "";
+}
+
+function boxSize(value: string | undefined) {
+  return value && /^\d{1,4}$/.test(value) ? value : "";
+}
+
 export function sanitizeArticleHtml(source: string) {
   return sanitizeHtml(source, {
     allowedTags,
     allowedAttributes: {
       a: ["href", "title", "target", "rel"],
       img: ["src", "alt", "width", "height"],
+      video: ["src", "controls", "playsinline", "preload"],
+      figure: ["contenteditable"],
       iframe: ["src", "width", "height", "title", "allow", "allowfullscreen"],
       td: ["colspan", "rowspan"],
       th: ["colspan", "rowspan"],
@@ -51,6 +72,29 @@ export function sanitizeArticleHtml(source: string) {
           rel: "noopener noreferrer",
         },
       }),
+      img: (tagName, attribs) => ({
+        tagName,
+        attribs: {
+          src: safeImageSrc(attribs.src ?? ""),
+          alt: attribs.alt ?? "",
+          ...(boxSize(attribs.width) ? { width: boxSize(attribs.width) } : {}),
+          ...(boxSize(attribs.height) ? { height: boxSize(attribs.height) } : {}),
+        },
+      }),
+      video: (tagName, attribs) => ({
+        tagName,
+        attribs: {
+          src: isStoredMedia(attribs.src ?? "") ? attribs.src : "",
+          controls: "controls",
+          playsinline: "playsinline",
+          preload: "metadata",
+        },
+      }),
+      figure: (tagName, attribs) => {
+        const next: Record<string, string> = {};
+        if (attribs.contenteditable === "false") next.contenteditable = "false";
+        return { tagName, attribs: next };
+      },
       iframe: (tagName, attribs) => ({
         tagName,
         attribs: {
@@ -62,6 +106,11 @@ export function sanitizeArticleHtml(source: string) {
           allowfullscreen: "true",
         },
       }),
+    },
+    exclusiveFilter: (frame) => {
+      if (frame.tag === "img") return !frame.attribs.src;
+      if (frame.tag === "video") return !isStoredMedia(frame.attribs.src ?? "");
+      return false;
     },
   }).trim();
 }

@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { clearSession, startSession } from "@/lib/auth";
 import { parseArticle, parseModel, parseService } from "@/lib/admin-parse";
 import { isStoredCover, removeCover, storeCover } from "@/lib/covers";
+import { dropRemovedMedia } from "@/lib/media";
 import { deleteRecord, listArticles, listModels, saveArticle, saveModel, saveService } from "@/lib/db";
 import { saveBenchmark, deleteBenchmark, type BenchmarkRow } from "@/lib/benchmarks";
 import { saveRatingStamp } from "@/lib/rating";
@@ -54,6 +55,7 @@ export async function saveArticleAction(formData: FormData): Promise<SaveArticle
         return { ok: false, error: "Это не ваша статья." };
       }
       await removeCover(existing?.coverImage);
+      if (existing) await dropRemovedMedia(existing.body, []);
       deleteRecord("articles", original);
     }
     publish();
@@ -128,6 +130,7 @@ export async function saveArticleAction(formData: FormData): Promise<SaveArticle
     return { ok: false, error: error instanceof Error ? error.message : "Не удалось сохранить." };
   }
   if (uploaded && previous && previous !== uploaded) await removeCover(previous);
+  if (existing) await dropRemovedMedia(existing.body, draft.body);
   publish();
   return { ok: true, href: `/admin/articles/${parsed.value.slug}?saved=1` };
 }
