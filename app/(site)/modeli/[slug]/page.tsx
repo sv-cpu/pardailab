@@ -9,6 +9,7 @@ import { ScoreMeter } from "@/components/score-meter";
 import { getModels } from "@/lib/cms";
 import { sortModels } from "@/lib/content/models";
 import { formatScore } from "@/lib/format";
+import { modelRelease } from "@/lib/rating-view";
 import { costHint, scoreFields } from "@/lib/scores";
 import { breadcrumbJsonLd, pageMeta } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -67,6 +68,7 @@ export default async function Page({ params }: Props) {
       />
       <p className="mt-8 font-mono text-[11px] tracking-[0.18em] text-olive uppercase">{model.vendor}</p>
       <h1 className="mt-4 font-heading text-5xl tracking-tight sm:text-6xl">{model.name}</h1>
+      {modelRelease(model) ? <p className="mt-3 font-mono text-lg text-olive">{modelRelease(model)}</p> : null}
       <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">{model.summary}</p>
       <p className="mt-6 font-mono text-3xl text-olive">
         {formatScore(model.scores.overall)}

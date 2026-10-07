@@ -79,7 +79,7 @@ export interface ModelScores {
 export interface ModelProfile {
   slug: string;
   name: string;
-  /** Полное название с версией. В таблице рейтинга показывается оно. */
+  /** Выпуск, который стоит в шкале. Линейка остаётся в `name`. */
   versionName?: string;
   /** Участие в десятке рейтинга. Пустое значение значит «участвует». */
   inRating?: boolean;

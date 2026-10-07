@@ -1,5 +1,6 @@
 import type { DatabaseSync } from "node:sqlite";
 
+import { models as localModels } from "@/lib/content/models";
 import { getDb, listModels, saveModel } from "@/lib/db";
 import { overallScore } from "@/lib/scores";
 import type { ModelProfile, ModelScores, RatedModel } from "@/lib/types";
@@ -42,7 +43,11 @@ export function ensureBenchmarks(db: DatabaseSync) {
     );
   `);
   const count = (db.prepare("SELECT COUNT(*) AS total FROM benchmarks").get() as { total: number }).total;
-  if (count) return;
+  if (!count) seedBenchmark(db);
+  syncCatalogVersions(db);
+}
+
+function seedBenchmark(db: DatabaseSync) {
   const models = (db.prepare("SELECT payload FROM models").all() as { payload: string }[])
     .map((row) => JSON.parse(row.payload) as ModelProfile)
     .sort((a, b) => overallScore(b.scores) - overallScore(a.scores));
@@ -61,6 +66,34 @@ export function ensureBenchmarks(db: DatabaseSync) {
     rows,
   };
   db.prepare("INSERT INTO benchmarks (slug, payload) VALUES (?, ?)").run(issue.slug, JSON.stringify(issue));
+}
+
+function syncCatalogVersions(db: DatabaseSync) {
+  const stored = (db.prepare("SELECT payload FROM models").all() as { payload: string }[]).map(
+    (row) => JSON.parse(row.payload) as ModelProfile,
+  );
+  for (const local of localModels) {
+    const version = local.versionName?.trim();
+    if (!version) continue;
+    const current = stored.find((item) => item.slug === local.slug);
+    if (!current || current.versionName?.trim()) continue;
+    saveModel({ ...current, versionName: version }, current.slug, db);
+    current.versionName = version;
+  }
+  const issues = (db.prepare("SELECT payload FROM benchmarks").all() as { payload: string }[]).map(
+    (row) => JSON.parse(row.payload) as Benchmark,
+  );
+  for (const issue of issues) {
+    let changed = false;
+    const rows = issue.rows.map((row) => {
+      const model = stored.find((item) => item.slug === row.modelSlug);
+      const version = model?.versionName?.trim();
+      if (!model || !version || row.versionName.trim() !== model.name.trim()) return row;
+      changed = true;
+      return { ...row, versionName: version };
+    });
+    if (changed) writeBenchmark({ ...issue, rows }, issue.slug, db);
+  }
 }
 
 function writeBenchmark(issue: Benchmark, originalSlug: string, db: DatabaseSync) {
@@ -115,7 +148,7 @@ export function saveBenchmark(issue: Benchmark, originalSlug: string, db = getDb
     if (!row.modelSlug) continue;
     const model = catalog.find((item) => item.slug === row.modelSlug);
     if (!model) continue;
-    saveModel({ ...model, name: row.versionName, versionName: row.versionName, vendor: row.vendor || model.vendor, scores: row.scores, inRating: true }, model.slug, db);
+    saveModel({ ...model, versionName: row.versionName, vendor: row.vendor || model.vendor, scores: row.scores, inRating: true }, model.slug, db);
   }
 }
 

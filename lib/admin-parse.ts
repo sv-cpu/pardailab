@@ -237,6 +237,8 @@ export function parseModel(form: FormData): ParseResult<ModelProfile> {
   if (!slug.ok) return slug;
   const name = required(text(form, "name"), "Название");
   if (!name.ok) return name;
+  const versionName = required(text(form, "versionName"), "Версия");
+  if (!versionName.ok) return versionName;
   const vendor = required(text(form, "vendor"), "Вендор");
   if (!vendor.ok) return vendor;
   const summary = required(text(form, "summary"), "Кратко");
@@ -258,6 +260,7 @@ export function parseModel(form: FormData): ParseResult<ModelProfile> {
     value: {
       slug: slug.value,
       name: name.value,
+      versionName: versionName.value,
       vendor: vendor.value,
       summary: summary.value,
       bestFor: bestFor.value,
