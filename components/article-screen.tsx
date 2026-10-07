@@ -19,6 +19,8 @@ import { site } from "@/lib/site";
 import type { Article, ArticleKind, Block } from "@/lib/types";
 import { findUserBySlug, roleLabel } from "@/lib/users";
 
+import { InquiryForm } from "@/components/inquiry-form";
+
 import { ShareBar } from "./share-bar";
 
 const roots: Record<ArticleKind, string> = {
@@ -193,6 +195,15 @@ export async function ArticleScreen({ kind, slug }: { kind: ArticleKind; slug: s
           <Blocks blocks={article.body} />
           <div className="mt-10 max-w-3xl border-t border-border pt-6">
             <ShareBar url={pageUrl} title={article.title} />
+          </div>
+          <div className="mt-12 max-w-3xl border-t border-border pt-8">
+            <InquiryForm
+              kind="correction"
+              pageTitle={article.title}
+              pagePath={articleHref(article.kind, article.slug)}
+              title="Нашли ошибку"
+              lede="Напишите, что не сходится в этом материале."
+            />
           </div>
         </div>
       </div>

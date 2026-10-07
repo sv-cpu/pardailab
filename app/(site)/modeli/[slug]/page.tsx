@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { InquiryForm } from "@/components/inquiry-form";
 import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
 import { ScoreMeter } from "@/components/score-meter";
@@ -102,6 +103,15 @@ export default async function Page({ params }: Props) {
           ))}
         </ul>
       </section>
+      <div className="mt-16 border-t border-border pt-8">
+        <InquiryForm
+          kind="correction"
+          pageTitle={model.name}
+          pagePath={`/modeli/${model.slug}`}
+          title="Замечание к карточке"
+          lede="Если оценка или описание расходятся с вашей задачей, напишите."
+        />
+      </div>
     </Container>
   );
 }

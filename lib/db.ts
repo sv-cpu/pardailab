@@ -36,6 +36,17 @@ function migrate(db: DatabaseSync) {
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS inquiries (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      created_at TEXT NOT NULL,
+      kind TEXT NOT NULL,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      message TEXT NOT NULL,
+      page_title TEXT NOT NULL,
+      page_path TEXT NOT NULL,
+      status TEXT NOT NULL
+    );
   `);
 }
 

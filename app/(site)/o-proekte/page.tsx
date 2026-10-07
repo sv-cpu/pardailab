@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import { InquiryForm } from "@/components/inquiry-form";
 import { PageIntro } from "@/components/page-intro";
 import { pageMeta } from "@/lib/seo";
 
@@ -100,6 +101,16 @@ export default function Page() {
             Соглашаться с оценкой не обязательно. Важно видеть, на чём она стоит, и решать по своей работе.
           </p>
         </section>
+        <div className="mt-16 border-t border-border pt-8">
+          <InquiryForm
+            id="redaktsii"
+            kind="letter"
+            pageTitle="О проекте"
+            pagePath="/o-proekte"
+            title="Написать редакции"
+            lede="Вопрос, поправка или несогласие со шкалой."
+          />
+        </div>
       </div>
     </Container>
   );

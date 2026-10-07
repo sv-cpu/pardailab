@@ -9,6 +9,7 @@ import type { StaffRole } from "@/lib/users";
 const links = [
   { href: "/admin", label: "Обзор", editor: false },
   { href: "/admin/articles", label: "Статьи", editor: false },
+  { href: "/admin/inquiries", label: "Обращения", editor: false },
   { href: "/admin/profile", label: "Профиль", editor: false },
   { href: "/admin/rubrics", label: "Рубрики", editor: true },
   { href: "/admin/services", label: "Сервисы", editor: true },
