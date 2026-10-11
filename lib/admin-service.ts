@@ -3,6 +3,7 @@ import { isStoredCover, removeCover, storeCover } from "@/lib/covers";
 import { stampPublished } from "@/lib/format";
 import { parseArticle, parseModel, parseService } from "@/lib/admin-parse";
 import { saveArticle, saveModel, saveService } from "@/lib/db";
+import type { RubricRecord } from "@/lib/rubric-seed";
 import type { Article, ModelProfile, Service } from "@/lib/types";
 
 export type SaveResult = { ok: true } | { ok: false; error: string };
@@ -12,7 +13,7 @@ export async function persistArticleDraft(input: {
   original: string;
   actor: { name: string; role: string; slug: string };
   articles: Article[];
-  rubrics: { slug: string; kind?: string; parent?: string; name: string }[];
+  rubrics: RubricRecord[];
 }): Promise<{ ok: true; href: string } | { ok: false; error: string }> {
   const { formData, original, actor, articles, rubrics } = input;
 
