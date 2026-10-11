@@ -48,6 +48,11 @@ describe("article media paths", () => {
     await assert.rejects(() => storeArticleMedia(file), /JPEG, PNG, WebP, GIF, MP4 или WebM/);
   });
 
+  it("explains heic photos from phones", async () => {
+    const file = new File(["not-heic"], "photo.heic", { type: "image/heic" });
+    await assert.rejects(() => storeArticleMedia(file), /HEIC не поддерживаются/);
+  });
+
   it("rejects an image over 8 MB before writing it", async () => {
     const bytes = Buffer.alloc(imageOverLimit());
     bytes[0] = 0xff;

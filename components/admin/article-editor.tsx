@@ -171,6 +171,38 @@ export function ArticleEditor({ initialHtml, onChange }: { initialHtml: string; 
     remember(next);
   }
 
+  function mediaFromTransfer(data: DataTransfer | null) {
+    if (!data) return null;
+    for (const item of Array.from(data.items)) {
+      if (item.kind !== "file") continue;
+      const file = item.getAsFile();
+      if (!file) continue;
+      if (file.type.startsWith("video/")) return { kind: "video" as const, file };
+      if (file.type.startsWith("image/")) return { kind: "image" as const, file };
+    }
+    const file = data.files.item(0);
+    if (!file) return null;
+    if (file.type.startsWith("video/")) return { kind: "video" as const, file };
+    if (file.type.startsWith("image/")) return { kind: "image" as const, file };
+    return null;
+  }
+
+  function onMediaPaste(event: React.ClipboardEvent) {
+    const picked = mediaFromTransfer(event.clipboardData);
+    if (!picked) return;
+    event.preventDefault();
+    rememberPlace();
+    void takeMedia(picked.kind, picked.file);
+  }
+
+  function onMediaDrop(event: React.DragEvent) {
+    event.preventDefault();
+    const picked = mediaFromTransfer(event.dataTransfer);
+    if (!picked) return;
+    rememberPlace();
+    void takeMedia(picked.kind, picked.file);
+  }
+
   async function takeMedia(kind: "image" | "video", file: File | null) {
     if (!file || busy) return;
     if (kind === "image" && file.size > imageMaxBytes) {
@@ -235,7 +267,7 @@ export function ArticleEditor({ initialHtml, onChange }: { initialHtml: string; 
         </span>
       </div>
       <p className="text-sm text-muted-foreground">
-        Изображение и видео встают туда, где стоит курсор: в готовой статье и в режиме HTML. Изображение — до 8 МБ. Видео — MP4 или WebM, до 12 МБ.
+        Изображение и видео встают туда, где стоит курсор: кнопкой «Изображение» или «Видео», вставкой из буфера (Ctrl+V) или перетаскиванием файла. Работает и в режиме HTML. Фото — JPEG, PNG, WebP или GIF, до 8 МБ. Видео — MP4 или WebM, до 12 МБ.
       </p>
       {mediaNote ? (
         <p className="text-sm text-foreground" aria-live="polite">
@@ -299,6 +331,9 @@ export function ArticleEditor({ initialHtml, onChange }: { initialHtml: string; 
           aria-multiline="true"
           aria-label="Текст статьи"
           suppressContentEditableWarning
+          onPaste={onMediaPaste}
+          onDrop={onMediaDrop}
+          onDragOver={(event) => event.preventDefault()}
           onInput={() => remember(editorRef.current?.innerHTML ?? "")}
         />
       ) : (
@@ -308,6 +343,9 @@ export function ArticleEditor({ initialHtml, onChange }: { initialHtml: string; 
             ref={htmlRef}
             value={html}
             onChange={(event) => remember(event.target.value)}
+            onPaste={onMediaPaste}
+            onDrop={onMediaDrop}
+            onDragOver={(event) => event.preventDefault()}
             rows={22}
             aria-label="HTML статьи"
             className={`box-border min-h-64 w-full max-w-full border bg-background px-4 py-3 font-mono text-sm sm:min-h-80 ${sourceReady ? "article-ready border-olive" : "border-border"}`}

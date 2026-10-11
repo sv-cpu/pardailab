@@ -52,7 +52,13 @@ export async function storeArticleMedia(file: File): Promise<StoredMedia> {
   if (file.size > videoMaxBytes) throw new Error("Файл больше 12 МБ. Изображение — до 8 МБ, видео — до 12 МБ.");
   const bytes = Buffer.from(await file.arrayBuffer());
   const detected = detectMedia(bytes);
-  if (!detected) throw new Error("Нужен файл JPEG, PNG, WebP, GIF, MP4 или WebM.");
+  if (!detected) {
+    const name = file.name.toLowerCase();
+    if (name.endsWith(".heic") || name.endsWith(".heif") || file.type === "image/heic" || file.type === "image/heif") {
+      throw new Error("Файлы HEIC не поддерживаются. Сохраните фото как JPEG или PNG и загрузите снова.");
+    }
+    throw new Error("Нужен файл JPEG, PNG, WebP, GIF, MP4 или WebM.");
+  }
   if (detected.kind === "image" && bytes.length > imageMaxBytes) throw new Error("Изображение больше 8 МБ.");
   const name = `${randomUUID()}.${detected.ext}`;
   const directory = mediaDirectory();
