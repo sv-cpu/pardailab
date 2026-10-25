@@ -72,6 +72,7 @@ function seed(db: DatabaseSync) {
 export function openDatabase(filename = databasePath()) {
   mkdirSync(path.dirname(filename), { recursive: true });
   const db = new DatabaseSync(filename);
+  db.exec("PRAGMA busy_timeout = 5000");
   db.exec("PRAGMA journal_mode = WAL");
   migrate(db);
   seed(db);

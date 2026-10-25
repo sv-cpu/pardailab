@@ -13,6 +13,9 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    env:
+      # Per-job file so parallel CI jobs (or future matrix) do not share one SQLite.
+      PARDAILABS_DB_PATH: data/ci-${{ github.job }}.db
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
