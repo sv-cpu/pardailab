@@ -50,5 +50,30 @@ describe("about lab", () => {
     const stored = getAboutLab(db);
     assert.equal(stored.title, "Лаборатория тест");
     assert.equal(stored.directions[0].body, "<p>Новое исследование.</p>");
+    assert.deepEqual(stored.projects, []);
+  });
+
+  it("keeps project cards with optional links and drops bad covers", () => {
+    const next = normalizeAboutLab({
+      projects: [
+        {
+          id: "alpha",
+          title: "Альфа",
+          description: "Описание.",
+          cover: "/uploads/covers/00000000-0000-4000-8000-000000000001.jpg",
+          url: "https://example.com",
+        },
+        {
+          id: "beta",
+          title: "Бета",
+          description: "Без ссылки.",
+          cover: "/uploads/covers/00000000-0000-4000-8000-000000000002.jpg",
+        },
+        { id: "bad", title: "Плохой", description: "Нет", cover: "https://evil.example/x.jpg" },
+      ],
+    });
+    assert.equal(next.projects.length, 2);
+    assert.equal(next.projects[0]?.url, "https://example.com");
+    assert.equal(next.projects[1]?.url, undefined);
   });
 });

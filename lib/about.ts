@@ -5,7 +5,9 @@ import {
   type AboutDirection,
   type AboutDirectionSlug,
   type AboutLab,
+  type AboutProject,
 } from "@/lib/about.shared";
+import { isStoredCover } from "@/lib/covers";
 import { sanitizeArticleHtml } from "@/lib/html";
 
 export {
@@ -16,6 +18,7 @@ export {
   type AboutDirection,
   type AboutDirectionSlug,
   type AboutLab,
+  type AboutProject,
 } from "@/lib/about.shared";
 
 const META_KEY = "about_lab";
@@ -41,6 +44,7 @@ export const defaultAboutLab = (): AboutLab => ({
   ),
   contactTitle: "Связаться с лабораторией",
   contactLede: "Задача на исследование, разработку, внедрение или партнёрство.",
+  projects: [],
   directions: [
     {
       slug: "issledovaniya",
@@ -119,6 +123,44 @@ function mergeDirection(base: AboutDirection, raw: Partial<AboutDirection> | und
   };
 }
 
+function cleanProjectUrl(value: unknown) {
+  const raw = cleanText(value, 500);
+  if (!raw) return undefined;
+  if (raw.startsWith("/") && !raw.startsWith("//")) return raw;
+  try {
+    const url = new URL(raw);
+    if (url.protocol === "http:" || url.protocol === "https:") return raw;
+  } catch {
+    return undefined;
+  }
+  return undefined;
+}
+
+export function normalizeProject(raw: Partial<AboutProject> | null | undefined): AboutProject | null {
+  if (!raw) return null;
+  const id = cleanText(raw.id, 80);
+  const title = cleanText(raw.title, 160);
+  const description = cleanText(raw.description, 4000);
+  const cover = cleanText(raw.cover, 300);
+  if (!id || !title || !description || !cover || !isStoredCover(cover)) return null;
+  const url = cleanProjectUrl(raw.url);
+  return { id, title, description, cover, ...(url ? { url } : {}) };
+}
+
+export function normalizeProjects(raw: unknown): AboutProject[] {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set<string>();
+  const projects: AboutProject[] = [];
+  for (const item of raw) {
+    const project = normalizeProject(item as Partial<AboutProject>);
+    if (!project || seen.has(project.id)) continue;
+    seen.add(project.id);
+    projects.push(project);
+    if (projects.length >= 48) break;
+  }
+  return projects;
+}
+
 export function normalizeAboutLab(raw: Partial<AboutLab> | null | undefined): AboutLab {
   const defaults = defaultAboutLab();
   if (!raw) return defaults;
@@ -139,6 +181,7 @@ export function normalizeAboutLab(raw: Partial<AboutLab> | null | undefined): Ab
     contactTitle: cleanText(raw.contactTitle, 120) || defaults.contactTitle,
     contactLede: cleanText(raw.contactLede, 400) || defaults.contactLede,
     directions: defaults.directions.map((item) => mergeDirection(item, bySlug.get(item.slug))),
+    projects: normalizeProjects(raw.projects),
   };
 }
 

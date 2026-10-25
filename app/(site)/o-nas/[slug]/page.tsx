@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AboutCopy } from "@/components/about-copy";
+import { AboutProjectGrid } from "@/components/about-projects";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Container } from "@/components/container";
 import { PageIntro } from "@/components/page-intro";
@@ -72,6 +73,8 @@ export default async function AboutDirectionPage({ params }: Props) {
       <div className="mt-10 max-w-2xl">
         <AboutCopy text={direction.body} />
       </div>
+
+      {direction.slug === "proekty" ? <AboutProjectGrid projects={about.projects} /> : null}
 
       <div className="mt-12 max-w-2xl border-t border-border pt-8">
         <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">Другие направления</p>

@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 
-import { saveAboutAction } from "@/app/admin/actions";
+import { saveAboutAction, saveAboutProjectAction } from "@/app/admin/actions";
 import { AboutDirectionForm } from "@/components/admin/about-forms";
+import { AboutProjectsAdmin } from "@/components/admin/about-projects";
 import { Notice } from "@/components/admin/ui";
-import { getAboutDirection } from "@/lib/about";
+import { getAboutDirection, getAboutLab } from "@/lib/about";
 import { requireEditor } from "@/lib/users";
 
 export default async function AboutDirectionAdminPage({
@@ -18,6 +19,7 @@ export default async function AboutDirectionAdminPage({
   const query = await searchParams;
   const direction = getAboutDirection(slug);
   if (!direction) notFound();
+  const about = getAboutLab();
 
   return (
     <div className="grid gap-6">
@@ -29,6 +31,7 @@ export default async function AboutDirectionAdminPage({
         </div>
       </div>
       <AboutDirectionForm direction={direction} action={saveAboutAction} />
+      {slug === "proekty" ? <AboutProjectsAdmin projects={about.projects} action={saveAboutProjectAction} /> : null}
     </div>
   );
 }
