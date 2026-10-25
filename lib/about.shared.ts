@@ -2,6 +2,15 @@ export const aboutDirectionSlugs = ["issledovaniya", "razrabotki", "proekty", "m
 
 export type AboutDirectionSlug = (typeof aboutDirectionSlugs)[number];
 
+export interface AboutProject {
+  id: string;
+  title: string;
+  description: string;
+  cover: string;
+  /** Optional external or site link. */
+  url?: string;
+}
+
 export interface AboutDirection {
   slug: AboutDirectionSlug;
   title: string;
@@ -23,6 +32,7 @@ export interface AboutLab {
   contactTitle: string;
   contactLede: string;
   directions: AboutDirection[];
+  projects: AboutProject[];
 }
 
 export function aboutDirectionHref(slug: AboutDirectionSlug) {

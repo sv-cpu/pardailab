@@ -1,5 +1,6 @@
 "use server";
 
+import { randomUUID } from "node:crypto";
 import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -10,9 +11,12 @@ import {
   aboutDirectionSlugs,
   getAboutLab,
   normalizeAboutLab,
+  normalizeProject,
+  normalizeProjects,
   saveAboutLab,
   type AboutDirectionSlug,
   type AboutLab,
+  type AboutProject,
 } from "@/lib/about";
 import { removeCover, storeCover } from "@/lib/covers";
 import { dropRemovedMedia } from "@/lib/media";
@@ -439,6 +443,73 @@ export async function saveAboutAction(formData: FormData) {
   }
 
   redirect("/admin/about?error=" + encodeURIComponent("Нечего сохранять."));
+}
+
+export async function saveAboutProjectAction(formData: FormData) {
+  await editorOnly();
+  const back = "/admin/about/proekty";
+  const intent = String(formData.get("intent") ?? "save");
+  const current = getAboutLab();
+  let projects = [...current.projects];
+
+  try {
+    if (intent === "delete") {
+      const id = String(formData.get("id") ?? "");
+      const removed = projects.find((item) => item.id === id);
+      projects = projects.filter((item) => item.id !== id);
+      if (removed?.cover) await removeCover(removed.cover);
+      saveAboutLab({ ...current, projects: normalizeProjects(projects) });
+      publish();
+      redirect(`${back}?saved=1`);
+    }
+
+    if (intent === "move") {
+      const id = String(formData.get("id") ?? "");
+      const direction = String(formData.get("direction") ?? "");
+      const index = projects.findIndex((item) => item.id === id);
+      if (index < 0) redirect(`${back}?error=${encodeURIComponent("Проект не найден.")}`);
+      const swap = direction === "up" ? index - 1 : index + 1;
+      if (swap < 0 || swap >= projects.length) redirect(back);
+      const copy = [...projects];
+      [copy[index], copy[swap]] = [copy[swap], copy[index]];
+      saveAboutLab({ ...current, projects: normalizeProjects(copy) });
+      publish();
+      redirect(`${back}?saved=1`);
+    }
+
+    if (intent === "save") {
+      const id = String(formData.get("id") ?? "").trim() || randomUUID();
+      const existing = projects.find((item) => item.id === id);
+      const uploaded = await readCover(formData);
+      const cover = uploaded ?? existing?.cover ?? "";
+      const draft: AboutProject = {
+        id,
+        title: String(formData.get("title") ?? ""),
+        description: String(formData.get("description") ?? ""),
+        cover,
+        url: String(formData.get("url") ?? "") || undefined,
+      };
+      const project = normalizeProject(draft);
+      if (!project) {
+        redirect(`${back}?error=${encodeURIComponent("Нужны название, описание и обложка (JPEG, PNG или WebP).")}`);
+      }
+      if (existing) {
+        projects = projects.map((item) => (item.id === id ? project : item));
+        if (uploaded && existing.cover && existing.cover !== project.cover) await removeCover(existing.cover);
+      } else {
+        projects = [...projects, project];
+      }
+      saveAboutLab({ ...current, projects: normalizeProjects(projects) });
+      publish();
+      redirect(`${back}?saved=1`);
+    }
+  } catch (error) {
+    if (error && typeof error === "object" && "digest" in error) throw error;
+    const message = error instanceof Error ? error.message : "Не удалось сохранить проект.";
+    redirect(`${back}?error=${encodeURIComponent(message)}`);
+  }
+
+  redirect(`${back}?error=${encodeURIComponent("Нечего сохранять.")}`);
 }
 
 async function readAvatar(formData: FormData) {
