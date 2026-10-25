@@ -4,8 +4,7 @@ import Link from "next/link";
 
 import { CoverField } from "@/components/admin/cover-field";
 import { Field, fieldClass } from "@/components/admin/ui";
-import type { AboutDirection, AboutLab } from "@/lib/about";
-import { aboutDirectionHref } from "@/lib/about";
+import { aboutDirectionHref, type AboutDirection, type AboutLab } from "@/lib/about.shared";
 
 export function AboutHubForm({
   about,

@@ -1,4 +1,4 @@
-import { aboutParagraphs } from "@/lib/about";
+import { aboutParagraphs } from "@/lib/about.shared";
 
 export function AboutCopy({ text, className }: { text: string; className?: string }) {
   const parts = aboutParagraphs(text);
