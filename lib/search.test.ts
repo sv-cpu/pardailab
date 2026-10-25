@@ -2,23 +2,20 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { articles } from "./content/articles";
-import { rateModels } from "./content/models";
-import { services } from "./content/services";
 import { searchCatalog, searchRecords, toSearchRecords, type SearchRecord } from "./search";
 import type { Article } from "./types";
 
-const catalog = { articles, services, models: rateModels() };
+const catalog = { articles };
 
 function record(href: string, title: string, parts: [number, string][]): SearchRecord {
   return { href, kind: "Новость", title, parts };
 }
 
 describe("search", () => {
-  it("returns one list with an article, a service and a model", () => {
+  it("returns articles that mention the query", () => {
     const hits = searchCatalog("claude", catalog);
     assert.ok(hits.some((item) => item.href.includes("dlinnyy-kontekst")));
-    assert.ok(hits.some((item) => item.href.endsWith("/claude") && item.kind === "Сервис"));
-    assert.ok(hits.some((item) => item.href.endsWith("/claude") && item.kind === "Модель"));
+    assert.ok(hits.every((item) => !item.href.startsWith("/modeli") && !item.href.startsWith("/resheniya")));
     assert.equal(new Set(hits.map((item) => item.href)).size, hits.length);
   });
 
@@ -85,7 +82,7 @@ describe("search", () => {
       tags: [],
       body: [{ type: "html", html: "<p>Редкий аккордеон</p><script>секретныйтокен</script>" }],
     };
-    const data = { articles: [article], services: [], models: [] };
+    const data = { articles: [article] };
     assert.equal(searchCatalog("аккордеон", data)[0]?.href, "/novosti/html-note");
     assert.equal(searchCatalog("секретныйтокен", data).length, 0);
   });

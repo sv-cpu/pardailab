@@ -74,11 +74,6 @@ export function ServiceForm({
         <button type="submit" name="intent" value="save" className="rounded-full bg-olive px-5 py-2.5 text-sm text-accent-foreground hover:bg-olive-deep">
           Сохранить
         </button>
-        {service ? (
-          <a href={`/resheniya/${service.slug}`} className="rounded-full border border-border px-5 py-2.5 text-sm hover:border-olive">
-            Открыть на сайте
-          </a>
-        ) : null}
         {service ? <ConfirmDelete /> : null}
       </div>
     </form>
@@ -132,11 +127,6 @@ export function ModelForm({
         <button type="submit" name="intent" value="save" className="rounded-full bg-olive px-5 py-2.5 text-sm text-accent-foreground hover:bg-olive-deep">
           Сохранить
         </button>
-        {model ? (
-          <a href={`/modeli/${model.slug}`} className="rounded-full border border-border px-5 py-2.5 text-sm hover:border-olive">
-            Открыть на сайте
-          </a>
-        ) : null}
         {model ? <ConfirmDelete /> : null}
       </div>
     </form>

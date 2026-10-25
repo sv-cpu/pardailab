@@ -1,25 +1,19 @@
 import type { MetadataRoute } from "next";
 
-import { listBenchmarks } from "@/lib/benchmarks";
-import { aiCategories } from "@/lib/categories";
-import { getArticles, getModels, getServices } from "@/lib/cms";
+import { getArticles } from "@/lib/cms";
 import { articleHref } from "@/lib/paths";
 import { site } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [articles, models, services] = await Promise.all([getArticles(), getModels(), getServices()]);
+  const articles = await getArticles();
   const staticPaths = [
     "",
     "/novosti",
     "/praktika",
-    "/resheniya",
     "/razrabotka",
     "/issledovaniya",
-    "/modeli",
-    "/benchmarki",
-    "/katalog",
     "/materialy",
     "/poisk",
     "/o-proekte",
@@ -36,27 +30,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: article.date,
       changeFrequency: "monthly" as const,
       priority: article.kind === "research" ? 0.9 : 0.6,
-    })),
-    ...listBenchmarks().map((issue) => ({
-      url: new URL(`/benchmarki/${issue.slug}`, site.url).toString(),
-      lastModified: issue.tested,
-      changeFrequency: "monthly" as const,
-      priority: 0.8,
-    })),
-    ...models.map((model) => ({
-      url: new URL(`/modeli/${model.slug}`, site.url).toString(),
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    })),
-    ...services.map((service) => ({
-      url: new URL(`/resheniya/${service.slug}`, site.url).toString(),
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    })),
-    ...aiCategories.map((category) => ({
-      url: new URL(`/katalog/${category.slug}`, site.url).toString(),
-      changeFrequency: "weekly" as const,
-      priority: 0.5,
     })),
   ];
 }
