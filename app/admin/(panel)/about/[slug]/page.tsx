@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
-import { saveAboutAction, saveAboutProjectAction } from "@/app/admin/actions";
+import { saveAboutAction, saveAboutDevelopmentAction, saveAboutProjectAction } from "@/app/admin/actions";
+import { AboutDevelopmentsAdmin } from "@/components/admin/about-developments";
 import { AboutDirectionForm } from "@/components/admin/about-forms";
 import { AboutProjectsAdmin } from "@/components/admin/about-projects";
 import { Notice } from "@/components/admin/ui";
@@ -32,6 +33,9 @@ export default async function AboutDirectionAdminPage({
       </div>
       <AboutDirectionForm direction={direction} action={saveAboutAction} />
       {slug === "proekty" ? <AboutProjectsAdmin projects={about.projects} action={saveAboutProjectAction} /> : null}
+      {slug === "razrabotki" ? (
+        <AboutDevelopmentsAdmin developments={about.developments} action={saveAboutDevelopmentAction} />
+      ) : null}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { getDb } from "@/lib/db";
 import {
   aboutDirectionSlugs,
   ensureAboutHtml,
+  type AboutDevelopment,
   type AboutDirection,
   type AboutDirectionSlug,
   type AboutLab,
@@ -15,6 +16,7 @@ export {
   aboutDirectionSlugs,
   aboutParagraphs,
   ensureAboutHtml,
+  type AboutDevelopment,
   type AboutDirection,
   type AboutDirectionSlug,
   type AboutLab,
@@ -45,6 +47,7 @@ export const defaultAboutLab = (): AboutLab => ({
   contactTitle: "Связаться с лабораторией",
   contactLede: "Задача на исследование, разработку, внедрение или партнёрство.",
   projects: [],
+  developments: [],
   directions: [
     {
       slug: "issledovaniya",
@@ -161,6 +164,31 @@ export function normalizeProjects(raw: unknown): AboutProject[] {
   return projects;
 }
 
+export function normalizeDevelopment(raw: Partial<AboutDevelopment> | null | undefined): AboutDevelopment | null {
+  if (!raw) return null;
+  const id = cleanText(raw.id, 80);
+  const title = cleanText(raw.title, 160);
+  const summary = cleanText(raw.summary, 800);
+  const cover = cleanText(raw.cover, 300);
+  const body = cleanHtml(raw.body, "");
+  if (!id || !title || !summary || !body || !cover || !isStoredCover(cover)) return null;
+  return { id, title, summary, body, cover };
+}
+
+export function normalizeDevelopments(raw: unknown): AboutDevelopment[] {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set<string>();
+  const developments: AboutDevelopment[] = [];
+  for (const item of raw) {
+    const development = normalizeDevelopment(item as Partial<AboutDevelopment>);
+    if (!development || seen.has(development.id)) continue;
+    seen.add(development.id);
+    developments.push(development);
+    if (developments.length >= 48) break;
+  }
+  return developments;
+}
+
 export function normalizeAboutLab(raw: Partial<AboutLab> | null | undefined): AboutLab {
   const defaults = defaultAboutLab();
   if (!raw) return defaults;
@@ -182,6 +210,7 @@ export function normalizeAboutLab(raw: Partial<AboutLab> | null | undefined): Ab
     contactLede: cleanText(raw.contactLede, 400) || defaults.contactLede,
     directions: defaults.directions.map((item) => mergeDirection(item, bySlug.get(item.slug))),
     projects: normalizeProjects(raw.projects),
+    developments: normalizeDevelopments(raw.developments),
   };
 }
 

@@ -51,6 +51,7 @@ describe("about lab", () => {
     assert.equal(stored.title, "Лаборатория тест");
     assert.equal(stored.directions[0].body, "<p>Новое исследование.</p>");
     assert.deepEqual(stored.projects, []);
+    assert.deepEqual(stored.developments, []);
   });
 
   it("keeps project cards with optional links and drops bad covers", () => {
@@ -75,5 +76,30 @@ describe("about lab", () => {
     assert.equal(next.projects.length, 2);
     assert.equal(next.projects[0]?.url, "https://example.com");
     assert.equal(next.projects[1]?.url, undefined);
+  });
+
+  it("keeps development cards with HTML body and drops incomplete ones", () => {
+    const next = normalizeAboutLab({
+      developments: [
+        {
+          id: "agent",
+          title: "Агент",
+          summary: "Кратко.",
+          body: "<p>Полный текст</p><script>x</script>",
+          cover: "/uploads/covers/00000000-0000-4000-8000-000000000003.jpg",
+        },
+        {
+          id: "empty",
+          title: "Без текста",
+          summary: "Кратко.",
+          body: "",
+          cover: "/uploads/covers/00000000-0000-4000-8000-000000000004.jpg",
+        },
+      ],
+    });
+    assert.equal(next.developments.length, 1);
+    assert.equal(next.developments[0]?.title, "Агент");
+    assert.match(next.developments[0]?.body ?? "", /<p>Полный текст<\/p>/);
+    assert.doesNotMatch(next.developments[0]?.body ?? "", /script/i);
   });
 });
