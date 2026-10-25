@@ -88,7 +88,7 @@ function RubricItem({
   );
 }
 
-export function SiteNav({ rubrics }: { rubrics: MenuRubric[] }) {
+export function SiteNav({ rubrics, about }: { rubrics: MenuRubric[]; about: MenuRubric }) {
   const pathname = usePathname();
   const [open, setOpen] = useState<string | null>(null);
   const [path, setPath] = useState(pathname);
@@ -124,11 +124,18 @@ export function SiteNav({ rubrics }: { rubrics: MenuRubric[] }) {
           onToggle={(slug) => setOpen((current) => (current === slug ? null : slug))}
         />
       ))}
+      <span className="mx-1 hidden h-4 w-px shrink-0 bg-border lg:block" aria-hidden />
+      <RubricItem
+        item={about}
+        pathname={pathname}
+        open={open === about.slug}
+        onToggle={(slug) => setOpen((current) => (current === slug ? null : slug))}
+      />
     </nav>
   );
 }
 
-export function SiteMenu({ rubrics }: { rubrics: MenuRubric[] }) {
+export function SiteMenu({ rubrics, about }: { rubrics: MenuRubric[]; about: MenuRubric }) {
   const pathname = usePathname();
   const menuRef = useRef<HTMLDetailsElement>(null);
 
@@ -158,6 +165,16 @@ export function SiteMenu({ rubrics }: { rubrics: MenuRubric[] }) {
               ) : null}
             </div>
           ))}
+        </nav>
+        <nav className="flex flex-col gap-2 border-t border-border pt-3" aria-label="Лаборатория">
+          <Item href={about.href} label={about.name} pathname={pathname} />
+          <div className="ml-3 flex flex-col gap-1">
+            {about.children.map((child) => (
+              <Link key={child.slug} href={child.href} className="text-sm text-muted-foreground hover:text-foreground">
+                {child.name}
+              </Link>
+            ))}
+          </div>
         </nav>
       </div>
     </details>
