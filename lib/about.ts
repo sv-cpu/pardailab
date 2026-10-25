@@ -1,36 +1,44 @@
 import { getDb } from "@/lib/db";
 import {
   aboutDirectionSlugs,
+  ensureAboutHtml,
   type AboutDirection,
   type AboutDirectionSlug,
   type AboutLab,
 } from "@/lib/about.shared";
+import { sanitizeArticleHtml } from "@/lib/html";
 
 export {
   aboutDirectionHref,
   aboutDirectionSlugs,
   aboutParagraphs,
+  ensureAboutHtml,
   type AboutDirection,
   type AboutDirectionSlug,
   type AboutLab,
 } from "@/lib/about.shared";
 
 const META_KEY = "about_lab";
+const HTML_MAX = 200_000;
+
+function p(...parts: string[]) {
+  return parts.map((part) => `<p>${part}</p>`).join("\n");
+}
 
 export const defaultAboutLab = (): AboutLab => ({
   eyebrow: "Лаборатория",
   title: "PardAiLab",
   lede: "Независимая AI-инжиниринговая лаборатория.",
   slogan: "Дальше — машины. Выше — люди.",
-  body: [
+  body: p(
     "Мы исследуем возможности искусственного интеллекта, разрабатываем интеллектуальные программные и аппаратные решения, реализуем собственные проекты и внедряем AI-технологии в реальные задачи.",
     "Наша цель — создавать технологии, которые приносят практическую пользу людям, бизнесу и государству.",
-  ].join("\n\n"),
+  ),
   methodTitle: "Как устроена работа",
-  methodBody: [
+  methodBody: p(
     "Работа лаборатории строится вокруг четырёх направлений: исследования, разработки, проекты и медиа. Каждое направление опирается на практику, а не на пересказ чужих заявлений.",
     "Мы публикуем то, что сами проверили или сделали. Граница выборки, ограничения и результат формулируются прямо — без рекламной подачи.",
-  ].join("\n\n"),
+  ),
   contactTitle: "Связаться с лабораторией",
   contactLede: "Задача на исследование, разработку, внедрение или партнёрство.",
   directions: [
@@ -39,40 +47,40 @@ export const defaultAboutLab = (): AboutLab => ({
       title: "Исследования",
       teaser: "Изучение и объективная оценка технологий искусственного интеллекта.",
       lede: "Проверяем заявления вендоров и возможности моделей на реальных задачах.",
-      body: [
+      body: p(
         "Исследования лаборатории нужны, чтобы отделить рабочий инструмент от рекламного обещания.",
         "Мы задаём тему, фиксируем границу выборки и публикуем результат так, чтобы его можно было прочитать и оспорить по делу.",
-      ].join("\n\n"),
+      ),
     },
     {
       slug: "razrabotki",
       title: "Разработки",
       teaser: "Программные продукты, AI-агенты, интеллектуальные устройства и инженерные решения.",
       lede: "Создаём программные и аппаратные системы, которые решают конкретную задачу.",
-      body: [
+      body: p(
         "Разработки лаборатории включают программные продукты, AI-агентов, интеллектуальные устройства и инженерные контуры.",
         "Мы проектируем решение от задачи: что должно работать в руках человека, где нужна автоматизация и где ответственность остаётся за оператором.",
-      ].join("\n\n"),
+      ),
     },
     {
       slug: "proekty",
       title: "Проекты",
       teaser: "Применение собственных технологий в реальных задачах и создание новых продуктов.",
       lede: "Выносим технологии из стенда в рабочий процесс.",
-      body: [
+      body: p(
         "Проекты — это применение собственных технологий в реальных задачах: у людей, в бизнесе и в государственных процессах.",
         "Здесь лаборатория отвечает не только за идею, но и за внедрение, сопровождение и измеряемый результат.",
-      ].join("\n\n"),
+      ),
     },
     {
       slug: "media",
       title: "Медиа",
       teaser: "Открытая публикация исследований, разработок, аналитики и опыта применения ИИ.",
       lede: "Делимся тем, что проверили и сделали сами.",
-      body: [
+      body: p(
         "Медиа-контур лаборатории — это открытая публикация исследований, разработок, аналитики и опыта применения искусственного интеллекта.",
         "Портал PardAiLab существует не вместо инженерии, а рядом с ней: чтобы читатель видел метод, ограничения и практический вывод.",
-      ].join("\n\n"),
+      ),
     },
   ],
 });
@@ -89,6 +97,16 @@ function cleanText(value: unknown, max = 20_000) {
     .slice(0, max);
 }
 
+function cleanHtml(value: unknown, fallback: string) {
+  const raw = String(value ?? "")
+    .replace(/\0/g, "")
+    .slice(0, HTML_MAX)
+    .trim();
+  if (!raw) return fallback;
+  const cleaned = sanitizeArticleHtml(ensureAboutHtml(raw)).trim();
+  return cleaned || fallback;
+}
+
 function mergeDirection(base: AboutDirection, raw: Partial<AboutDirection> | undefined): AboutDirection {
   if (!raw) return base;
   return {
@@ -96,7 +114,7 @@ function mergeDirection(base: AboutDirection, raw: Partial<AboutDirection> | und
     title: cleanText(raw.title, 120) || base.title,
     teaser: cleanText(raw.teaser, 400) || base.teaser,
     lede: cleanText(raw.lede, 600) || base.lede,
-    body: cleanText(raw.body) || base.body,
+    body: cleanHtml(raw.body, base.body),
     image: typeof raw.image === "string" && raw.image ? raw.image : undefined,
   };
 }
@@ -114,9 +132,9 @@ export function normalizeAboutLab(raw: Partial<AboutLab> | null | undefined): Ab
     title: cleanText(raw.title, 120) || defaults.title,
     lede: cleanText(raw.lede, 400) || defaults.lede,
     slogan: cleanText(raw.slogan, 200) || defaults.slogan,
-    body: cleanText(raw.body) || defaults.body,
+    body: cleanHtml(raw.body, defaults.body),
     methodTitle: cleanText(raw.methodTitle, 120) || defaults.methodTitle,
-    methodBody: cleanText(raw.methodBody) || defaults.methodBody,
+    methodBody: cleanHtml(raw.methodBody, defaults.methodBody),
     image: typeof raw.image === "string" && raw.image ? raw.image : undefined,
     contactTitle: cleanText(raw.contactTitle, 120) || defaults.contactTitle,
     contactLede: cleanText(raw.contactLede, 400) || defaults.contactLede,
@@ -145,4 +163,9 @@ export function saveAboutLab(next: AboutLab, db = getDb()) {
 export function getAboutDirection(slug: string, db = getDb()) {
   if (!isDirectionSlug(slug)) return null;
   return getAboutLab(db).directions.find((item) => item.slug === slug) ?? null;
+}
+
+/** Safe HTML for public pages. */
+export function renderAboutHtml(source: string) {
+  return sanitizeArticleHtml(ensureAboutHtml(source));
 }

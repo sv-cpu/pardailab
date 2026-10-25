@@ -35,3 +35,17 @@ export function aboutParagraphs(text: string) {
     .map((part) => part.trim())
     .filter(Boolean);
 }
+
+export function escapeAboutText(value: string) {
+  return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+}
+
+/** Plain paragraphs → HTML for the editor; already-marked HTML is left as-is. */
+export function ensureAboutHtml(source: string) {
+  const trimmed = source.replace(/\r\n/g, "\n").trim();
+  if (!trimmed) return "";
+  if (/<[a-z][\s\S]*>/i.test(trimmed)) return trimmed;
+  return aboutParagraphs(trimmed)
+    .map((part) => `<p>${escapeAboutText(part)}</p>`)
+    .join("\n");
+}

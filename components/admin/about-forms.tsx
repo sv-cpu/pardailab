@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 
+import { ArticleEditor } from "@/components/admin/article-editor";
 import { CoverField } from "@/components/admin/cover-field";
 import { Field, fieldClass } from "@/components/admin/ui";
-import { aboutDirectionHref, type AboutDirection, type AboutLab } from "@/lib/about.shared";
+import { aboutDirectionHref, ensureAboutHtml, type AboutDirection, type AboutLab } from "@/lib/about.shared";
 
 export function AboutHubForm({
   about,
@@ -13,9 +15,14 @@ export function AboutHubForm({
   about: AboutLab;
   action: (formData: FormData) => void | Promise<void>;
 }) {
+  const [body, setBody] = useState(() => ensureAboutHtml(about.body));
+  const [methodBody, setMethodBody] = useState(() => ensureAboutHtml(about.methodBody));
+
   return (
-    <form action={action} className="grid max-w-3xl gap-5">
+    <form action={action} className="grid max-w-4xl gap-5">
       <input type="hidden" name="scope" value="hub" />
+      <input type="hidden" name="body" value={body} />
+      <input type="hidden" name="methodBody" value={methodBody} />
       <Field label="Надзаголовок">
         <input name="eyebrow" defaultValue={about.eyebrow} required className={fieldClass} />
       </Field>
@@ -28,9 +35,10 @@ export function AboutHubForm({
       <Field label="Слоган">
         <input name="slogan" defaultValue={about.slogan} required className={fieldClass} />
       </Field>
-      <Field label="Основной текст. Абзацы разделяйте пустой строкой.">
-        <textarea name="body" defaultValue={about.body} required rows={8} className={fieldClass} />
-      </Field>
+      <div className="grid gap-2">
+        <p className="text-sm text-muted-foreground">Основной текст</p>
+        <ArticleEditor initialHtml={body} onChange={setBody} />
+      </div>
       <CoverField preview={about.image ?? ""} />
       <label className="flex items-center gap-2 text-sm text-muted-foreground">
         <input type="checkbox" name="removeImage" value="1" />
@@ -39,9 +47,10 @@ export function AboutHubForm({
       <Field label="Заголовок блока метода">
         <input name="methodTitle" defaultValue={about.methodTitle} required className={fieldClass} />
       </Field>
-      <Field label="Текст метода">
-        <textarea name="methodBody" defaultValue={about.methodBody} required rows={6} className={fieldClass} />
-      </Field>
+      <div className="grid gap-2">
+        <p className="text-sm text-muted-foreground">Текст метода</p>
+        <ArticleEditor initialHtml={methodBody} onChange={setMethodBody} />
+      </div>
       <Field label="Заголовок формы связи">
         <input name="contactTitle" defaultValue={about.contactTitle} required className={fieldClass} />
       </Field>
@@ -67,10 +76,13 @@ export function AboutDirectionForm({
   direction: AboutDirection;
   action: (formData: FormData) => void | Promise<void>;
 }) {
+  const [body, setBody] = useState(() => ensureAboutHtml(direction.body));
+
   return (
-    <form action={action} className="grid max-w-3xl gap-5">
+    <form action={action} className="grid max-w-4xl gap-5">
       <input type="hidden" name="scope" value="direction" />
       <input type="hidden" name="slug" value={direction.slug} />
+      <input type="hidden" name="body" value={body} />
       <Field label="Название">
         <input name="title" defaultValue={direction.title} required className={fieldClass} />
       </Field>
@@ -80,9 +92,10 @@ export function AboutDirectionForm({
       <Field label="Подзаголовок страницы">
         <textarea name="lede" defaultValue={direction.lede} required rows={2} className={fieldClass} />
       </Field>
-      <Field label="Текст страницы. Абзацы разделяйте пустой строкой.">
-        <textarea name="body" defaultValue={direction.body} required rows={10} className={fieldClass} />
-      </Field>
+      <div className="grid gap-2">
+        <p className="text-sm text-muted-foreground">Текст страницы</p>
+        <ArticleEditor initialHtml={body} onChange={setBody} />
+      </div>
       <CoverField preview={direction.image ?? ""} />
       <label className="flex items-center gap-2 text-sm text-muted-foreground">
         <input type="checkbox" name="removeImage" value="1" />

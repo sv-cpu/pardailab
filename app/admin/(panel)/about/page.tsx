@@ -19,8 +19,8 @@ export default async function AboutAdminPage({
       <div>
         <h1 className="font-heading text-4xl tracking-tight">О нас</h1>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-          Главная страница лаборатории и четыре направления. Текст правится в полях ниже, изображения — через загрузку
-          кадра 16:9.
+          Главная страница лаборатории и четыре направления. Длинный текст — визуальный редактор с режимом HTML,
+          изображения 16:9 — через загрузку кадра.
         </p>
         <div className="mt-4">
           <Notice saved={query.saved} error={query.error} />
