@@ -34,10 +34,15 @@ export default function Page() {
           <h2 className="font-heading text-3xl tracking-tight">О чём портал</h2>
           <p className="mt-5 font-serif text-lg leading-8 text-pretty">
             PardAiLab — независимая лаборатория практического искусственного интеллекта. Мы публикуем новости, практические
-            разборы, материалы для разработки и собственные исследования.
+            разборы, материалы для разработки и собственные исследования. Это медиа-контур лаборатории.
           </p>
           <p className="mt-5 font-serif text-lg leading-8 text-pretty">
-            Портал отвечает на рабочий вопрос: подойдёт ли инструмент к задаче, где он ошибается и чего от него ждать.
+            Портал отвечает на рабочий вопрос: подойдёт ли инструмент к задаче, где он ошибается и чего от него ждать. О
+            самой лаборатории, разработках и проектах — на странице{" "}
+            <Link href="/o-nas" className="underline decoration-border underline-offset-4 hover:decoration-olive">
+              О нас
+            </Link>
+            .
           </p>
         </section>
 

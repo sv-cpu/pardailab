@@ -6,7 +6,15 @@ import { redirect } from "next/navigation";
 import { clearSession, startSession } from "@/lib/auth";
 import { persistArticleDraft, persistModelDraft, persistServiceDraft } from "@/lib/admin-service";
 import { parseArticle, parseModel, parseService } from "@/lib/admin-parse";
-import { isStoredCover, removeCover, storeCover } from "@/lib/covers";
+import {
+  aboutDirectionSlugs,
+  getAboutLab,
+  normalizeAboutLab,
+  saveAboutLab,
+  type AboutDirectionSlug,
+  type AboutLab,
+} from "@/lib/about";
+import { removeCover, storeCover } from "@/lib/covers";
 import { dropRemovedMedia } from "@/lib/media";
 import { deleteRecord, listArticles, listModels, saveArticle, saveModel, saveService } from "@/lib/db";
 import { saveBenchmark, deleteBenchmark, type BenchmarkRow } from "@/lib/benchmarks";
@@ -356,6 +364,81 @@ export async function deleteBenchmarkAction(formData: FormData) {
   deleteBenchmark(String(formData.get("slug") ?? ""));
   publish();
   redirect("/admin/benchmarks?saved=1");
+}
+
+async function readCover(formData: FormData) {
+  const file = formData.get("coverFile");
+  if (!(file instanceof File) || file.size <= 0) return undefined;
+  return storeCover(file);
+}
+
+export async function saveAboutAction(formData: FormData) {
+  await editorOnly();
+  const scope = String(formData.get("scope") ?? "");
+  const current = getAboutLab();
+  const removeImage = formData.get("removeImage") === "1";
+
+  try {
+    if (scope === "hub") {
+      const image = await readCover(formData);
+      const next: AboutLab = normalizeAboutLab({
+        ...current,
+        eyebrow: String(formData.get("eyebrow") ?? ""),
+        title: String(formData.get("title") ?? ""),
+        lede: String(formData.get("lede") ?? ""),
+        slogan: String(formData.get("slogan") ?? ""),
+        body: String(formData.get("body") ?? ""),
+        methodTitle: String(formData.get("methodTitle") ?? ""),
+        methodBody: String(formData.get("methodBody") ?? ""),
+        contactTitle: String(formData.get("contactTitle") ?? ""),
+        contactLede: String(formData.get("contactLede") ?? ""),
+        image: image ?? (removeImage ? undefined : current.image),
+        directions: current.directions,
+      });
+      if ((image || removeImage) && current.image && current.image !== next.image) await removeCover(current.image);
+      saveAboutLab(next);
+      publish();
+      redirect("/admin/about?saved=1");
+    }
+
+    if (scope === "direction") {
+      const slug = String(formData.get("slug") ?? "") as AboutDirectionSlug;
+      if (!(aboutDirectionSlugs as readonly string[]).includes(slug)) {
+        redirect("/admin/about?error=" + encodeURIComponent("Неизвестное направление."));
+      }
+      const image = await readCover(formData);
+      const existing = current.directions.find((item) => item.slug === slug);
+      const next = normalizeAboutLab({
+        ...current,
+        directions: current.directions.map((item) =>
+          item.slug === slug
+            ? {
+                ...item,
+                title: String(formData.get("title") ?? ""),
+                teaser: String(formData.get("teaser") ?? ""),
+                lede: String(formData.get("lede") ?? ""),
+                body: String(formData.get("body") ?? ""),
+                image: image ?? (removeImage ? undefined : item.image),
+              }
+            : item,
+        ),
+      });
+      const updated = next.directions.find((item) => item.slug === slug);
+      if ((image || removeImage) && existing?.image && existing.image !== updated?.image) {
+        await removeCover(existing.image);
+      }
+      saveAboutLab(next);
+      publish();
+      redirect(`/admin/about/${slug}?saved=1`);
+    }
+  } catch (error) {
+    if (error && typeof error === "object" && "digest" in error) throw error;
+    const message = error instanceof Error ? error.message : "Не удалось сохранить страницу.";
+    const back = scope === "direction" ? `/admin/about/${String(formData.get("slug") ?? "")}` : "/admin/about";
+    redirect(`${back}?error=${encodeURIComponent(message)}`);
+  }
+
+  redirect("/admin/about?error=" + encodeURIComponent("Нечего сохранять."));
 }
 
 async function readAvatar(formData: FormData) {
