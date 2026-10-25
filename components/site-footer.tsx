@@ -11,16 +11,19 @@ export function SiteFooter() {
         <div>
           <p className="font-heading text-2xl tracking-tight">PardAiLab</p>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            Независимая лаборатория практического искусственного интеллекта. Мы объясняем инструменты и публикуем
-            собственные проверки, а не пересказываем ленту.
+            Независимая AI-инжиниринговая лаборатория. Исследуем, разрабатываем, внедряем и открыто публикуем опыт.
           </p>
           <p className="mt-4 text-sm">
+            <Link href="/o-nas" className="underline decoration-border underline-offset-4 hover:decoration-olive">
+              О нас
+            </Link>
+            <span className="text-muted-foreground"> · </span>
             <Link href="/o-proekte" className="underline decoration-border underline-offset-4 hover:decoration-olive">
               О проекте
             </Link>
             <span className="text-muted-foreground"> · </span>
-            <Link href="/o-proekte#redaktsii" className="underline decoration-border underline-offset-4 hover:decoration-olive">
-              Написать редакции
+            <Link href="/o-nas#svyaz" className="underline decoration-border underline-offset-4 hover:decoration-olive">
+              Связаться
             </Link>
           </p>
         </div>

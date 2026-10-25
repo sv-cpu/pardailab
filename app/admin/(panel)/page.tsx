@@ -8,6 +8,7 @@ export default function OverviewPage() {
   const inquiries = inquiryCounts();
   const cards = [
     { href: "/admin/articles", label: "Статьи", total: counts.articles, note: "" },
+    { href: "/admin/about", label: "О нас", total: 5, note: "хаб и 4 направления" },
     { href: "/admin/services", label: "Сервисы", total: counts.services, note: "" },
     { href: "/admin/models", label: "Модели", total: counts.models, note: "" },
     { href: "/admin/inquiries", label: "Обращения", total: inquiries.total, note: inquiries.fresh ? `${inquiries.fresh} новых` : "" },
@@ -18,7 +19,7 @@ export default function OverviewPage() {
       <p className="mt-3 max-w-xl text-muted-foreground">
         Правки попадают на сайт сразу после сохранения. Архив хранится в базе редакции.
       </p>
-      <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((card) => (
           <li key={card.href}>
             <Link href={card.href} className="block rounded-2xl border border-border bg-card px-5 py-6 hover:border-olive">

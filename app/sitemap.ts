@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { aboutDirectionSlugs } from "@/lib/about";
 import { getArticles } from "@/lib/cms";
 import { articleHref } from "@/lib/paths";
 import { site } from "@/lib/site";
@@ -17,13 +18,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/materialy",
     "/poisk",
     "/o-proekte",
+    "/o-nas",
+    ...aboutDirectionSlugs.map((slug) => `/o-nas/${slug}`),
   ];
 
   return [
     ...staticPaths.map((path) => ({
       url: new URL(path || "/", site.url).toString(),
       changeFrequency: "weekly" as const,
-      priority: path === "" ? 1 : 0.7,
+      priority: path === "" ? 1 : path.startsWith("/o-nas") ? 0.8 : 0.7,
     })),
     ...articles.map((article) => ({
       url: new URL(articleHref(article.kind, article.slug), site.url).toString(),
