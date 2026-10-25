@@ -1,6 +1,5 @@
-import { categoryBySlug } from "@/lib/categories";
 import { articleHref } from "@/lib/paths";
-import type { Article, ArticleKind, Block, RatedModel, Service } from "@/lib/types";
+import type { Article, ArticleKind, Block } from "@/lib/types";
 
 const WORD = /[0-9A-Za-zА-Яа-яЁё]+/g;
 const BODY_CAP = 4000;
@@ -116,27 +115,6 @@ function articleRecord(item: Article): SearchRecord {
   };
 }
 
-function serviceRecord(item: Service): SearchRecord {
-  const parts: [number, string][] = [];
-  push(parts, 8, item.name);
-  push(parts, 4, item.description);
-  push(
-    parts,
-    2,
-    [...item.domains, ...item.categories.map((slug) => categoryBySlug(slug)?.label ?? slug), ...item.tags].join(" "),
-  );
-  return { href: `/resheniya/${item.slug}`, kind: "Сервис", title: item.name, parts };
-}
-
-function modelRecord(item: RatedModel): SearchRecord {
-  const parts: [number, string][] = [];
-  push(parts, 8, [item.name, item.versionName ?? ""].filter(Boolean).join(" "));
-  push(parts, 4, item.summary);
-  push(parts, 3, item.bestFor);
-  push(parts, 2, [item.vendor, ...item.tags].join(" "));
-  return { href: `/modeli/${item.slug}`, kind: "Модель", title: item.name, parts };
-}
-
 function capBodies(records: SearchRecord[]) {
   if (JSON.stringify(records).length <= PAYLOAD_CAP) return records;
   return records.map((record) => ({
@@ -147,12 +125,8 @@ function capBodies(records: SearchRecord[]) {
   }));
 }
 
-export function toSearchRecords(data: { articles: Article[]; services: Service[]; models: RatedModel[] }) {
-  return capBodies([
-    ...data.articles.map(articleRecord),
-    ...data.services.map(serviceRecord),
-    ...data.models.map(modelRecord),
-  ]);
+export function toSearchRecords(data: { articles: Article[] }) {
+  return capBodies(data.articles.map(articleRecord));
 }
 
 function wordsOf(text: string) {
@@ -220,11 +194,7 @@ export function searchRecords(query: string, records: SearchRecord[], limit = 20
   return hits.slice(0, limit).map(({ href, kind, title, snippet }) => ({ href, kind, title, snippet }));
 }
 
-export function searchCatalog(
-  query: string,
-  data: { articles: Article[]; services: Service[]; models: RatedModel[] },
-  limit = 24,
-) {
+export function searchCatalog(query: string, data: { articles: Article[] }, limit = 24) {
   return searchRecords(query, toSearchRecords(data), limit);
 }
 

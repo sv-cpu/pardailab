@@ -8,13 +8,6 @@ import { useEffect, useRef, useState } from "react";
 import type { MenuRubric } from "@/lib/rubrics";
 import { cn } from "@/lib/utils";
 
-const reference = [
-  { href: "/modeli", label: "Модели", menu: "Модели" },
-  { href: "/resheniya", label: "Решения", menu: "Каталог решений" },
-  { href: "/katalog", label: "Каталог", menu: "Каталог AI" },
-  { href: "/benchmarki", label: "Бенчмарки", menu: "Бенчмарки" },
-];
-
 function Item({
   href,
   label,
@@ -131,10 +124,6 @@ export function SiteNav({ rubrics }: { rubrics: MenuRubric[] }) {
           onToggle={(slug) => setOpen((current) => (current === slug ? null : slug))}
         />
       ))}
-      <span className="mx-1 hidden h-4 w-px shrink-0 bg-border lg:block" aria-hidden />
-      {reference.map((item) => (
-        <Item key={item.href} href={item.href} label={item.label} pathname={pathname} />
-      ))}
     </nav>
   );
 }
@@ -168,12 +157,6 @@ export function SiteMenu({ rubrics }: { rubrics: MenuRubric[] }) {
                 </div>
               ) : null}
             </div>
-          ))}
-        </nav>
-        <nav className="flex flex-col gap-2 border-t border-border pt-3" aria-label="Справочник">
-          <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">Справочник</p>
-          {reference.map((item) => (
-            <Item key={item.href} href={item.href} label={item.menu} pathname={pathname} />
           ))}
         </nav>
       </div>

@@ -4,7 +4,7 @@ import { Container } from "@/components/container";
 import { PageIntro } from "@/components/page-intro";
 import { SearchForm } from "@/components/search-form";
 import { SearchHitList } from "@/components/search-hits";
-import { getArticles, getModels, getServices } from "@/lib/cms";
+import { getArticles } from "@/lib/cms";
 import { searchCatalog } from "@/lib/search";
 import { pageMeta } from "@/lib/seo";
 
@@ -14,7 +14,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const { q = "" } = await searchParams;
   return pageMeta({
     title: q ? `Поиск: ${q}` : "Поиск",
-    description: "Поиск по статьям, сервисам, моделям и исследованиям PardAiLab.",
+    description: "Поиск по статьям и исследованиям PardAiLab.",
     path: q ? `/poisk?q=${encodeURIComponent(q)}` : "/poisk",
     noIndex: Boolean(q),
   });
@@ -22,15 +22,15 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default async function Page({ searchParams }: Props) {
   const { q = "" } = await searchParams;
-  const [articles, services, models] = await Promise.all([getArticles(), getServices(), getModels()]);
-  const hits = q.trim() ? searchCatalog(q, { articles, services, models }) : [];
+  const articles = await getArticles();
+  const hits = q.trim() ? searchCatalog(q, { articles }) : [];
 
   return (
     <Container className="py-16 sm:py-20">
       <PageIntro
         eyebrow="Поиск"
         title="Найдите по словам, которые помните"
-        lede="Одна строка по статьям, исследованиям, сервисам и моделям."
+        lede="Одна строка по статьям, практике, разработке и исследованиям."
       />
       <div className="mt-10 max-w-3xl">
         <SearchForm large defaultValue={q} />
