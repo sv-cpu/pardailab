@@ -11,9 +11,12 @@ import {
   aboutDirectionSlugs,
   getAboutLab,
   normalizeAboutLab,
+  normalizeDevelopment,
+  normalizeDevelopments,
   normalizeProject,
   normalizeProjects,
   saveAboutLab,
+  type AboutDevelopment,
   type AboutDirectionSlug,
   type AboutLab,
   type AboutProject,
@@ -506,6 +509,75 @@ export async function saveAboutProjectAction(formData: FormData) {
   } catch (error) {
     if (error && typeof error === "object" && "digest" in error) throw error;
     const message = error instanceof Error ? error.message : "Не удалось сохранить проект.";
+    redirect(`${back}?error=${encodeURIComponent(message)}`);
+  }
+
+  redirect(`${back}?error=${encodeURIComponent("Нечего сохранять.")}`);
+}
+
+export async function saveAboutDevelopmentAction(formData: FormData) {
+  await editorOnly();
+  const back = "/admin/about/razrabotki";
+  const intent = String(formData.get("intent") ?? "save");
+  const current = getAboutLab();
+  let developments = [...current.developments];
+
+  try {
+    if (intent === "delete") {
+      const id = String(formData.get("id") ?? "");
+      const removed = developments.find((item) => item.id === id);
+      developments = developments.filter((item) => item.id !== id);
+      if (removed?.cover) await removeCover(removed.cover);
+      saveAboutLab({ ...current, developments: normalizeDevelopments(developments) });
+      publish();
+      redirect(`${back}?saved=1`);
+    }
+
+    if (intent === "move") {
+      const id = String(formData.get("id") ?? "");
+      const direction = String(formData.get("direction") ?? "");
+      const index = developments.findIndex((item) => item.id === id);
+      if (index < 0) redirect(`${back}?error=${encodeURIComponent("Разработка не найдена.")}`);
+      const swap = direction === "up" ? index - 1 : index + 1;
+      if (swap < 0 || swap >= developments.length) redirect(back);
+      const copy = [...developments];
+      [copy[index], copy[swap]] = [copy[swap], copy[index]];
+      saveAboutLab({ ...current, developments: normalizeDevelopments(copy) });
+      publish();
+      redirect(`${back}?saved=1`);
+    }
+
+    if (intent === "save") {
+      const id = String(formData.get("id") ?? "").trim() || randomUUID();
+      const existing = developments.find((item) => item.id === id);
+      const uploaded = await readCover(formData);
+      const cover = uploaded ?? existing?.cover ?? "";
+      const draft: AboutDevelopment = {
+        id,
+        title: String(formData.get("title") ?? ""),
+        summary: String(formData.get("summary") ?? ""),
+        body: String(formData.get("body") ?? ""),
+        cover,
+      };
+      const development = normalizeDevelopment(draft);
+      if (!development) {
+        redirect(
+          `${back}?error=${encodeURIComponent("Нужны название, краткое описание, полный текст и обложка (JPEG, PNG или WebP).")}`,
+        );
+      }
+      if (existing) {
+        developments = developments.map((item) => (item.id === id ? development : item));
+        if (uploaded && existing.cover && existing.cover !== development.cover) await removeCover(existing.cover);
+      } else {
+        developments = [...developments, development];
+      }
+      saveAboutLab({ ...current, developments: normalizeDevelopments(developments) });
+      publish();
+      redirect(`${back}?saved=1`);
+    }
+  } catch (error) {
+    if (error && typeof error === "object" && "digest" in error) throw error;
+    const message = error instanceof Error ? error.message : "Не удалось сохранить разработку.";
     redirect(`${back}?error=${encodeURIComponent(message)}`);
   }
 

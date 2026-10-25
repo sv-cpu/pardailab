@@ -11,6 +11,16 @@ export interface AboutProject {
   url?: string;
 }
 
+export interface AboutDevelopment {
+  id: string;
+  title: string;
+  /** Short text shown on the card. */
+  summary: string;
+  /** Full HTML shown in the modal. */
+  body: string;
+  cover: string;
+}
+
 export interface AboutDirection {
   slug: AboutDirectionSlug;
   title: string;
@@ -33,6 +43,7 @@ export interface AboutLab {
   contactLede: string;
   directions: AboutDirection[];
   projects: AboutProject[];
+  developments: AboutDevelopment[];
 }
 
 export function aboutDirectionHref(slug: AboutDirectionSlug) {
