@@ -106,6 +106,50 @@ export function createRubric(name: string, parent: string | null, db = getDb()) 
   return rubric;
 }
 
+export function articleCountLabel(count: number) {
+  if (count <= 0) return "Нет статей";
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return `${count} статья`;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${count} статьи`;
+  return `${count} статей`;
+}
+
+export function rubricArticleCounts(db = getDb()) {
+  const counts = new Map<string, number>();
+  for (const article of listArticles(db)) {
+    const seen = new Set<string>();
+    for (const placement of articlePlacements(article)) {
+      if (placement.rubric) seen.add(placement.rubric);
+      if (placement.subrubric) seen.add(placement.subrubric);
+    }
+    for (const slug of seen) counts.set(slug, (counts.get(slug) ?? 0) + 1);
+  }
+  return counts;
+}
+
+export function moveRubric(slug: string, direction: "up" | "down", db = getDb()) {
+  const all = listRubrics(db);
+  const current = all.find((item) => item.slug === slug);
+  if (!current) throw new Error("Рубрика не найдена.");
+  const siblings = all.filter((item) => item.parent === current.parent);
+  const index = siblings.findIndex((item) => item.slug === slug);
+  const target = direction === "up" ? index - 1 : index + 1;
+  if (target < 0 || target >= siblings.length) return;
+  const ordered = siblings.filter((item) => item.slug !== slug);
+  ordered.splice(target, 0, current);
+  db.exec("BEGIN");
+  try {
+    ordered.forEach((rubric, position) => {
+      if (rubric.position !== position) writeRubric({ ...rubric, position }, db);
+    });
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    throw error;
+  }
+}
+
 export function renameRubric(slug: string, name: string, db = getDb()) {
   const all = listRubrics(db);
   const current = all.find((item) => item.slug === slug);
@@ -119,27 +163,6 @@ export function renameRubric(slug: string, name: string, db = getDb()) {
     if (first.subrubric === slug || (first.rubric === slug && !first.subrubric)) {
       saveArticle({ ...article, category: next.name }, article.slug, db);
     }
-  }
-}
-
-export function moveRubric(slug: string, direction: "up" | "down", db = getDb()) {
-  const sections = listRubrics(db).filter((item) => !item.parent);
-  const index = sections.findIndex((item) => item.slug === slug);
-  const moving = sections[index];
-  if (!moving) throw new Error("Раздел не найден.");
-  const target = direction === "up" ? index - 1 : index + 1;
-  if (target < 0 || target >= sections.length) return;
-  const ordered = sections.filter((item) => item.slug !== slug);
-  ordered.splice(target, 0, moving);
-  db.exec("BEGIN");
-  try {
-    ordered.forEach((rubric, position) => {
-      if (rubric.position !== position) writeRubric({ ...rubric, position }, db);
-    });
-    db.exec("COMMIT");
-  } catch (error) {
-    db.exec("ROLLBACK");
-    throw error;
   }
 }
 
