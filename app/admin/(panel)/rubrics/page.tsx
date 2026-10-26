@@ -3,6 +3,30 @@ import { Notice, fieldClass } from "@/components/admin/ui";
 import { listRubrics } from "@/lib/rubrics";
 import { requireEditor } from "@/lib/users";
 
+function MoveSection({ slug, name, index, total }: { slug: string; name: string; index: number; total: number }) {
+  const buttonClass = "text-sm text-olive disabled:text-muted-foreground";
+  return (
+    <div className="flex items-center gap-2">
+      <form action={saveRubricAction}>
+        <input type="hidden" name="intent" value="move" />
+        <input type="hidden" name="slug" value={slug} />
+        <input type="hidden" name="direction" value="up" />
+        <button type="submit" disabled={index === 0} aria-label={`Выше: ${name}`} className={buttonClass}>
+          Выше
+        </button>
+      </form>
+      <form action={saveRubricAction}>
+        <input type="hidden" name="intent" value="move" />
+        <input type="hidden" name="slug" value={slug} />
+        <input type="hidden" name="direction" value="down" />
+        <button type="submit" disabled={index === total - 1} aria-label={`Ниже: ${name}`} className={buttonClass}>
+          Ниже
+        </button>
+      </form>
+    </div>
+  );
+}
+
 export default async function RubricsPage({ searchParams }: { searchParams: Promise<{ saved?: string; error?: string }> }) {
   await requireEditor();
   const query = await searchParams;
@@ -12,24 +36,27 @@ export default async function RubricsPage({ searchParams }: { searchParams: Prom
     <div>
       <h1 className="font-heading text-4xl tracking-tight">Рубрики</h1>
       <p className="mt-3 max-w-xl text-muted-foreground">
-        Подрубрики открываются в меню сайта списком у своей рубрики.
+        Порядок разделов в этом списке — порядок в главном меню сайта. Подрубрики открываются списком у своей рубрики.
       </p>
       <div className="mt-6">
         <Notice saved={query.saved} error={query.error} />
       </div>
       <ul className="mt-8 divide-y divide-border border-y border-border">
-        {parents.map((parent) => {
+        {parents.map((parent, index) => {
           const children = rubrics.filter((item) => item.parent === parent.slug);
           return (
             <li key={parent.slug} className="py-6">
-              <form action={saveRubricAction} className="flex flex-wrap items-center gap-3">
-                <input type="hidden" name="intent" value="rename" />
-                <input type="hidden" name="slug" value={parent.slug} />
-                <input name="name" defaultValue={parent.name} required className={`${fieldClass} max-w-sm`} />
-                <button type="submit" className="text-sm text-olive">
-                  Сохранить
-                </button>
-              </form>
+              <div className="flex flex-wrap items-center gap-3">
+                <MoveSection slug={parent.slug} name={parent.name} index={index} total={parents.length} />
+                <form action={saveRubricAction} className="flex flex-wrap items-center gap-3">
+                  <input type="hidden" name="intent" value="rename" />
+                  <input type="hidden" name="slug" value={parent.slug} />
+                  <input name="name" defaultValue={parent.name} required className={`${fieldClass} max-w-sm`} />
+                  <button type="submit" className="text-sm text-olive">
+                    Сохранить
+                  </button>
+                </form>
+              </div>
               <ul className="mt-4 grid gap-3 pl-4">
                 {children.map((child) => (
                   <li key={child.slug} className="flex flex-wrap items-center gap-3">

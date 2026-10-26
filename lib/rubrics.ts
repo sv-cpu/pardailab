@@ -122,6 +122,27 @@ export function renameRubric(slug: string, name: string, db = getDb()) {
   }
 }
 
+export function moveRubric(slug: string, direction: "up" | "down", db = getDb()) {
+  const sections = listRubrics(db).filter((item) => !item.parent);
+  const index = sections.findIndex((item) => item.slug === slug);
+  const moving = sections[index];
+  if (!moving) throw new Error("Раздел не найден.");
+  const target = direction === "up" ? index - 1 : index + 1;
+  if (target < 0 || target >= sections.length) return;
+  const ordered = sections.filter((item) => item.slug !== slug);
+  ordered.splice(target, 0, moving);
+  db.exec("BEGIN");
+  try {
+    ordered.forEach((rubric, position) => {
+      if (rubric.position !== position) writeRubric({ ...rubric, position }, db);
+    });
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    throw error;
+  }
+}
+
 export function deleteRubric(slug: string, db = getDb()) {
   const all = listRubrics(db);
   const current = all.find((item) => item.slug === slug);
