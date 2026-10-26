@@ -1,7 +1,7 @@
 import { getDb } from "@/lib/db";
 
 export type InquiryKind = "correction" | "letter";
-export type InquiryStatus = "new" | "read" | "done";
+export type InquiryStatus = "new" | "read" | "archive";
 
 export const inquiryKindLabel: Record<InquiryKind, string> = {
   correction: "Замечание",
@@ -11,7 +11,7 @@ export const inquiryKindLabel: Record<InquiryKind, string> = {
 export const inquiryStatusLabel: Record<InquiryStatus, string> = {
   new: "Новое",
   read: "Прочитано",
-  done: "Разобрано",
+  archive: "Архив",
 };
 
 export interface Inquiry {
@@ -24,6 +24,7 @@ export interface Inquiry {
   pageTitle: string;
   pagePath: string;
   status: InquiryStatus;
+  important: boolean;
 }
 
 export interface InquiryDraft {
@@ -45,10 +46,16 @@ type InquiryRow = {
   page_title: string;
   page_path: string;
   status: string;
+  important?: number;
 };
 
 const kinds = new Set<InquiryKind>(["correction", "letter"]);
-const statuses = new Set<InquiryStatus>(["new", "read", "done"]);
+const statuses = new Set<InquiryStatus>(["new", "read", "archive"]);
+
+function storedStatus(status: string): InquiryStatus {
+  if (status === "done") return "archive";
+  return statuses.has(status as InquiryStatus) ? (status as InquiryStatus) : "new";
+}
 
 function clean(value: string) {
   return value.replace(/\0/g, "").trim();
@@ -102,7 +109,8 @@ function rowToInquiry(row: InquiryRow): Inquiry {
     message: row.message,
     pageTitle: row.page_title,
     pagePath: row.page_path,
-    status: statuses.has(row.status as InquiryStatus) ? (row.status as InquiryStatus) : "new",
+    status: storedStatus(row.status),
+    important: row.important === 1,
   };
 }
 
@@ -151,6 +159,10 @@ export function openInquiry(id: number, db = getDb()) {
 
 export function setInquiryStatus(id: number, status: InquiryStatus, db = getDb()) {
   db.prepare("UPDATE inquiries SET status = ? WHERE id = ?").run(status, id);
+}
+
+export function setInquiryImportant(id: number, important: boolean, db = getDb()) {
+  db.prepare("UPDATE inquiries SET important = ? WHERE id = ?").run(important ? 1 : 0, id);
 }
 
 export function deleteInquiry(id: number, db = getDb()) {

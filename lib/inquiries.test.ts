@@ -13,6 +13,7 @@ import {
   openInquiry,
   readInquiry,
   recentInquiryCount,
+  setInquiryImportant,
   setInquiryStatus,
 } from "./inquiries";
 
@@ -59,9 +60,14 @@ describe("inquiries", () => {
     assert.equal(recentInquiryCount("anna@example.com", "2026-10-06T11:00:00.000Z", db), 1);
     const opened = openInquiry(second, db);
     assert.equal(opened?.status, "read");
-    setInquiryStatus(second, "done", db);
-    assert.equal(getInquiry(second, db)?.status, "done");
-    assert.equal(openInquiry(second, db)?.status, "done");
+    assert.equal(opened?.important, false);
+    setInquiryImportant(second, true, db);
+    setInquiryStatus(second, "archive", db);
+    assert.equal(getInquiry(second, db)?.status, "archive");
+    assert.equal(getInquiry(second, db)?.important, true);
+    assert.equal(openInquiry(second, db)?.status, "archive");
+    db.prepare("UPDATE inquiries SET status = 'done' WHERE id = ?").run(first);
+    assert.equal(getInquiry(first, db)?.status, "archive");
     deleteInquiry(first, db);
     assert.equal(getInquiry(first, db), null);
   });

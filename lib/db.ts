@@ -45,9 +45,15 @@ function migrate(db: DatabaseSync) {
       message TEXT NOT NULL,
       page_title TEXT NOT NULL,
       page_path TEXT NOT NULL,
-      status TEXT NOT NULL
+      status TEXT NOT NULL,
+      important INTEGER NOT NULL DEFAULT 0
     );
   `);
+  const inquiryColumns = db.prepare("PRAGMA table_info(inquiries)").all() as { name: string }[];
+  if (!inquiryColumns.some((column) => column.name === "important")) {
+    db.exec("ALTER TABLE inquiries ADD COLUMN important INTEGER NOT NULL DEFAULT 0");
+  }
+  db.exec("UPDATE inquiries SET status = 'archive' WHERE status = 'done'");
 }
 
 function seed(db: DatabaseSync) {
