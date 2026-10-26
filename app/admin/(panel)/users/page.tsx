@@ -1,5 +1,6 @@
 import { saveUserAction } from "@/app/admin/actions";
 import { AvatarField } from "@/components/admin/avatar-field";
+import { BioField } from "@/components/admin/bio-field";
 import { Notice, fieldClass } from "@/components/admin/ui";
 import { listUsers, requireEditor, roleLabel, type StaffRole } from "@/lib/users";
 
@@ -8,7 +9,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
   const query = await searchParams;
   const users = listUsers();
   return (
-    <div className="mx-auto grid w-full max-w-3xl gap-8">
+    <div className="mx-auto grid w-full max-w-4xl gap-8">
       <div>
         <h1 className="font-heading text-4xl tracking-tight">Пользователи</h1>
         <p className="mt-3 text-muted-foreground">Редактор ведёт редакцию. Журналист пишет свои материалы и свой профиль.</p>
@@ -22,7 +23,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
               <input type="hidden" name="slug" value={user.slug} />
               <p className="text-sm text-muted-foreground">Логин {user.login}</p>
               <input name="name" defaultValue={user.name} required className={fieldClass} />
-              <textarea name="bio" defaultValue={user.bio} rows={3} placeholder="О себе" className={fieldClass} />
+              <BioField key={user.slug} initial={user.bio} />
               <select name="role" defaultValue={user.role} className={fieldClass}>
                 {(Object.keys(roleLabel) as StaffRole[]).map((role) => (
                   <option key={role} value={role}>
@@ -53,7 +54,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
         <input name="name" placeholder="Имя" required className={fieldClass} />
         <input name="login" placeholder="Логин" required className={fieldClass} />
         <input name="password" type="password" placeholder="Пароль" required className={fieldClass} />
-        <textarea name="bio" placeholder="О себе" rows={3} className={fieldClass} />
+        <BioField initial="" />
         <select name="role" defaultValue="journalist" className={fieldClass}>
           <option value="journalist">Журналист</option>
           <option value="editor">Редактор</option>

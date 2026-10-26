@@ -17,7 +17,9 @@ describe("profile fields", () => {
       { name: "Анна", login: "anna1", password: "password1", role: "journalist", bio: "Текст", photo },
       db,
     );
+    assert.equal(user.bio, "<p>Текст</p>");
     const renamed = updateUser(user.slug, { name: "Анна Иванова", bio: "Новый текст" }, db);
+    assert.equal(renamed.bio, "<p>Новый текст</p>");
     assert.equal(renamed.photo, photo);
     assert.equal(renamed.name, "Анна Иванова");
     const replaced = updateUser(user.slug, { name: "Анна Иванова", bio: "Новый текст", photo: photo.replace("ab", "ac") }, db);
