@@ -23,6 +23,7 @@ import {
 } from "@/lib/about";
 import { removeCover, storeCover } from "@/lib/covers";
 import { dropRemovedMedia } from "@/lib/media";
+import { dropArticleViews } from "@/lib/article-views";
 import { deleteRecord, listArticles, listModels, saveArticle, saveModel, saveService } from "@/lib/db";
 import { saveBenchmark, deleteBenchmark, type BenchmarkRow } from "@/lib/benchmarks";
 import { saveRatingStamp } from "@/lib/rating";
@@ -73,6 +74,7 @@ export async function saveArticleAction(formData: FormData): Promise<SaveArticle
       await removeCover(existing?.coverImage);
       if (existing) await dropRemovedMedia(existing.body, []);
       deleteRecord("articles", original);
+      dropArticleViews(original);
     }
     publish();
     return { ok: true, href: "/admin/articles" };

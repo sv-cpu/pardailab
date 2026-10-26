@@ -1,3 +1,4 @@
+import { moveArticleViews } from "@/lib/article-views";
 import { dropRemovedMedia } from "@/lib/media";
 import { isStoredCover, removeCover, storeCover } from "@/lib/covers";
 import { stampPublished } from "@/lib/format";
@@ -84,6 +85,7 @@ export async function persistArticleDraft(input: {
 
   if (uploaded && previous && previous !== uploaded) await removeCover(previous);
   if (existing) await dropRemovedMedia(existing.body, draft.body);
+  if (original && original !== parsed.value.slug) moveArticleViews(original, parsed.value.slug);
   return { ok: true, href: `/admin/articles/${parsed.value.slug}?saved=1` };
 }
 
