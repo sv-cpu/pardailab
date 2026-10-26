@@ -131,29 +131,54 @@ export async function saveModelAction(formData: FormData) {
   redirect(`/admin/models/${String(formData.get("slug") ?? existing?.slug ?? "")}?saved=1`);
 }
 
-export async function saveRubricAction(formData: FormData) {
+export type RubricActionResult = { ok: true; slug: string } | { ok: false; error: string };
+
+function rubricError(error: unknown) {
+  return error instanceof Error ? error.message : "Не удалось сохранить рубрику.";
+}
+
+export async function renameRubricAction(slug: string, name: string): Promise<RubricActionResult> {
   await editorOnly();
-  const intent = String(formData.get("intent") ?? "");
   try {
-    if (intent === "delete") {
-      deleteRubric(String(formData.get("slug") ?? ""));
-    } else if (intent === "rename") {
-      renameRubric(String(formData.get("slug") ?? ""), String(formData.get("name") ?? ""));
-    } else if (intent === "move") {
-      const direction = String(formData.get("direction") ?? "");
-      if (direction !== "up" && direction !== "down") throw new Error("Не удалось изменить порядок.");
-      moveRubric(String(formData.get("slug") ?? ""), direction);
-    } else if (intent === "child") {
-      createRubric(String(formData.get("name") ?? ""), String(formData.get("parent") ?? ""));
-    } else {
-      createRubric(String(formData.get("name") ?? ""), null);
-    }
+    renameRubric(slug, name);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Не удалось сохранить рубрику.";
-    redirect(`/admin/rubrics?error=${encodeURIComponent(message)}`);
+    return { ok: false, error: rubricError(error) };
   }
   publish();
-  redirect("/admin/rubrics?saved=1");
+  return { ok: true, slug };
+}
+
+export async function createRubricAction(name: string, parent: string | null): Promise<RubricActionResult> {
+  await editorOnly();
+  try {
+    const rubric = createRubric(name, parent);
+    publish();
+    return { ok: true, slug: rubric.slug };
+  } catch (error) {
+    return { ok: false, error: rubricError(error) };
+  }
+}
+
+export async function deleteRubricAction(slug: string): Promise<RubricActionResult> {
+  await editorOnly();
+  try {
+    deleteRubric(slug);
+  } catch (error) {
+    return { ok: false, error: rubricError(error) };
+  }
+  publish();
+  return { ok: true, slug };
+}
+
+export async function moveRubricAction(slug: string, direction: "up" | "down"): Promise<RubricActionResult> {
+  await editorOnly();
+  try {
+    moveRubric(slug, direction);
+  } catch (error) {
+    return { ok: false, error: rubricError(error) };
+  }
+  publish();
+  return { ok: true, slug };
 }
 
 async function editorOnly() {
