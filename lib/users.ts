@@ -2,6 +2,7 @@ import type { DatabaseSync } from "node:sqlite";
 import { redirect } from "next/navigation";
 
 import { adminCredentials, currentSession, secretsMatch } from "@/lib/auth";
+import { cleanStaffBio } from "@/lib/bio";
 import { getDb } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/passwords";
 import { transliterate } from "@/lib/rubric-seed";
@@ -142,7 +143,7 @@ export function createUser(
     name,
     passwordHash: hashPassword(input.password),
     role: input.role,
-    bio: input.bio.trim(),
+    bio: cleanStaffBio(input.bio),
     ...(input.photo ? { photo: input.photo } : {}),
   };
   writeUser(user, db);
@@ -162,7 +163,7 @@ export function updateUser(
   const next: StaffUser = {
     ...current,
     name,
-    bio: input.bio.trim(),
+    bio: cleanStaffBio(input.bio),
     role: input.role ?? current.role,
     passwordHash: input.password ? hashPassword(input.password) : current.passwordHash,
   };

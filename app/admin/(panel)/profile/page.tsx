@@ -17,7 +17,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   if (!user) redirect("/admin/login");
   const query = await searchParams;
   return (
-    <div className="mx-auto grid w-full max-w-3xl gap-8">
+    <div className="mx-auto grid w-full max-w-4xl gap-8">
       <div>
         <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">Учётная запись</p>
         <h1 className="mt-3 font-heading text-4xl tracking-tight">Профиль</h1>
