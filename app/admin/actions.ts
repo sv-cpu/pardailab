@@ -30,7 +30,7 @@ import { stampPublished } from "@/lib/format";
 import { transliterate } from "@/lib/rubric-seed";
 import { scoreFields } from "@/lib/scores";
 import type { ModelScores } from "@/lib/types";
-import { createRubric, deleteRubric, listRubrics, renameRubric } from "@/lib/rubrics";
+import { createRubric, deleteRubric, listRubrics, moveRubric, renameRubric } from "@/lib/rubrics";
 import { verifyPassword } from "@/lib/passwords";
 import { authenticate, createUser, currentUser, deleteUser, findUserBySlug, ownsArticle, updateUser, type StaffRole } from "@/lib/users";
 import { removeAvatar, storeAvatar } from "@/lib/avatars";
@@ -139,6 +139,10 @@ export async function saveRubricAction(formData: FormData) {
       deleteRubric(String(formData.get("slug") ?? ""));
     } else if (intent === "rename") {
       renameRubric(String(formData.get("slug") ?? ""), String(formData.get("name") ?? ""));
+    } else if (intent === "move") {
+      const direction = String(formData.get("direction") ?? "");
+      if (direction !== "up" && direction !== "down") throw new Error("Не удалось изменить порядок.");
+      moveRubric(String(formData.get("slug") ?? ""), direction);
     } else if (intent === "child") {
       createRubric(String(formData.get("name") ?? ""), String(formData.get("parent") ?? ""));
     } else {
