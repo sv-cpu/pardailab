@@ -19,6 +19,7 @@ import { site } from "@/lib/site";
 import type { Article, ArticleKind, Block } from "@/lib/types";
 import { findUserBySlug, roleLabel } from "@/lib/users";
 
+import { ArticleView } from "@/components/article-view";
 import { InquiryForm } from "@/components/inquiry-form";
 
 import { ShareBar } from "./share-bar";
@@ -127,6 +128,7 @@ export async function ArticleScreen({ kind, slug }: { kind: ArticleKind; slug: s
 
   return (
     <Container className="py-12 sm:py-16">
+      <ArticleView slug={article.slug} />
       <JsonLd data={articleJsonLd(article)} />
       <JsonLd data={breadcrumbJsonLd(crumbs)} />
       <Breadcrumbs

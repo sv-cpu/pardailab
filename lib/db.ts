@@ -48,6 +48,10 @@ function migrate(db: DatabaseSync) {
       status TEXT NOT NULL,
       important INTEGER NOT NULL DEFAULT 0
     );
+    CREATE TABLE IF NOT EXISTS article_views (
+      slug TEXT PRIMARY KEY,
+      views INTEGER NOT NULL
+    );
   `);
   const inquiryColumns = db.prepare("PRAGMA table_info(inquiries)").all() as { name: string }[];
   if (!inquiryColumns.some((column) => column.name === "important")) {
