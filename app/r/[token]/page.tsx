@@ -29,7 +29,7 @@ export default async function ResumePage({ params }: Props) {
   return (
     <div className="min-h-screen bg-background">
       <div className="border-b border-border print:hidden">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-5 py-3 sm:px-8">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3 sm:px-8">
           <p className="font-heading text-sm tracking-tight text-olive">{site.name}</p>
           <p className="text-xs text-muted-foreground">Закрытая ссылка</p>
         </div>
