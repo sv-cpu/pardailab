@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { removeAvatar, storeAvatar } from "@/lib/avatars";
 import {
   canManageResume,
   createResume,
@@ -30,6 +31,12 @@ function readPayload(formData: FormData) {
   return parsed;
 }
 
+async function readPhoto(formData: FormData) {
+  const file = formData.get("photo");
+  if (!(file instanceof File) || file.size <= 0) return undefined;
+  return storeAvatar(file);
+}
+
 export async function saveResumeAction(formData: FormData) {
   const actor = await currentUser();
   if (!actor) redirect("/admin/login");
@@ -44,6 +51,7 @@ export async function saveResumeAction(formData: FormData) {
     if (!existing) fail("/admin/resumes", "Резюме не найдено.");
     if (!canManageResume(existing, actor)) fail("/admin/resumes", "Это не ваше резюме.");
     deleteResume(id);
+    await removeAvatar(existing.photo);
     revalidatePath("/admin/resumes");
     redirect("/admin/resumes?saved=1");
   }
@@ -61,20 +69,24 @@ export async function saveResumeAction(formData: FormData) {
 
   try {
     const parsed = readPayload(formData);
+    const photo = await readPhoto(formData);
+    const removePhoto = formData.get("removePhoto") === "1";
+
     if (id) {
       const existing = findResumeById(id);
       if (!existing) fail("/admin/resumes", "Резюме не найдено.");
       if (!canManageResume(existing, actor)) fail(back, "Это не ваше резюме.");
       const ownerSlug =
         actor.role === "editor" ? String(formData.get("ownerSlug") || existing.ownerSlug) : existing.ownerSlug;
-      updateResume(id, { ...asInput(parsed), ownerSlug });
+      updateResume(id, { ...asInput(parsed), ownerSlug }, undefined, photo ? photo : removePhoto ? null : undefined);
+      if ((photo || removePhoto) && existing.photo && existing.photo !== photo) await removeAvatar(existing.photo);
       revalidatePath("/admin/resumes");
       revalidatePath(`/admin/resumes/${id}`);
       redirect(`/admin/resumes/${id}?saved=1`);
     }
 
     const ownerSlug = actor.role === "editor" ? String(formData.get("ownerSlug") || actor.slug) : actor.slug;
-    const created = createResume(asInput(parsed), ownerSlug);
+    const created = createResume(asInput(parsed), ownerSlug, undefined, photo);
     revalidatePath("/admin/resumes");
     redirect(`/admin/resumes/${created.id}?saved=1`);
   } catch (error) {
