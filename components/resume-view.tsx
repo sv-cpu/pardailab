@@ -5,7 +5,7 @@ import {
   formatJobPeriod,
   formatUpdatedAt,
   type Resume,
-} from "@/lib/resumes";
+} from "@/lib/resumes.shared";
 
 function Paragraphs({ text }: { text: string }) {
   const parts = text

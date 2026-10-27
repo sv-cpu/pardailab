@@ -14,8 +14,7 @@ import {
   type ResumeJob,
   type ResumeLanguage,
   type ResumeProject,
-} from "@/lib/resumes";
-import type { StaffUser } from "@/lib/users";
+} from "@/lib/resumes.shared";
 
 import { ConfirmDelete } from "./delete-button";
 import { Field, fieldClass } from "./ui";
@@ -64,7 +63,7 @@ export function ResumeForm({
   canAssignOwner,
 }: {
   resume?: Resume;
-  users: Pick<StaffUser, "slug" | "name">[];
+  users: { slug: string; name: string }[];
   canAssignOwner: boolean;
 }) {
   const initial = useMemo<Draft>(() => {
