@@ -8,6 +8,7 @@ import { services as localServices } from "@/lib/content/services";
 import { ensureRubrics } from "@/lib/rubrics";
 import { ensureUsers } from "@/lib/users";
 import { ensureBenchmarks } from "@/lib/benchmarks";
+import { ensureResumes } from "@/lib/resumes";
 import type { Article, ModelProfile, Service } from "@/lib/types";
 
 type Table = "articles" | "services" | "models";
@@ -89,6 +90,7 @@ export function openDatabase(filename = databasePath()) {
   ensureRubrics(db);
   ensureUsers(db);
   ensureBenchmarks(db);
+  ensureResumes(db);
   return db;
 }
 
