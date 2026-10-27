@@ -25,7 +25,7 @@ export function ResumeView({ resume }: { resume: Resume }) {
   const jobs = sortJobsByDate(resume.jobs);
 
   return (
-    <article className="mx-auto max-w-3xl px-5 py-10 sm:px-8 sm:py-14 print:max-w-none print:px-0 print:py-0">
+    <article className="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14 print:max-w-none print:px-0 print:py-0">
       <header className="border-b border-border pb-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
           <div className="grid size-28 shrink-0 place-items-center overflow-hidden rounded-full bg-olive-soft text-olive sm:size-32">
