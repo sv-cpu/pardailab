@@ -70,11 +70,6 @@ export function ResumeView({ resume }: { resume: Resume }) {
                     .join(", ")}
                 </MetaLine>
               ) : null}
-              {resume.person.relocation || resume.person.businessTrips ? (
-                <MetaLine>
-                  {[resume.person.relocation, resume.person.businessTrips].filter(Boolean).join(", ")}
-                </MetaLine>
-              ) : null}
             </div>
           </div>
         </div>
@@ -87,33 +82,9 @@ export function ResumeView({ resume }: { resume: Resume }) {
         </section>
       ) : null}
 
-      {(resume.target.title ||
-        resume.target.employmentType ||
-        resume.target.workFormat ||
-        resume.target.commute ||
-        resume.target.salary) && (
-        <section className="border-b border-border py-8">
-          <h2 className="font-heading text-2xl tracking-tight">Желаемая должность и зарплата</h2>
-          {resume.target.title ? (
-            <p className="mt-4 text-lg leading-snug font-medium text-balance">{resume.target.title}</p>
-          ) : null}
-          {resume.target.salary ? <p className="mt-2 text-[15px] text-muted-foreground">{resume.target.salary}</p> : null}
-          <div className="mt-4 space-y-1 text-[15px] text-muted-foreground">
-            {resume.target.employmentType ? <p>Тип занятости: {resume.target.employmentType}</p> : null}
-            {resume.target.workFormat ? <p>Формат работы: {resume.target.workFormat}</p> : null}
-            {resume.target.commute ? <p>Желательное время в пути до работы: {resume.target.commute}</p> : null}
-          </div>
-        </section>
-      )}
-
       {jobs.length ? (
         <section className="border-b border-border py-8">
-          <div className="flex flex-wrap items-baseline justify-between gap-3">
-            <h2 className="font-heading text-2xl tracking-tight">Опыт работы</h2>
-            {resume.experienceLabel ? (
-              <p className="text-sm text-muted-foreground">— {resume.experienceLabel}</p>
-            ) : null}
-          </div>
+          <h2 className="font-heading text-2xl tracking-tight">Опыт работы</h2>
           <div className="mt-8 space-y-10">
             {jobs.map((job, index) => {
               const duration = formatJobDuration(job);

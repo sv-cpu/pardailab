@@ -73,8 +73,6 @@ export function ResumeForm({
     if (!resume) return blankResume();
     return {
       person: resume.person,
-      target: resume.target,
-      experienceLabel: resume.experienceLabel,
       jobs: sortJobsByDate(resume.jobs),
       education: resume.education,
       skills: resume.skills,
@@ -90,10 +88,6 @@ export function ResumeForm({
 
   function patchPerson<K extends keyof Draft["person"]>(key: K, value: Draft["person"][K]) {
     setDraft((prev) => ({ ...prev, person: { ...prev.person, [key]: value } }));
-  }
-
-  function patchTarget<K extends keyof Draft["target"]>(key: K, value: Draft["target"][K]) {
-    setDraft((prev) => ({ ...prev, target: { ...prev.target, [key]: value } }));
   }
 
   function patchJob(index: number, next: ResumeJob) {
@@ -211,20 +205,6 @@ export function ResumeForm({
               className={fieldClass}
             />
           </Field>
-          <Field label="Переезд">
-            <input
-              value={draft.person.relocation}
-              onChange={(e) => patchPerson("relocation", e.target.value)}
-              className={fieldClass}
-            />
-          </Field>
-          <Field label="Командировки">
-            <input
-              value={draft.person.businessTrips}
-              onChange={(e) => patchPerson("businessTrips", e.target.value)}
-              className={fieldClass}
-            />
-          </Field>
         </div>
       </Section>
 
@@ -236,47 +216,6 @@ export function ResumeForm({
           name="aboutHtml"
           onChange={(about) => setDraft((prev) => ({ ...prev, about }))}
         />
-      </Section>
-
-      <Section title="Желаемая должность">
-        <Field label="Должность">
-          <textarea
-            value={draft.target.title}
-            onChange={(e) => patchTarget("title", e.target.value)}
-            rows={2}
-            className={fieldClass}
-          />
-        </Field>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Тип занятости">
-            <input
-              value={draft.target.employmentType}
-              onChange={(e) => patchTarget("employmentType", e.target.value)}
-              className={fieldClass}
-            />
-          </Field>
-          <Field label="Формат работы">
-            <input
-              value={draft.target.workFormat}
-              onChange={(e) => patchTarget("workFormat", e.target.value)}
-              className={fieldClass}
-            />
-          </Field>
-          <Field label="Время в пути">
-            <input value={draft.target.commute} onChange={(e) => patchTarget("commute", e.target.value)} className={fieldClass} />
-          </Field>
-          <Field label="Зарплата">
-            <input value={draft.target.salary} onChange={(e) => patchTarget("salary", e.target.value)} className={fieldClass} />
-          </Field>
-          <Field label="Опыт работы (подпись)">
-            <input
-              value={draft.experienceLabel}
-              onChange={(e) => setDraft((prev) => ({ ...prev, experienceLabel: e.target.value }))}
-              placeholder="3 года 9 месяцев"
-              className={fieldClass}
-            />
-          </Field>
-        </div>
       </Section>
 
       <Section title="Опыт работы">

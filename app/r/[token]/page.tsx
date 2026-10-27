@@ -15,7 +15,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!resume) return { title: "Резюме не найдено", robots: { index: false, follow: false } };
   return {
     title: `${resume.person.fullName} — резюме`,
-    description: resume.target.title || `Резюме: ${resume.person.fullName}`,
+    description: resume.jobs[0]?.position
+      ? `${resume.person.fullName} — ${resume.jobs[0].position}`
+      : `Резюме: ${resume.person.fullName}`,
     robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
     alternates: { canonical: new URL(resumePublicPath(resume.token), site.url).toString() },
   };
