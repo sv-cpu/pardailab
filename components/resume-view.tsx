@@ -1,98 +1,93 @@
+import { AboutCopy } from "@/components/about-copy";
 import { ResumePrintButton } from "@/components/resume-print-button";
 import {
   formatBirthLine,
   formatJobDuration,
   formatJobPeriod,
   formatUpdatedAt,
+  sortJobsByDate,
   type Resume,
 } from "@/lib/resumes.shared";
 
-function Paragraphs({ text }: { text: string }) {
-  const parts = text
-    .split(/\n{2,}/)
-    .map((item) => item.trim())
-    .filter(Boolean);
-  if (!parts.length) return null;
-  return (
-    <div className="space-y-3">
-      {parts.map((part, index) => (
-        <p key={index} className="whitespace-pre-line text-[15px] leading-relaxed text-foreground/90">
-          {part}
-        </p>
-      ))}
-    </div>
-  );
-}
-
-function BulletList({ items, title }: { items: string[]; title?: string }) {
-  if (!items.length) return null;
-  return (
-    <div className="mt-4">
-      {title ? <p className="text-sm font-medium text-foreground">{title}</p> : null}
-      <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[15px] leading-relaxed text-foreground/90">
-        {items.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 function MetaLine({ children }: { children: React.ReactNode }) {
   return <p className="text-[15px] leading-relaxed text-muted-foreground">{children}</p>;
+}
+
+function initialOf(value: string) {
+  const letter = value.trim().slice(0, 1);
+  return letter ? letter.toLocaleUpperCase("ru-RU") : "?";
 }
 
 export function ResumeView({ resume }: { resume: Resume }) {
   const birth = formatBirthLine(resume.person);
   const updated = formatUpdatedAt(resume.updatedAt);
   const shortName = resume.person.fullName.split(/\s+/).slice(0, 2).join(" ");
+  const jobs = sortJobsByDate(resume.jobs);
 
   return (
     <article className="mx-auto max-w-3xl px-5 py-10 sm:px-8 sm:py-14 print:max-w-none print:px-0 print:py-0">
       <header className="border-b border-border pb-8">
-        <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">Резюме</p>
-        <h1 className="mt-3 font-heading text-4xl leading-tight tracking-tight text-balance sm:text-5xl">
-          {resume.person.fullName}
-        </h1>
-        {birth ? <p className="mt-3 text-[15px] text-muted-foreground">{birth}</p> : null}
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+          <div className="grid size-28 shrink-0 place-items-center overflow-hidden rounded-full bg-olive-soft text-olive sm:size-32">
+            {resume.photo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={resume.photo} alt="" className="size-full object-cover" />
+            ) : (
+              <span className="font-heading text-4xl">{initialOf(resume.person.fullName)}</span>
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-mono text-[11px] tracking-[0.16em] text-olive uppercase">Резюме</p>
+            <h1 className="mt-3 font-heading text-4xl leading-tight tracking-tight text-balance sm:text-5xl">
+              {resume.person.fullName}
+            </h1>
+            {birth ? <p className="mt-3 text-[15px] text-muted-foreground">{birth}</p> : null}
 
-        <div className="mt-6 space-y-1.5">
-          {resume.person.phone ? (
-            <MetaLine>
-              <a href={`tel:${resume.person.phone.replace(/[^\d+]/g, "")}`} className="text-foreground hover:text-olive">
-                {resume.person.phone}
-              </a>
-              {resume.person.phoneNote ? ` — ${resume.person.phoneNote}` : null}
-            </MetaLine>
-          ) : null}
-          {resume.person.email ? (
-            <MetaLine>
-              <a href={`mailto:${resume.person.email}`} className="text-foreground hover:text-olive">
-                {resume.person.email}
-              </a>
-            </MetaLine>
-          ) : null}
-          {resume.person.city ? <MetaLine>Проживает: {resume.person.city}</MetaLine> : null}
-          {resume.person.citizenship || resume.person.workPermit ? (
-            <MetaLine>
-              {[
-                resume.person.citizenship ? `Гражданство: ${resume.person.citizenship}` : "",
-                resume.person.workPermit ? `есть разрешение на работу: ${resume.person.workPermit}` : "",
-              ]
-                .filter(Boolean)
-                .join(", ")}
-            </MetaLine>
-          ) : null}
-          {resume.person.relocation || resume.person.businessTrips ? (
-            <MetaLine>
-              {[resume.person.relocation, resume.person.businessTrips].filter(Boolean).join(", ")}
-            </MetaLine>
-          ) : null}
+            <div className="mt-6 space-y-1.5">
+              {resume.person.phone ? (
+                <MetaLine>
+                  <a href={`tel:${resume.person.phone.replace(/[^\d+]/g, "")}`} className="text-foreground hover:text-olive">
+                    {resume.person.phone}
+                  </a>
+                  {resume.person.phoneNote ? ` — ${resume.person.phoneNote}` : null}
+                </MetaLine>
+              ) : null}
+              {resume.person.email ? (
+                <MetaLine>
+                  <a href={`mailto:${resume.person.email}`} className="text-foreground hover:text-olive">
+                    {resume.person.email}
+                  </a>
+                </MetaLine>
+              ) : null}
+              {resume.person.city ? <MetaLine>Проживает: {resume.person.city}</MetaLine> : null}
+              {resume.person.citizenship || resume.person.workPermit ? (
+                <MetaLine>
+                  {[
+                    resume.person.citizenship ? `Гражданство: ${resume.person.citizenship}` : "",
+                    resume.person.workPermit ? `есть разрешение на работу: ${resume.person.workPermit}` : "",
+                  ]
+                    .filter(Boolean)
+                    .join(", ")}
+                </MetaLine>
+              ) : null}
+              {resume.person.relocation || resume.person.businessTrips ? (
+                <MetaLine>
+                  {[resume.person.relocation, resume.person.businessTrips].filter(Boolean).join(", ")}
+                </MetaLine>
+              ) : null}
+            </div>
+          </div>
         </div>
       </header>
 
+      {resume.about ? (
+        <section className="border-b border-border py-8">
+          <h2 className="font-heading text-2xl tracking-tight">Обо мне</h2>
+          <AboutCopy text={resume.about} className="mt-5" />
+        </section>
+      ) : null}
+
       {(resume.target.title ||
-        resume.target.specializations.length ||
         resume.target.employmentType ||
         resume.target.workFormat ||
         resume.target.commute ||
@@ -103,16 +98,6 @@ export function ResumeView({ resume }: { resume: Resume }) {
             <p className="mt-4 text-lg leading-snug font-medium text-balance">{resume.target.title}</p>
           ) : null}
           {resume.target.salary ? <p className="mt-2 text-[15px] text-muted-foreground">{resume.target.salary}</p> : null}
-          {resume.target.specializations.length ? (
-            <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Специализации:</p>
-              <ul className="mt-2 space-y-1 text-[15px]">
-                {resume.target.specializations.map((item) => (
-                  <li key={item}>— {item}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
           <div className="mt-4 space-y-1 text-[15px] text-muted-foreground">
             {resume.target.employmentType ? <p>Тип занятости: {resume.target.employmentType}</p> : null}
             {resume.target.workFormat ? <p>Формат работы: {resume.target.workFormat}</p> : null}
@@ -121,7 +106,7 @@ export function ResumeView({ resume }: { resume: Resume }) {
         </section>
       )}
 
-      {resume.jobs.length ? (
+      {jobs.length ? (
         <section className="border-b border-border py-8">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <h2 className="font-heading text-2xl tracking-tight">Опыт работы</h2>
@@ -130,7 +115,7 @@ export function ResumeView({ resume }: { resume: Resume }) {
             ) : null}
           </div>
           <div className="mt-8 space-y-10">
-            {resume.jobs.map((job, index) => {
+            {jobs.map((job, index) => {
               const duration = formatJobDuration(job);
               return (
                 <div key={`${job.company}-${job.start}-${index}`} className="grid gap-4 sm:grid-cols-[11rem_1fr]">
@@ -146,13 +131,7 @@ export function ResumeView({ resume }: { resume: Resume }) {
                       </p>
                     ) : null}
                     {job.position ? <p className="mt-3 font-medium">{job.position}</p> : null}
-                    {job.summary ? (
-                      <div className="mt-3">
-                        <Paragraphs text={job.summary} />
-                      </div>
-                    ) : null}
-                    <BulletList title="Основные обязанности:" items={job.duties} />
-                    <BulletList title="Ключевые компетенции:" items={job.competencies} />
+                    {job.summary ? <AboutCopy text={job.summary} className="mt-3" /> : null}
                     {job.projects.length ? (
                       <div className="mt-4">
                         <p className="text-sm font-medium">Основные проекты</p>
@@ -218,10 +197,7 @@ export function ResumeView({ resume }: { resume: Resume }) {
           {resume.skills.length ? (
             <ul className="mt-5 flex flex-wrap gap-2">
               {resume.skills.map((skill) => (
-                <li
-                  key={skill}
-                  className="border border-border bg-card px-3 py-1.5 text-sm text-foreground"
-                >
+                <li key={skill} className="border border-border bg-card px-3 py-1.5 text-sm text-foreground">
                   {skill}
                 </li>
               ))}
@@ -251,15 +227,6 @@ export function ResumeView({ resume }: { resume: Resume }) {
           ) : null}
         </section>
       )}
-
-      {resume.about ? (
-        <section className="py-8">
-          <h2 className="font-heading text-2xl tracking-tight">Обо мне</h2>
-          <div className="mt-5">
-            <Paragraphs text={resume.about} />
-          </div>
-        </section>
-      ) : null}
 
       <footer className="border-t border-border pt-6 text-sm text-muted-foreground">
         <p>

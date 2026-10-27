@@ -3,11 +3,14 @@
 import { useMemo, useState } from "react";
 
 import { saveResumeAction } from "@/app/admin/resume-actions";
+import { AvatarField } from "@/components/admin/avatar-field";
+import { BioField } from "@/components/admin/bio-field";
 import {
   blankEducation,
   blankJob,
   blankResume,
   resumePublicUrl,
+  sortJobsByDate,
   type Resume,
   type ResumeEducation,
   type ResumeInput,
@@ -72,7 +75,7 @@ export function ResumeForm({
       person: resume.person,
       target: resume.target,
       experienceLabel: resume.experienceLabel,
-      jobs: resume.jobs,
+      jobs: sortJobsByDate(resume.jobs),
       education: resume.education,
       skills: resume.skills,
       languages: resume.languages,
@@ -123,7 +126,7 @@ export function ResumeForm({
   }
 
   return (
-    <form action={saveResumeAction} className="grid max-w-3xl gap-8">
+    <form action={saveResumeAction} encType="multipart/form-data" className="grid max-w-3xl gap-8">
       <input type="hidden" name="id" value={resume?.id ?? ""} />
       <input type="hidden" name="payload" value={payload} />
       {canAssignOwner ? <input type="hidden" name="ownerSlug" value={ownerSlug} /> : null}
@@ -151,6 +154,7 @@ export function ResumeForm({
       ) : null}
 
       <Section title="Личные данные">
+        <AvatarField photo={resume?.photo} fallback={draft.person.fullName || "Р"} />
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="ФИО">
             <input
@@ -224,20 +228,22 @@ export function ResumeForm({
         </div>
       </Section>
 
+      <Section title="О себе">
+        <BioField
+          key={resume?.id ?? "new-about"}
+          initial={draft.about}
+          label=""
+          name="aboutHtml"
+          onChange={(about) => setDraft((prev) => ({ ...prev, about }))}
+        />
+      </Section>
+
       <Section title="Желаемая должность">
         <Field label="Должность">
           <textarea
             value={draft.target.title}
             onChange={(e) => patchTarget("title", e.target.value)}
             rows={2}
-            className={fieldClass}
-          />
-        </Field>
-        <Field label="Специализации (по строке)">
-          <textarea
-            value={linesToText(draft.target.specializations)}
-            onChange={(e) => patchTarget("specializations", textToLines(e.target.value))}
-            rows={3}
             className={fieldClass}
           />
         </Field>
@@ -274,6 +280,7 @@ export function ResumeForm({
       </Section>
 
       <Section title="Опыт работы">
+        <p className="text-sm text-muted-foreground">На странице резюме места идут от новых к старым по дате начала.</p>
         {draft.jobs.map((job, index) => (
           <div key={index} className="grid gap-4 rounded-xl border border-border p-4">
             <div className="flex items-center justify-between gap-3">
@@ -288,22 +295,38 @@ export function ResumeForm({
               />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Начало (YYYY-MM)">
+              <Field label="Начало">
                 <input
+                  type="month"
                   value={job.start}
                   onChange={(e) => patchJob(index, { ...job, start: e.target.value })}
-                  placeholder="2024-11"
                   className={fieldClass}
                 />
               </Field>
-              <Field label="Окончание (пусто = настоящее время)">
-                <input
-                  value={job.end}
-                  onChange={(e) => patchJob(index, { ...job, end: e.target.value })}
-                  placeholder="2026-05"
-                  className={fieldClass}
-                />
-              </Field>
+              <div className="grid gap-2">
+                <Field label="Окончание">
+                  <input
+                    type="month"
+                    value={job.end}
+                    disabled={!job.end}
+                    onChange={(e) => patchJob(index, { ...job, end: e.target.value })}
+                    className={fieldClass}
+                  />
+                </Field>
+                <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    checked={!job.end}
+                    onChange={(e) =>
+                      patchJob(index, {
+                        ...job,
+                        end: e.target.checked ? "" : job.end || job.start || new Date().toISOString().slice(0, 7),
+                      })
+                    }
+                  />
+                  По настоящее время
+                </label>
+              </div>
               <Field label="Компания">
                 <input
                   value={job.company}
@@ -329,30 +352,13 @@ export function ResumeForm({
                 />
               </Field>
             </div>
-            <Field label="Описание">
-              <textarea
-                value={job.summary}
-                onChange={(e) => patchJob(index, { ...job, summary: e.target.value })}
-                rows={5}
-                className={fieldClass}
-              />
-            </Field>
-            <Field label="Обязанности (по строке)">
-              <textarea
-                value={linesToText(job.duties)}
-                onChange={(e) => patchJob(index, { ...job, duties: textToLines(e.target.value) })}
-                rows={4}
-                className={fieldClass}
-              />
-            </Field>
-            <Field label="Компетенции (по строке)">
-              <textarea
-                value={linesToText(job.competencies)}
-                onChange={(e) => patchJob(index, { ...job, competencies: textToLines(e.target.value) })}
-                rows={4}
-                className={fieldClass}
-              />
-            </Field>
+            <BioField
+              key={`job-summary-${index}-${job.start}-${job.company}`}
+              initial={job.summary}
+              label="Описание"
+              name={`job-summary-${index}`}
+              onChange={(summary) => patchJob(index, { ...job, summary })}
+            />
             <div className="grid gap-3">
               <p className="text-sm text-muted-foreground">Проекты</p>
               {job.projects.map((project, projectIndex) => (
@@ -530,17 +536,6 @@ export function ResumeForm({
             />
           </Field>
         </div>
-      </Section>
-
-      <Section title="О себе">
-        <Field label="Текст">
-          <textarea
-            value={draft.about}
-            onChange={(e) => setDraft((prev) => ({ ...prev, about: e.target.value }))}
-            rows={10}
-            className={fieldClass}
-          />
-        </Field>
       </Section>
 
       {canAssignOwner ? (
