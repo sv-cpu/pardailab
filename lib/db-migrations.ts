@@ -1,8 +1,9 @@
 import { ensureBenchmarks } from "@/lib/benchmarks";
+import { ensureResumes } from "@/lib/resumes";
 import { ensureRubrics } from "@/lib/rubrics";
 import { ensureUsers } from "@/lib/users";
 
-const CURRENT_SCHEMA_VERSION = 2;
+const CURRENT_SCHEMA_VERSION = 3;
 
 export function applyDatabaseMigrations(db: { exec: (sql: string) => void; prepare: (sql: string) => { get: (...params: unknown[]) => unknown; run: (...params: unknown[]) => unknown } }) {
   const versionRow = db.prepare("SELECT value FROM meta WHERE key = 'schema_version'").get() as { value?: string } | undefined;
@@ -29,4 +30,5 @@ export function applyDatabaseMigrations(db: { exec: (sql: string) => void; prepa
   ensureRubrics(db as never);
   ensureUsers(db as never);
   ensureBenchmarks(db as never);
+  ensureResumes(db as never);
 }
