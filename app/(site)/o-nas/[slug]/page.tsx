@@ -16,6 +16,7 @@ import {
   getAboutLab,
   type AboutDirectionSlug,
 } from "@/lib/about";
+import { mergeAboutProjects } from "@/lib/lab-projects";
 import { pageMeta } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -75,7 +76,7 @@ export default async function AboutDirectionPage({ params }: Props) {
         <AboutCopy text={direction.body} />
       </div>
 
-      {direction.slug === "proekty" ? <AboutProjectGrid projects={about.projects} /> : null}
+      {direction.slug === "proekty" ? <AboutProjectGrid projects={mergeAboutProjects(about.projects)} /> : null}
       {direction.slug === "razrabotki" ? <AboutDevelopmentGrid developments={about.developments} /> : null}
 
       <div className="mt-12 max-w-2xl border-t border-border pt-8">
