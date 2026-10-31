@@ -30,7 +30,7 @@ export function AboutProjectGrid({ projects }: { projects: AboutProject[] }) {
                 alt=""
                 fill
                 sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 100vw"
-                unoptimized={project.cover.startsWith("/uploads/")}
+                unoptimized={project.cover.startsWith("/uploads/") || project.cover.startsWith("/projects/")}
                 className="object-cover transition duration-500 group-hover:scale-[1.02]"
               />
             </div>

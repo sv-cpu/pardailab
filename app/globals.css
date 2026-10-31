@@ -236,6 +236,21 @@
   }
 }
 
+@keyframes lab-project-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lab-project-reveal {
+  animation: lab-project-reveal 0.7s ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

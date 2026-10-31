@@ -23,6 +23,7 @@ export function AboutProjectsAdmin({
           <h2 className="font-heading text-2xl tracking-tight">Карточки проектов</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Обложка, название, описание. Ссылка необязательна — без неё карточка просто показывается на странице.
+            Проект «Нижегородец Г6» уже задан в коде сайта и всегда виден на публичной витрине.
           </p>
         </div>
         <button

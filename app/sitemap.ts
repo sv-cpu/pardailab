@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 
 import { aboutDirectionSlugs } from "@/lib/about";
 import { getArticles } from "@/lib/cms";
+import { labProjectHref, labProjectSlugs } from "@/lib/lab-projects";
 import { articleHref } from "@/lib/paths";
 import { site } from "@/lib/site";
 
@@ -20,6 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/o-proekte",
     "/o-nas",
     ...aboutDirectionSlugs.map((slug) => `/o-nas/${slug}`),
+    ...labProjectSlugs().map((slug) => labProjectHref(slug)),
   ];
 
   return [
