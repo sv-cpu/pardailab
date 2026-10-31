@@ -29,7 +29,8 @@ describe("resumes", () => {
     assert.equal(resume.jobs.length, 6);
     assert.equal(resume.jobs[0].company, "АО «НПО РусБИТех»");
     assert.equal(resume.jobs[0].start, "2026-07");
-    assert.ok(!("specializations" in resume.target));
+    assert.ok(!("target" in resume));
+    assert.ok(!("relocation" in resume.person));
     assert.ok(!("duties" in resume.jobs[0]));
     assert.match(resume.jobs[0].summary, /<p>/);
     assert.equal(ageFromBirthDate("1975-02-06", new Date("2026-10-27T00:00:00Z")), 51);

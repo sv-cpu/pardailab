@@ -60,8 +60,8 @@ export default async function ResumesPage({
                   <Link href={`/admin/resumes/${item.id}`} className="font-heading text-2xl hover:text-olive">
                     {item.person.fullName}
                   </Link>
-                  {item.target.title ? (
-                    <p className="mt-1 max-w-xl text-sm text-muted-foreground">{item.target.title}</p>
+                  {item.jobs[0]?.position ? (
+                    <p className="mt-1 max-w-xl text-sm text-muted-foreground">{item.jobs[0].position}</p>
                   ) : null}
                   <p className="mt-2 font-mono text-xs text-muted-foreground">
                     {owner ? owner.name : item.ownerSlug}

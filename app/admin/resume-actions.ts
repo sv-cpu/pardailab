@@ -114,8 +114,6 @@ function asInput(parsed: unknown) {
   const resume = normalizeResume({ ...(parsed as object), ownerSlug: "form" });
   return {
     person: resume.person,
-    target: resume.target,
-    experienceLabel: resume.experienceLabel,
     jobs: resume.jobs,
     education: resume.education,
     skills: resume.skills,

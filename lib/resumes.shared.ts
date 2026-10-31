@@ -42,16 +42,6 @@ export interface ResumePerson {
   city: string;
   citizenship: string;
   workPermit: string;
-  relocation: string;
-  businessTrips: string;
-}
-
-export interface ResumeTarget {
-  title: string;
-  employmentType: string;
-  workFormat: string;
-  commute: string;
-  salary: string;
 }
 
 export interface ResumeDriving {
@@ -66,8 +56,6 @@ export interface Resume {
   updatedAt: string;
   photo?: string;
   person: ResumePerson;
-  target: ResumeTarget;
-  experienceLabel: string;
   jobs: ResumeJob[];
   education: ResumeEducation[];
   skills: string[];
@@ -124,18 +112,6 @@ function blankPerson(): ResumePerson {
     city: "",
     citizenship: "",
     workPermit: "",
-    relocation: "",
-    businessTrips: "",
-  };
-}
-
-function blankTarget(): ResumeTarget {
-  return {
-    title: "",
-    employmentType: "",
-    workFormat: "",
-    commute: "",
-    salary: "",
   };
 }
 
@@ -159,8 +135,6 @@ export function blankEducation(): ResumeEducation {
 export function blankResume(): ResumeInput {
   return {
     person: blankPerson(),
-    target: blankTarget(),
-    experienceLabel: "",
     jobs: [blankJob()],
     education: [blankEducation()],
     skills: [],
@@ -289,7 +263,6 @@ export function coerceResume(
 ): Resume {
   const raw = asObject(input);
   const personRaw = asObject(raw.person);
-  const targetRaw = asObject(raw.target);
   const drivingRaw = asObject(raw.driving);
   const ownerSlug = asString(raw.ownerSlug) || identity.ownerSlug || fallback?.ownerSlug || "";
   if (!ownerSlug) throw new Error("Укажите владельца резюме.");
@@ -303,17 +276,8 @@ export function coerceResume(
     city: asString(personRaw.city),
     citizenship: asString(personRaw.citizenship),
     workPermit: asString(personRaw.workPermit),
-    relocation: asString(personRaw.relocation),
-    businessTrips: asString(personRaw.businessTrips),
   };
   if (!person.fullName) throw new Error("Укажите ФИО.");
-  const target: ResumeTarget = {
-    title: asString(targetRaw.title),
-    employmentType: asString(targetRaw.employmentType),
-    workFormat: asString(targetRaw.workFormat),
-    commute: asString(targetRaw.commute),
-    salary: asString(targetRaw.salary),
-  };
   const photo = asString(raw.photo) || fallback?.photo || "";
   return {
     id: asString(raw.id) || identity.id,
@@ -322,8 +286,6 @@ export function coerceResume(
     updatedAt: asString(raw.updatedAt) || identity.updatedAt || fallback?.updatedAt || new Date().toISOString(),
     ...(photo ? { photo } : {}),
     person,
-    target,
-    experienceLabel: asString(raw.experienceLabel),
     jobs: asJobs(raw.jobs),
     education: asEducation(raw.education),
     skills: asLines(raw.skills),
@@ -461,17 +423,7 @@ export function sampleResumeInput(): ResumeInput {
       city: "Москва",
       citizenship: "Россия",
       workPermit: "Россия",
-      relocation: "Не готов к переезду",
-      businessTrips: "готов к командировкам",
     },
-    target: {
-      title: "Руководитель проектов в области БПЛА / БАС / Информационных систем",
-      employmentType: "полная занятость",
-      workFormat: "на месте работодателя",
-      commute: "не имеет значения",
-      salary: "",
-    },
-    experienceLabel: "3 года 9 месяцев",
     jobs: [
       {
         start: "2026-07",
