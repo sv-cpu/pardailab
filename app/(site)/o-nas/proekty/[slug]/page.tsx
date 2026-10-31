@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { LabProjectView } from "@/components/lab-project-view";
-import { getLabProject, labProjectHref, labProjectSlugs } from "@/lib/lab-projects";
+import { getAboutLab } from "@/lib/about";
+import { labProjectHref, labProjectSlugs, resolveLabProject } from "@/lib/lab-projects";
 import { pageMeta } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +16,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const project = getLabProject(slug);
+  const project = resolveLabProject(slug, getAboutLab().projects);
   if (!project) return {};
   return pageMeta({
     title: `${project.title} — Проекты`,
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function LabProjectPage({ params }: Props) {
   const { slug } = await params;
-  const project = getLabProject(slug);
+  const project = resolveLabProject(slug, getAboutLab().projects);
   if (!project) notFound();
   return <LabProjectView project={project} />;
 }

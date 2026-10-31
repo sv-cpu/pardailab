@@ -70,12 +70,19 @@ describe("about lab", () => {
           description: "Без ссылки.",
           cover: "/uploads/covers/00000000-0000-4000-8000-000000000002.jpg",
         },
+        {
+          id: "g6",
+          title: "Г6",
+          description: "Каталожная обложка.",
+          cover: "/projects/nizhegorodets-g6/cover.jpg",
+        },
         { id: "bad", title: "Плохой", description: "Нет", cover: "https://evil.example/x.jpg" },
       ],
     });
-    assert.equal(next.projects.length, 2);
+    assert.equal(next.projects.length, 3);
     assert.equal(next.projects[0]?.url, "https://example.com");
     assert.equal(next.projects[1]?.url, undefined);
+    assert.equal(next.projects[2]?.cover, "/projects/nizhegorodets-g6/cover.jpg");
   });
 
   it("keeps development cards with HTML body and drops incomplete ones", () => {

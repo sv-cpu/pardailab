@@ -6,6 +6,7 @@ import { AboutDirectionForm } from "@/components/admin/about-forms";
 import { AboutProjectsAdmin } from "@/components/admin/about-projects";
 import { Notice } from "@/components/admin/ui";
 import { getAboutDirection, getAboutLab } from "@/lib/about";
+import { labProjectSlugs, mergeAboutProjects } from "@/lib/lab-projects";
 import { requireEditor } from "@/lib/users";
 
 export default async function AboutDirectionAdminPage({
@@ -32,7 +33,13 @@ export default async function AboutDirectionAdminPage({
         </div>
       </div>
       <AboutDirectionForm direction={direction} action={saveAboutAction} />
-      {slug === "proekty" ? <AboutProjectsAdmin projects={about.projects} action={saveAboutProjectAction} /> : null}
+      {slug === "proekty" ? (
+        <AboutProjectsAdmin
+          projects={mergeAboutProjects(about.projects)}
+          catalogIds={labProjectSlugs()}
+          action={saveAboutProjectAction}
+        />
+      ) : null}
       {slug === "razrabotki" ? (
         <AboutDevelopmentsAdmin developments={about.developments} action={saveAboutDevelopmentAction} />
       ) : null}

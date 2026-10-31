@@ -234,6 +234,10 @@ export function labProjectSlugs() {
   return labProjects.map((item) => item.slug);
 }
 
+export function isCatalogLabProjectId(id: string) {
+  return labProjects.some((item) => item.id === id);
+}
+
 /** Карточки витрины «Проекты» из каталога лабораторных проектов. */
 export function labProjectsAsCards(): AboutProject[] {
   return labProjects.map((item) => ({
@@ -245,26 +249,50 @@ export function labProjectsAsCards(): AboutProject[] {
   }));
 }
 
+/** Страница проекта с учётом правок карточки из админки. */
+export function resolveLabProject(slug: string, adminProjects: AboutProject[] = []): LabProject | null {
+  const base = getLabProject(slug);
+  if (!base) return null;
+  const override = adminProjects.find((item) => item.id === base.id);
+  if (!override) return base;
+  return {
+    ...base,
+    title: override.title || base.title,
+    teaser: override.description || base.teaser,
+    cover: isLabProjectCover(override.cover) || isStoredUploadsCover(override.cover) ? override.cover : base.cover,
+  };
+}
+
 /**
- * Публичная витрина: сначала проекты из кода, затем карточки из админки.
- * Карточка админки с тем же id перекрывает каталожную.
+ * Витрина для сайта и админки.
+ * Порядок берём из админки, если карточки уже сохранены; каталожные без записи в БД
+ * добавляются в начало. Правки админки перекрывают дефолты каталога.
  */
 export function mergeAboutProjects(adminProjects: AboutProject[]): AboutProject[] {
   const curated = labProjectsAsCards();
-  const byId = new Map(adminProjects.map((item) => [item.id, item]));
-  const curatedIds = new Set(curated.map((item) => item.id));
-  const mergedCurated = curated.map((item) => {
-    const override = byId.get(item.id);
-    if (!override) return item;
-    return {
-      ...item,
-      ...override,
-      url: override.url || item.url,
-      cover: isLabProjectCover(override.cover) || isStoredUploadsCover(override.cover) ? override.cover : item.cover,
-    };
-  });
-  const extras = adminProjects.filter((item) => !curatedIds.has(item.id));
-  return [...mergedCurated, ...extras];
+  if (!adminProjects.length) return curated;
+
+  const curatedById = new Map(curated.map((item) => [item.id, item]));
+  const seen = new Set<string>();
+  const ordered: AboutProject[] = [];
+
+  for (const item of adminProjects) {
+    const base = curatedById.get(item.id);
+    if (base) {
+      ordered.push({
+        ...base,
+        ...item,
+        url: item.url || base.url,
+        cover: isLabProjectCover(item.cover) || isStoredUploadsCover(item.cover) ? item.cover : base.cover,
+      });
+    } else {
+      ordered.push(item);
+    }
+    seen.add(item.id);
+  }
+
+  const missing = curated.filter((item) => !seen.has(item.id));
+  return [...missing, ...ordered];
 }
 
 export function isLabProjectCover(value: string) {
