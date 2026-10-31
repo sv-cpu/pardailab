@@ -10,6 +10,7 @@ import {
 } from "@/lib/about.shared";
 import { isStoredCover } from "@/lib/covers";
 import { sanitizeArticleHtml } from "@/lib/html";
+import { isLabProjectCover } from "@/lib/lab-projects";
 
 export {
   aboutDirectionHref,
@@ -139,13 +140,17 @@ function cleanProjectUrl(value: unknown) {
   return undefined;
 }
 
+function isAboutProjectCover(value: string) {
+  return isStoredCover(value) || isLabProjectCover(value);
+}
+
 export function normalizeProject(raw: Partial<AboutProject> | null | undefined): AboutProject | null {
   if (!raw) return null;
   const id = cleanText(raw.id, 80);
   const title = cleanText(raw.title, 160);
   const description = cleanText(raw.description, 4000);
   const cover = cleanText(raw.cover, 300);
-  if (!id || !title || !description || !cover || !isStoredCover(cover)) return null;
+  if (!id || !title || !description || !cover || !isAboutProjectCover(cover)) return null;
   const url = cleanProjectUrl(raw.url);
   return { id, title, description, cover, ...(url ? { url } : {}) };
 }

@@ -3,11 +3,13 @@ import { describe, it } from "node:test";
 
 import {
   getLabProject,
+  isCatalogLabProjectId,
   isLabProjectCover,
   labProjectHref,
   labProjectsAsCards,
   labProjectSlugs,
   mergeAboutProjects,
+  resolveLabProject,
 } from "./lab-projects";
 
 describe("lab projects catalog", () => {
@@ -27,8 +29,14 @@ describe("lab projects catalog", () => {
     assert.equal(cards[0]?.url, "/o-nas/proekty/nizhegorodets-g6");
   });
 
-  it("merges curated cards ahead of admin cards and allows override by id", () => {
+  it("keeps admin order and overrides catalog fields by id", () => {
     const merged = mergeAboutProjects([
+      {
+        id: "other",
+        title: "Другой",
+        description: "Из админки.",
+        cover: "/uploads/covers/00000000-0000-4000-8000-000000000098.jpg",
+      },
       {
         id: "nizhegorodets-g6",
         title: "Г6 (правка)",
@@ -36,6 +44,15 @@ describe("lab projects catalog", () => {
         cover: "/uploads/covers/00000000-0000-4000-8000-000000000099.jpg",
         url: "/custom",
       },
+    ]);
+    assert.equal(merged.length, 2);
+    assert.equal(merged[0]?.id, "other");
+    assert.equal(merged[1]?.title, "Г6 (правка)");
+    assert.equal(merged[1]?.url, "/custom");
+  });
+
+  it("prepends catalog projects that are not yet saved in admin", () => {
+    const merged = mergeAboutProjects([
       {
         id: "other",
         title: "Другой",
@@ -43,9 +60,7 @@ describe("lab projects catalog", () => {
         cover: "/uploads/covers/00000000-0000-4000-8000-000000000098.jpg",
       },
     ]);
-    assert.equal(merged.length, 2);
-    assert.equal(merged[0]?.title, "Г6 (правка)");
-    assert.equal(merged[0]?.url, "/custom");
+    assert.equal(merged[0]?.id, "nizhegorodets-g6");
     assert.equal(merged[1]?.id, "other");
   });
 
@@ -53,5 +68,23 @@ describe("lab projects catalog", () => {
     assert.equal(isLabProjectCover("/projects/../etc/passwd.jpg"), false);
     assert.equal(isLabProjectCover("https://evil.example/x.jpg"), false);
     assert.equal(isLabProjectCover("/projects/nizhegorodets-g6/cover.jpg"), true);
+  });
+
+  it("marks catalog ids and applies admin overrides on the project page", () => {
+    assert.equal(isCatalogLabProjectId("nizhegorodets-g6"), true);
+    assert.equal(isCatalogLabProjectId("other"), false);
+    const resolved = resolveLabProject("nizhegorodets-g6", [
+      {
+        id: "nizhegorodets-g6",
+        title: "Г6 обновлён",
+        description: "Новый тизер.",
+        cover: "/uploads/covers/00000000-0000-4000-8000-000000000077.jpg",
+        url: "/o-nas/proekty/nizhegorodets-g6",
+      },
+    ]);
+    assert.equal(resolved?.title, "Г6 обновлён");
+    assert.equal(resolved?.teaser, "Новый тизер.");
+    assert.equal(resolved?.cover, "/uploads/covers/00000000-0000-4000-8000-000000000077.jpg");
+    assert.match(resolved?.lede ?? "", /Собственная конструкция/);
   });
 });

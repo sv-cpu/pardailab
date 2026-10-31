@@ -26,6 +26,7 @@ import { dropRemovedMedia } from "@/lib/media";
 import { dropArticleViews } from "@/lib/article-views";
 import { deleteRecord, listArticles, listModels, saveArticle, saveModel, saveService } from "@/lib/db";
 import { saveBenchmark, deleteBenchmark, type BenchmarkRow } from "@/lib/benchmarks";
+import { labProjectsAsCards, mergeAboutProjects } from "@/lib/lab-projects";
 import { saveRatingStamp } from "@/lib/rating";
 import { stampPublished } from "@/lib/format";
 import { transliterate } from "@/lib/rubric-seed";
@@ -484,13 +485,13 @@ export async function saveAboutProjectAction(formData: FormData) {
   const back = "/admin/about/proekty";
   const intent = String(formData.get("intent") ?? "save");
   const current = getAboutLab();
-  let projects = [...current.projects];
 
   try {
     if (intent === "delete") {
       const id = String(formData.get("id") ?? "");
-      const removed = projects.find((item) => item.id === id);
-      projects = projects.filter((item) => item.id !== id);
+      // Каталожный проект остаётся на витрине с дефолтами; из БД снимаем только правки.
+      const removed = current.projects.find((item) => item.id === id);
+      const projects = current.projects.filter((item) => item.id !== id);
       if (removed?.cover) await removeCover(removed.cover);
       saveAboutLab({ ...current, projects: normalizeProjects(projects) });
       publish();
@@ -500,6 +501,7 @@ export async function saveAboutProjectAction(formData: FormData) {
     if (intent === "move") {
       const id = String(formData.get("id") ?? "");
       const direction = String(formData.get("direction") ?? "");
+      const projects = mergeAboutProjects(current.projects);
       const index = projects.findIndex((item) => item.id === id);
       if (index < 0) redirect(`${back}?error=${encodeURIComponent("Проект не найден.")}`);
       const swap = direction === "up" ? index - 1 : index + 1;
@@ -513,9 +515,11 @@ export async function saveAboutProjectAction(formData: FormData) {
 
     if (intent === "save") {
       const id = String(formData.get("id") ?? "").trim() || randomUUID();
-      const existing = projects.find((item) => item.id === id);
+      const catalog = labProjectsAsCards().find((item) => item.id === id);
+      const existing = current.projects.find((item) => item.id === id) ?? catalog;
       const uploaded = await readCover(formData);
-      const cover = uploaded ?? existing?.cover ?? "";
+      const previousCover = String(formData.get("existingCover") ?? "") || existing?.cover || "";
+      const cover = uploaded ?? previousCover;
       const draft: AboutProject = {
         id,
         title: String(formData.get("title") ?? ""),
@@ -527,11 +531,14 @@ export async function saveAboutProjectAction(formData: FormData) {
       if (!project) {
         redirect(`${back}?error=${encodeURIComponent("Нужны название, описание и обложка (JPEG, PNG или WebP).")}`);
       }
-      if (existing) {
+      let projects = [...current.projects];
+      const stored = projects.find((item) => item.id === id);
+      if (stored) {
         projects = projects.map((item) => (item.id === id ? project : item));
-        if (uploaded && existing.cover && existing.cover !== project.cover) await removeCover(existing.cover);
+        if (uploaded && stored.cover && stored.cover !== project.cover) await removeCover(stored.cover);
       } else {
-        projects = [...projects, project];
+        // Первое сохранение каталожного или нового проекта — пишем в БД.
+        projects = mergeAboutProjects([...projects, project]).map((item) => (item.id === id ? project : item));
       }
       saveAboutLab({ ...current, projects: normalizeProjects(projects) });
       publish();

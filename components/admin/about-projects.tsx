@@ -8,13 +8,17 @@ import type { AboutProject } from "@/lib/about.shared";
 
 export function AboutProjectsAdmin({
   projects,
+  catalogIds = [],
   action,
 }: {
   projects: AboutProject[];
+  /** id каталожных проектов (совпадают со slug) — «Удалить» сбрасывает правки, а не убирает с витрины. */
+  catalogIds?: string[];
   action: (formData: FormData) => void | Promise<void>;
 }) {
   const [editing, setEditing] = useState<string | "new" | null>(null);
   const current = editing && editing !== "new" ? projects.find((item) => item.id === editing) : null;
+  const catalog = new Set(catalogIds);
 
   return (
     <section className="grid max-w-4xl gap-6 border-t border-border pt-10">
@@ -22,8 +26,9 @@ export function AboutProjectsAdmin({
         <div>
           <h2 className="font-heading text-2xl tracking-tight">Карточки проектов</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Обложка, название, описание. Ссылка необязательна — без неё карточка просто показывается на странице.
-            Проект «Нижегородец Г6» уже задан в коде сайта и всегда виден на публичной витрине.
+            Обложка, название, описание и ссылка. Каталожные проекты (например «Нижегородец Г6») можно править здесь —
+            изменения попадают на витрину и на страницу проекта. «Удалить» у каталожного проекта сбрасывает правки к
+            значениям по умолчанию.
           </p>
         </div>
         <button
@@ -48,6 +53,11 @@ export function AboutProjectsAdmin({
                   <p className="font-heading text-xl">{project.title}</p>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{project.description}</p>
                   {project.url ? <p className="mt-1 truncate font-mono text-xs text-olive">{project.url}</p> : null}
+                  {catalog.has(project.id) ? (
+                    <p className="mt-1 font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase">
+                      Каталог сайта
+                    </p>
+                  ) : null}
                 </div>
               </div>
               <div className="flex flex-wrap gap-3 text-sm">
@@ -78,7 +88,7 @@ export function AboutProjectsAdmin({
                   <input type="hidden" name="intent" value="delete" />
                   <input type="hidden" name="id" value={project.id} />
                   <button type="submit" className="text-muted-foreground hover:text-foreground">
-                    Удалить
+                    {catalog.has(project.id) ? "Сбросить" : "Удалить"}
                   </button>
                 </form>
               </div>
@@ -93,6 +103,7 @@ export function AboutProjectsAdmin({
           <form action={action} className="mt-5 grid gap-5">
             <input type="hidden" name="intent" value="save" />
             <input type="hidden" name="id" value={current?.id ?? ""} />
+            <input type="hidden" name="existingCover" value={current?.cover ?? ""} />
             <Field label="Название">
               <input name="title" defaultValue={current?.title ?? ""} required className={fieldClass} />
             </Field>
